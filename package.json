@@ -62,7 +62,7 @@
     "./location/schemas": { "types": "./dist/location/schemas/index.d.ts", "import": "./dist/location/schemas/index.js" },
     "./location/dtos": { "types": "./dist/location/dtos/index.d.ts", "import": "./dist/location/dtos/index.js" },
     "./subscription": { "types": "./dist/subscription/index.d.ts", "import": "./dist/subscription/index.js" },
-    "./http": { "types": "./dist/http/ResponseBase.d.ts", "import": "./dist/http/ResponseBase.js" },
+    "./http": { "types": "./dist/http/ResponseBase.d.ts", "import": "./dist/http/ResponseBase.js" }
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
