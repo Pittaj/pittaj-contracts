@@ -26,5 +26,4 @@ export * from './primitives';
 // ─── HTTP Response Types ────────────────────────────────────
 export * from './http/ResponseBase';
 
-// ─── Hono Context Types ─────────────────────────────────────
-export * from './hono';
+// ─── Hono Context Types ─── MOVIDOS a @pittaj/lib-server-types (solo backend)
