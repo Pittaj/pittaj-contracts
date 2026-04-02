@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/Pittaj/pittaj-contracts/compare/v1.3.1...v1.3.2) (2026-04-02)
+
+
+### Bug Fixes
+
+* install npm 11+ for trusted publishing OIDC support ([ff35d26](https://github.com/Pittaj/pittaj-contracts/commit/ff35d260e4591dd0d78bb0ce16f4f6c9246818bc))
+
 ## [1.3.1](https://github.com/Pittaj/pittaj-contracts/compare/v1.3.0...v1.3.1) (2026-04-02)
 
 
