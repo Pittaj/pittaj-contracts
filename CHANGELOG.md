@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/Pittaj/pittaj-contracts/compare/v1.2.0...v1.2.1) (2026-04-02)
+
+
+### Bug Fixes
+
+* combine release and publish workflows ([222807e](https://github.com/Pittaj/pittaj-contracts/commit/222807e27e27c9511c2af8754d7118160bbdf57a))
+
 ## [1.2.0](https://github.com/Pittaj/pittaj-contracts/compare/v1.1.1...v1.2.0) (2026-04-02)
 
 
