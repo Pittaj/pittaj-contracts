@@ -1,34 +1,94 @@
 {
   "name": "@pittaj/contracts",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Contratos compartidos de Pittaj ERP: schemas Zod, responses, constantes y primitivas.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
-
-    "./shared": { "types": "./dist/shared/index.d.ts", "import": "./dist/shared/index.js" },
-
-    "./auth": { "types": "./dist/auth/index.d.ts", "import": "./dist/auth/index.js" },
-    "./cash-closure": { "types": "./dist/cash-closure/index.d.ts", "import": "./dist/cash-closure/index.js" },
-    "./category": { "types": "./dist/category/index.d.ts", "import": "./dist/category/index.js" },
-    "./company": { "types": "./dist/company/index.d.ts", "import": "./dist/company/index.js" },
-    "./customer": { "types": "./dist/customer/index.d.ts", "import": "./dist/customer/index.js" },
-    "./license": { "types": "./dist/license/index.d.ts", "import": "./dist/license/index.js" },
-    "./location": { "types": "./dist/location/index.d.ts", "import": "./dist/location/index.js" },
-    "./payment-method": { "types": "./dist/payment-method/index.d.ts", "import": "./dist/payment-method/index.js" },
-    "./permission": { "types": "./dist/permission/index.d.ts", "import": "./dist/permission/index.js" },
-    "./pos-session": { "types": "./dist/pos-session/index.d.ts", "import": "./dist/pos-session/index.js" },
-    "./pos-ticket": { "types": "./dist/pos-ticket/index.d.ts", "import": "./dist/pos-ticket/index.js" },
-    "./product": { "types": "./dist/product/index.d.ts", "import": "./dist/product/index.js" },
-    "./role": { "types": "./dist/role/index.d.ts", "import": "./dist/role/index.js" },
-    "./sales-order": { "types": "./dist/sales-order/index.d.ts", "import": "./dist/sales-order/index.js" },
-    "./subscription": { "types": "./dist/subscription/index.d.ts", "import": "./dist/subscription/index.js" },
-    "./tenant": { "types": "./dist/tenant/index.d.ts", "import": "./dist/tenant/index.js" },
-    "./user": { "types": "./dist/user/index.d.ts", "import": "./dist/user/index.js" },
-    "./user-role": { "types": "./dist/user-role/index.d.ts", "import": "./dist/user-role/index.js" }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./shared": {
+      "types": "./dist/shared/index.d.ts",
+      "import": "./dist/shared/index.js"
+    },
+    "./auth": {
+      "types": "./dist/auth/index.d.ts",
+      "import": "./dist/auth/index.js"
+    },
+    "./cash-closure": {
+      "types": "./dist/cash-closure/index.d.ts",
+      "import": "./dist/cash-closure/index.js"
+    },
+    "./category": {
+      "types": "./dist/category/index.d.ts",
+      "import": "./dist/category/index.js"
+    },
+    "./company": {
+      "types": "./dist/company/index.d.ts",
+      "import": "./dist/company/index.js"
+    },
+    "./customer": {
+      "types": "./dist/customer/index.d.ts",
+      "import": "./dist/customer/index.js"
+    },
+    "./license": {
+      "types": "./dist/license/index.d.ts",
+      "import": "./dist/license/index.js"
+    },
+    "./location": {
+      "types": "./dist/location/index.d.ts",
+      "import": "./dist/location/index.js"
+    },
+    "./payment-method": {
+      "types": "./dist/payment-method/index.d.ts",
+      "import": "./dist/payment-method/index.js"
+    },
+    "./permission": {
+      "types": "./dist/permission/index.d.ts",
+      "import": "./dist/permission/index.js"
+    },
+    "./pos-session": {
+      "types": "./dist/pos-session/index.d.ts",
+      "import": "./dist/pos-session/index.js"
+    },
+    "./pos-ticket": {
+      "types": "./dist/pos-ticket/index.d.ts",
+      "import": "./dist/pos-ticket/index.js"
+    },
+    "./product": {
+      "types": "./dist/product/index.d.ts",
+      "import": "./dist/product/index.js"
+    },
+    "./role": {
+      "types": "./dist/role/index.d.ts",
+      "import": "./dist/role/index.js"
+    },
+    "./sales-order": {
+      "types": "./dist/sales-order/index.d.ts",
+      "import": "./dist/sales-order/index.js"
+    },
+    "./subscription": {
+      "types": "./dist/subscription/index.d.ts",
+      "import": "./dist/subscription/index.js"
+    },
+    "./tenant": {
+      "types": "./dist/tenant/index.d.ts",
+      "import": "./dist/tenant/index.js"
+    },
+    "./user": {
+      "types": "./dist/user/index.d.ts",
+      "import": "./dist/user/index.js"
+    },
+    "./user-role": {
+      "types": "./dist/user-role/index.d.ts",
+      "import": "./dist/user-role/index.js"
+    }
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
