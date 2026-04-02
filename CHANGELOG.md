@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/Pittaj/pittaj-contracts/compare/v1.3.0...v1.3.1) (2026-04-02)
+
+
+### Bug Fixes
+
+* use node 22 for trusted publishing compatibility ([5f8fac8](https://github.com/Pittaj/pittaj-contracts/commit/5f8fac86579ebf86074b9c13901fbd9aa9ba4ac7))
+
 ## [1.3.0](https://github.com/Pittaj/pittaj-contracts/compare/v1.2.2...v1.3.0) (2026-04-02)
 
 
