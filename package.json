@@ -1,7 +1,7 @@
 {
   "name": "@pittaj/contracts",
   "version": "1.1.1",
-  "description": "Contratos compartidos de Pittaj ERP: schemas Zod, DTOs, responses, constantes y primitivas.",
+  "description": "Contratos compartidos de Pittaj ERP: schemas Zod, responses, constantes y primitivas.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
