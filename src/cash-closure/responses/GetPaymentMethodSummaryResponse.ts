@@ -1,4 +1,4 @@
-import type { MoneyPrimitives } from '../../primitives';
+import type { MoneyPrimitives } from '../../shared';
 
 /** Resumen por método de pago. */
 export interface PaymentMethodSummary {

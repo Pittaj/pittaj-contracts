@@ -4,9 +4,9 @@
  * @version 1.0.0
  */
 
-import type { CashClosurePaymentSummaryPrimitives } from '../../primitives';
-import type { CashClosurePeriodPrimitives } from '../../primitives';
-import type { MoneyPrimitives } from '../../primitives';
+import type { CashClosurePaymentSummaryPrimitives } from '../primitives';
+import type { CashClosurePeriodPrimitives } from '../primitives';
+import type {MoneyPrimitives} from '../../shared';
 
 export interface CashClosureResponse {
     readonly id: string;

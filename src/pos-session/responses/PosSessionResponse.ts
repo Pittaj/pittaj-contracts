@@ -4,10 +4,10 @@
  * @version 1.0.0
  */
 
-import type { OpeningBalancePrimitives } from '../../primitives';
-import type { ClosingBalancePrimitives } from '../../primitives';
-import type { CashMovementPrimitives } from '../../primitives';
-import type { SessionSummaryPrimitives } from '../../primitives';
+import type { OpeningBalancePrimitives } from '../../shared';
+import type { ClosingBalancePrimitives } from '../../shared';
+import type { CashMovementPrimitives } from '../../shared';
+import type { SessionSummaryPrimitives } from '../primitives';
 
 export interface PosSessionResponse {
     readonly id: string;

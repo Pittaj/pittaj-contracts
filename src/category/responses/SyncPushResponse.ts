@@ -1,4 +1,4 @@
-import type { SyncBatchResult } from '../../primitives';
+import type { SyncBatchResult } from '../../shared';
 
 /**
  * Re-exportar el tipo de dominio como Response del Application Layer.

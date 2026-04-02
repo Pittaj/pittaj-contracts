@@ -3,7 +3,7 @@
  * @module Auth/Application/Commands/OAuthCallback
  */
 
-import type { AuthUserDto, AuthClaimsDto } from '../../primitives';
+import type { AuthUserPrimitives, AuthClaimsPrimitives } from '../primitives';
 
 /**
  * Resultado del procesamiento del callback OAuth.
@@ -14,9 +14,9 @@ export interface OAuthCallbackResponse {
     /** Refresh token para renovar sesión. */
     readonly refreshToken: string;
     /** Información del usuario. */
-    readonly user: AuthUserDto;
+    readonly user: AuthUserPrimitives;
     /** Claims del usuario incluidos en el JWT. */
-    readonly claims: AuthClaimsDto;
+    readonly claims: AuthClaimsPrimitives;
     /** Timestamp de expiración del access token. */
     readonly expiresAt: number;
     /** URL del frontend a la que redirigir. */

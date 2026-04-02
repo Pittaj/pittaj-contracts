@@ -7,8 +7,8 @@
  * Usado como base por todos los mapeos de respuesta.
  */
 
-import type { PosTicketLinePrimitives } from '../../primitives';
-import type { PosTicketPaymentPrimitives } from '../../primitives';
+import type { PosTicketLinePrimitives } from '../primitives';
+import type { PosTicketPaymentPrimitives } from '../primitives';
 
 /**
  * Response DTO para ticket POS individual.
