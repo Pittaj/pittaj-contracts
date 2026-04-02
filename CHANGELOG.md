@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/Pittaj/pittaj-contracts/compare/v1.2.2...v1.3.0) (2026-04-02)
+
+
+### Features
+
+* switch to trusted publishing ([25539cd](https://github.com/Pittaj/pittaj-contracts/commit/25539cde14c5f22c78d55a297c182696e3586c47))
+
 ## [1.2.2](https://github.com/Pittaj/pittaj-contracts/compare/v1.2.1...v1.2.2) (2026-04-02)
 
 
