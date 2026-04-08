@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.4](https://github.com/Pittaj/pittaj-contracts/compare/v1.4.3...v1.4.4) (2026-04-08)
+
+
+### Bug Fixes
+
+* corregir workflow de publicación npm ([729737a](https://github.com/Pittaj/pittaj-contracts/commit/729737a5c319a112d7c4d21e0f132744bdf3e819))
+
 ## [1.4.3](https://github.com/Pittaj/pittaj-contracts/compare/v1.4.2...v1.4.3) (2026-04-08)
 
 
