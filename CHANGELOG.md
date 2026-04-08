@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.2](https://github.com/Pittaj/pittaj-contracts/compare/v1.4.1...v1.4.2) (2026-04-08)
+
+
+### Bug Fixes
+
+* deleted  NPM_TOKEN unnecesary ([db46d94](https://github.com/Pittaj/pittaj-contracts/commit/db46d9433a093c8e25661a09aad2dbad012ec9e5))
+
 ## [1.4.1](https://github.com/Pittaj/pittaj-contracts/compare/v1.4.0...v1.4.1) (2026-04-08)
 
 
