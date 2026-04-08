@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.3](https://github.com/Pittaj/pittaj-contracts/compare/v1.4.2...v1.4.3) (2026-04-08)
+
+
+### Bug Fixes
+
+* quitar registry-url ([c5a88b6](https://github.com/Pittaj/pittaj-contracts/commit/c5a88b669e0263b7c4fff3a8841777698b84821a))
+
 ## [1.4.2](https://github.com/Pittaj/pittaj-contracts/compare/v1.4.1...v1.4.2) (2026-04-08)
 
 
