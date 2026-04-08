@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.5](https://github.com/Pittaj/pittaj-contracts/compare/v1.4.4...v1.4.5) (2026-04-08)
+
+
+### Bug Fixes
+
+* eliminar :authtoken ([a5ae7eb](https://github.com/Pittaj/pittaj-contracts/commit/a5ae7eb3df7221a160a13bab6c2ab0905d74b485))
+
 ## [1.4.4](https://github.com/Pittaj/pittaj-contracts/compare/v1.4.3...v1.4.4) (2026-04-08)
 
 
