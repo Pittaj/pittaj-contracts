@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.8](https://github.com/Pittaj/pittaj-contracts/compare/v1.4.7...v1.4.8) (2026-04-08)
+
+
+### Bug Fixes
+
+* added node 24 version ([16ab779](https://github.com/Pittaj/pittaj-contracts/commit/16ab77901160e3eb114831bcc7af23bf77eac5eb))
+
 ## [1.4.7](https://github.com/Pittaj/pittaj-contracts/compare/v1.4.6...v1.4.7) (2026-04-08)
 
 
