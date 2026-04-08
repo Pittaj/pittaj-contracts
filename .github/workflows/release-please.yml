@@ -45,4 +45,7 @@ jobs:
           node-version: 22
           registry-url: https://registry.npmjs.org
 
+      # Eliminar _authToken que setup-node inyecta, para que npm use OIDC (Trusted Publisher)
+      - run: sed -i '/_authToken/d' ~/.npmrc
+
       - run: npm publish --provenance --access public
