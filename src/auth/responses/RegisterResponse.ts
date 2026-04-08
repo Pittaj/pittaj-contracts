@@ -2,7 +2,7 @@
 export interface RegisterResponse {
     readonly userId: string;
     readonly email: string;
-    readonly tenantId: string | null;
+    readonly tenantId?: string;
     readonly requiresEmailVerification: boolean;
     readonly message: string;
 }
