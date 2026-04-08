@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/Pittaj/pittaj-contracts/compare/v1.4.0...v1.4.1) (2026-04-08)
+
+
+### Bug Fixes
+
+* CI (release-please.yml) ([fb9c1f2](https://github.com/Pittaj/pittaj-contracts/commit/fb9c1f250ab7100daf4224875f2c5b0cc9b8a478))
+
 ## [1.4.0](https://github.com/Pittaj/pittaj-contracts/compare/v1.3.2...v1.4.0) (2026-04-08)
 
 
