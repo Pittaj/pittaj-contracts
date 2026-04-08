@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/Pittaj/pittaj-contracts/compare/v1.3.2...v1.4.0) (2026-04-08)
+
+
+### Features
+
+* **auth:** agregar response types para endpoints de autenticación ([9307624](https://github.com/Pittaj/pittaj-contracts/commit/9307624ef3cac7fa70e5be4a13e7ca51702bcb90))
+
 ## [1.3.2](https://github.com/Pittaj/pittaj-contracts/compare/v1.3.1...v1.3.2) (2026-04-02)
 
 
