@@ -67,7 +67,7 @@ export const createCategorySchema = z.object({
      * - Online: Cliente NO envía ID, servidor lo genera
      * - Offline → Sync: Cliente envía ID generado localmente
      */
-    id: z.string().uuid('El id debe ser un UUID válido').optional(),
+    id: z.string().uuid('El id debe ser un UUID válido'),
 
     /**
      * Nombre de la categoría (2-100 caracteres).

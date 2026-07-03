@@ -73,13 +73,14 @@ export const CreateRoleSchema = z
 
     /**
      * Nombre del rol.
-     * 
-     * Requerido, único por tenant, 2-100 caracteres.
+     *
+     * Requerido, único por tenant, 2-50 caracteres
+     * (el VO de dominio RoleName limita a 50; antes el schema permitía 100).
      */
     name: z
       .string({ required_error: ERROR_MESSAGES.NAME_REQUIRED })
       .min(2, { message: ERROR_MESSAGES.NAME_TOO_SHORT })
-      .max(100, { message: ERROR_MESSAGES.NAME_TOO_LONG })
+      .max(50, { message: ERROR_MESSAGES.NAME_TOO_LONG })
       .regex(NAME_REGEX, { message: ERROR_MESSAGES.NAME_INVALID_FORMAT })
       .trim(),
 

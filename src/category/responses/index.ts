@@ -3,6 +3,7 @@ export * from './CategoryMetadataResponse';
 export * from './CategoryResponse';
 export * from './CategoryTreeResponse';
 export * from './CreateCategoryResponse';
+export * from './PaginatedCategoriesResult';
 export * from './SyncPullResponse';
 export * from './SyncPushResponse';
 export * from './UpdateCategoryResponse';

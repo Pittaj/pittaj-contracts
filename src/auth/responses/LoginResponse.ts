@@ -7,4 +7,5 @@ export interface LoginResponse {
     readonly expiresAt: number;
     readonly user: AuthUserPrimitives;
     readonly claims: AuthClaimsPrimitives;
+    readonly mustChangePassword: boolean;
 }

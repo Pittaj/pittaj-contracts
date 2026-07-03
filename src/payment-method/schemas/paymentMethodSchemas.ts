@@ -73,6 +73,7 @@ export const createDefaultsSchema = z.object({
 export const updatePaymentMethodSchema = z.object({
     version: z.number().int().min(1),
     name: z.string().min(LIMITS.MIN_NAME_LENGTH).max(LIMITS.MAX_NAME_LENGTH).optional(),
+    type: paymentMethodTypeEnum.optional(),
     displayOrder: z.number().int().min(LIMITS.MIN_DISPLAY_ORDER).max(LIMITS.MAX_DISPLAY_ORDER).optional(),
     config: paymentMethodConfigSchema.optional(),
 });

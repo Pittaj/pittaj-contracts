@@ -161,7 +161,7 @@ export const CreateLocationSchema = z.object({
    * - Servidor respeta el ID del cliente
    * - Si no se proporciona, servidor genera uno nuevo
    */
-  id: z.string().uuid().optional(),
+  id: z.string().uuid(),
 
   /**
    * ID de la company propietaria (UUID v4).

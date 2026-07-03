@@ -67,7 +67,7 @@ export const categoryIdParamSchema = z.object({
  * Crear una nueva categoría.
  */
 export const createCategorySchema = z.object({
-    id: z.string().uuid('El id debe ser un UUID válido').optional(),
+    id: z.string().uuid('El id debe ser un UUID válido'),
     name: z
         .string()
         .min(2, 'El nombre debe tener al menos 2 caracteres')
@@ -245,4 +245,46 @@ export const syncPullSchema = z.object({
     lastSyncedAt: z.string().datetime().optional(),
     limit: z.number().optional(),
     offset: z.number().optional(),
+});
+
+// ============================================================
+// COMMANDS - Schemas adicionales
+// ============================================================
+
+/**
+ * PATCH /api/categories/:id/status
+ * Cambiar el estado de una categoría.
+ */
+export const changeCategoryStatusSchema = z.object({
+    newStatus: CategoryStatusEnum,
+    reason: z
+        .string()
+        .min(1, 'La razón debe tener al menos 1 carácter')
+        .max(500, 'La razón no debe exceder 500 caracteres')
+        .trim(),
+    version: z
+        .number()
+        .int('La versión debe ser un número entero')
+        .min(0, 'La versión no puede ser negativa'),
+});
+
+/**
+ * PATCH /api/categories/:id/move
+ * Mover una categoría a una nueva posición en el árbol.
+ */
+export const moveCategorySchema = z.object({
+    newParentId: z
+        .string()
+        .uuid('El newParentId debe ser un UUID válido')
+        .nullable(),
+    reason: z
+        .string()
+        .min(1, 'La razón debe tener al menos 1 carácter')
+        .max(500, 'La razón no debe exceder 500 caracteres')
+        .trim()
+        .optional(),
+    version: z
+        .number()
+        .int('La versión debe ser un número entero')
+        .min(0, 'La versión no puede ser negativa'),
 });

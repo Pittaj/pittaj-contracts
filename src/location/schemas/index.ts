@@ -6,4 +6,6 @@
  */
 
 export { CreateLocationSchema, type CreateLocationRequest } from './createLocation.schema';
+export { updateLocationSchema, type UpdateLocationRequest } from './updateLocation.schema';
 export { GetLocationsSchema, type GetLocationsQuery } from './getLocations.schema';
+export { locationIdParamSchema, type LocationIdParam } from './getLocationById.schema';

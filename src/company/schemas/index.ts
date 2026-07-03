@@ -6,4 +6,6 @@
  */
 
 export { CreateCompanySchema, type CreateCompanyRequest } from './createCompany.schema';
+export { updateCompanySchema, type UpdateCompanyRequest } from './updateCompany.schema';
 export { GetCompaniesSchema, type GetCompaniesQuery } from './getCompanies.schema';
+export { companyIdParamSchema, type CompanyIdParam } from './getCompanyById.schema';

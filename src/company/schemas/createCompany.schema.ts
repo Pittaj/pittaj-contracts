@@ -52,7 +52,7 @@ export const CreateCompanySchema = z.object({
    * - Servidor respeta el ID del cliente
    * - Si no se proporciona, servidor genera uno nuevo
    */
-  id: z.string().uuid().optional(),
+  id: z.string().uuid(),
 
   /**
    * Nombre comercial de la empresa.
@@ -69,27 +69,28 @@ export const CreateCompanySchema = z.object({
     .trim(),
 
   /**
-   * Nombre legal completo de la empresa.
-   * 
-   * Requisitos:
-   * - Longitud: 2-200 caracteres
-   * - Nombre registrado legalmente (Razón Social)
-   * 
+   * Nombre legal completo de la empresa (Razón Social).
+   *
+   * Opcional: puede capturarse después (p.ej. al configurar CFDI).
+   * Si se envía, longitud 2-200 caracteres.
+   *
    * @example "Comercializadora El Sol S.A. de C.V."
    */
   legalName: z.string()
     .min(2, 'El nombre legal debe tener al menos 2 caracteres')
     .max(200, 'El nombre legal no puede exceder 200 caracteres')
-    .trim(),
+    .trim()
+    .nullish(),
 
   /**
    * Identificación fiscal (RUC, NIF, RFC, EIN, etc.).
-   * 
-   * Requisitos:
+   *
+   * Opcional: puede capturarse después (p.ej. al configurar CFDI).
+   * Si se envía:
    * - Formato alfanumérico con guiones opcionales
    * - Longitud: 8-20 caracteres
    * - Único por tenant
-   * 
+   *
    * @example
    * - Ecuador: "1792146739001" (RUC)
    * - España: "12345678A" (NIF)
@@ -99,7 +100,8 @@ export const CreateCompanySchema = z.object({
   taxId: z.string()
     .regex(TAX_ID_REGEX, 'Tax ID debe ser alfanumérico (8-20 caracteres)')
     .trim()
-    .toUpperCase(),
+    .toUpperCase()
+    .nullish(),
 
   /**
    * Indica si es la empresa por defecto del tenant.

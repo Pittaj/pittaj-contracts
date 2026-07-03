@@ -49,6 +49,15 @@ export const GetUsersSchema = z.object({
     .optional(),
 
   /**
+   * Filtrar por estado exacto del usuario.
+   *
+   * Query param: ?status=ACTIVE | INACTIVE | BLOCKED
+   *
+   * Más preciso que isActive (que colapsa INACTIVE y BLOCKED).
+   */
+  status: z.enum(['ACTIVE', 'INACTIVE', 'BLOCKED']).optional(),
+
+  /**
    * Término de búsqueda.
    * 
    * Query param: ?search=juan

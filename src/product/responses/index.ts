@@ -1,4 +1,5 @@
 export * from './CreateProductResponse';
+export * from './PaginatedProductsResult';
 export * from './ProductCursorResponse';
 export * from './ProductListResponse';
 export * from './ProductResponse';

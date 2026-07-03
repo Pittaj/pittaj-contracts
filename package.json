@@ -10,84 +10,148 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
       "import": "./dist/index.js"
     },
     "./shared": {
-      "types": "./dist/shared/index.d.ts",
+      "types": "./src/shared/index.ts",
       "import": "./dist/shared/index.js"
     },
     "./auth": {
-      "types": "./dist/auth/index.d.ts",
+      "types": "./src/auth/index.ts",
       "import": "./dist/auth/index.js"
     },
     "./cash-closure": {
-      "types": "./dist/cash-closure/index.d.ts",
+      "types": "./src/cash-closure/index.ts",
       "import": "./dist/cash-closure/index.js"
     },
     "./category": {
-      "types": "./dist/category/index.d.ts",
+      "types": "./src/category/index.ts",
       "import": "./dist/category/index.js"
     },
     "./company": {
-      "types": "./dist/company/index.d.ts",
+      "types": "./src/company/index.ts",
       "import": "./dist/company/index.js"
     },
     "./customer": {
-      "types": "./dist/customer/index.d.ts",
+      "types": "./src/customer/index.ts",
       "import": "./dist/customer/index.js"
     },
     "./license": {
-      "types": "./dist/license/index.d.ts",
+      "types": "./src/license/index.ts",
       "import": "./dist/license/index.js"
     },
     "./location": {
-      "types": "./dist/location/index.d.ts",
+      "types": "./src/location/index.ts",
       "import": "./dist/location/index.js"
     },
+    "./onboarding": {
+      "types": "./src/onboarding/index.ts",
+      "import": "./dist/onboarding/index.js"
+    },
+    "./onboarding/schemas": {
+      "types": "./src/onboarding/schemas/index.ts",
+      "import": "./dist/onboarding/schemas/index.js"
+    },
+    "./onboarding/primitives": {
+      "types": "./src/onboarding/primitives/index.ts",
+      "import": "./dist/onboarding/primitives/index.js"
+    },
+    "./onboarding/responses": {
+      "types": "./src/onboarding/responses/index.ts",
+      "import": "./dist/onboarding/responses/index.js"
+    },
     "./payment-method": {
-      "types": "./dist/payment-method/index.d.ts",
+      "types": "./src/payment-method/index.ts",
       "import": "./dist/payment-method/index.js"
     },
     "./permission": {
-      "types": "./dist/permission/index.d.ts",
+      "types": "./src/permission/index.ts",
       "import": "./dist/permission/index.js"
     },
     "./pos-session": {
-      "types": "./dist/pos-session/index.d.ts",
+      "types": "./src/pos-session/index.ts",
       "import": "./dist/pos-session/index.js"
     },
     "./pos-ticket": {
-      "types": "./dist/pos-ticket/index.d.ts",
+      "types": "./src/pos-ticket/index.ts",
       "import": "./dist/pos-ticket/index.js"
     },
     "./product": {
-      "types": "./dist/product/index.d.ts",
+      "types": "./src/product/index.ts",
       "import": "./dist/product/index.js"
     },
     "./role": {
-      "types": "./dist/role/index.d.ts",
+      "types": "./src/role/index.ts",
       "import": "./dist/role/index.js"
     },
-    "./sales-order": {
-      "types": "./dist/sales-order/index.d.ts",
-      "import": "./dist/sales-order/index.js"
-    },
-    "./subscription": {
-      "types": "./dist/subscription/index.d.ts",
-      "import": "./dist/subscription/index.js"
-    },
-    "./tenant": {
-      "types": "./dist/tenant/index.d.ts",
-      "import": "./dist/tenant/index.js"
+    "./role-permission": {
+      "types": "./src/role-permission/index.ts",
+      "import": "./dist/role-permission/index.js"
     },
     "./user": {
-      "types": "./dist/user/index.d.ts",
+      "types": "./src/user/index.ts",
       "import": "./dist/user/index.js"
     },
     "./user-role": {
-      "types": "./dist/user-role/index.d.ts",
+      "types": "./src/user-role/index.ts",
       "import": "./dist/user-role/index.js"
+    },
+    "./sales-order": {
+      "types": "./src/sales-order/index.ts",
+      "import": "./dist/sales-order/index.js"
+    },
+"./tenant": {
+      "types": "./src/tenant/index.ts",
+      "import": "./dist/tenant/index.js"
+    },
+    "./admin-user": {
+      "types": "./src/admin-user/index.ts",
+      "import": "./dist/admin-user/index.js"
+    },
+    "./plan": {
+      "types": "./src/plan/index.ts",
+      "import": "./dist/plan/index.js"
+    },
+    "./subscription": {
+      "types": "./src/subscription/index.ts",
+      "import": "./dist/subscription/index.js"
+    },
+    "./invoice": {
+      "types": "./src/invoice/index.ts",
+      "import": "./dist/invoice/index.js"
+    },
+    "./payment": {
+      "types": "./src/payment/index.ts",
+      "import": "./dist/payment/index.js"
+    },
+    "./feature-flag": {
+      "types": "./src/feature-flag/index.ts",
+      "import": "./dist/feature-flag/index.js"
+    },
+    "./usage-limit": {
+      "types": "./src/usage-limit/index.ts",
+      "import": "./dist/usage-limit/index.js"
+    },
+    "./coupon": {
+      "types": "./src/coupon/index.ts",
+      "import": "./dist/coupon/index.js"
+    },
+    "./audit-log": {
+      "types": "./src/audit-log/index.ts",
+      "import": "./dist/audit-log/index.js"
+    },
+    "./admin-role": {
+      "types": "./src/admin-role/index.ts",
+      "import": "./dist/admin-role/index.js"
+    },
+    "./saas-metrics": {
+      "types": "./src/saas-metrics/index.ts",
+      "import": "./dist/saas-metrics/index.js"
+    },
+    "./platform-config": {
+      "types": "./src/platform-config/index.ts",
+      "import": "./dist/platform-config/index.js"
     }
   },
   "scripts": {
@@ -96,7 +160,7 @@
     "prepublishOnly": "bun run build"
   },
   "dependencies": {
-    "zod": "^3.23.0"
+    "zod": "3.23.8"
   },
   "devDependencies": {
     "typescript": "^5.6.2"

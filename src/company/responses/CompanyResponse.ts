@@ -44,13 +44,15 @@ export interface CompanyResponse {
 
   /**
    * Nombre legal completo (Razón Social).
+   * Null si aún no se captura.
    */
-  readonly legalName: string;
+  readonly legalName: string | null;
 
   /**
    * Identificación fiscal (RUC, NIF, RFC, EIN).
+   * Null si aún no se captura.
    */
-  readonly taxId: string;
+  readonly taxId: string | null;
 
   /**
    * Indica si es la empresa por defecto del tenant.

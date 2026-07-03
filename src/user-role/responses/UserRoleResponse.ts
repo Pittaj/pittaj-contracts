@@ -34,9 +34,9 @@ export interface UserRoleResponse {
   tenantId: string;
 
   /**
-   * Fecha de creación.
+   * Fecha de creación (ISO 8601 — en el wire JSON siempre llega como string).
    */
-  createdAt: Date;
+  createdAt: string;
 
   /**
    * ID del usuario que creó la asignación.

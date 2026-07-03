@@ -64,7 +64,12 @@ export interface UserResponse {
   readonly avatarUrl?: string;
 
   /**
-   * Indica si el usuario está activo.
+   * Estado del usuario (ACTIVE | INACTIVE | BLOCKED).
+   */
+  readonly status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED';
+
+  /**
+   * Indica si el usuario está activo (derivado de status === 'ACTIVE').
    */
   readonly isActive: boolean;
 

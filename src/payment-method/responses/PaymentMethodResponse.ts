@@ -13,6 +13,11 @@ export interface PaymentMethodResponse {
     readonly status: string;
     readonly config: PaymentMethodConfigPrimitives;
     readonly displayOrder: number;
+    /**
+     * Método gestionado por el sistema (defaults de Pittaj).
+     * No se puede eliminar, solo desactivar.
+     */
+    readonly isSystemManaged: boolean;
     readonly tenantId: string;
     readonly createdAt: Date;
     readonly createdBy: string | null;
