@@ -109,6 +109,10 @@
       "types": "./src/document-series/index.ts",
       "import": "./dist/document-series/index.js"
     },
+    "./department": {
+      "types": "./src/department/index.ts",
+      "import": "./dist/department/index.js"
+    },
     "./user": {
       "types": "./src/user/index.ts",
       "import": "./dist/user/index.js"
