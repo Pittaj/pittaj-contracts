@@ -4,7 +4,8 @@
  * Modelo de negocio (decisión 2026-07-03): precio único con COBRO POR
  * SUCURSAL — sin planes por niveles. El estimado mensual es
  * sucursales activas × precio por sucursal (setting billing.price-per-location,
- * preliminar hasta que exista integración de pagos).
+ * $399 MXN IVA incluido por decisión 2026-07-04; incluye 100 timbres
+ * CFDI/mes, timbres adicionales por paquete).
  *
  * @module Contracts/SubscriptionSummary
  */
@@ -30,7 +31,7 @@ export interface SubscriptionUsage {
 export interface SubscriptionBilling {
     /** Sucursales activas: la base del cobro. */
     readonly activeLocations: number;
-    /** Precio por sucursal/mes (setting billing.price-per-location). */
+    /** Precio por sucursal/mes, IVA incluido (setting billing.price-per-location). */
     readonly pricePerLocation: number;
     readonly currency: 'MXN';
     /** activeLocations × pricePerLocation. */
