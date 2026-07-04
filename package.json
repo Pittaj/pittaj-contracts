@@ -97,6 +97,10 @@
       "types": "./src/tenant-settings/index.ts",
       "import": "./dist/tenant-settings/index.js"
     },
+    "./subscription-summary": {
+      "types": "./src/subscription-summary/index.ts",
+      "import": "./dist/subscription-summary/index.js"
+    },
     "./document-series": {
       "types": "./src/document-series/index.ts",
       "import": "./dist/document-series/index.js"
