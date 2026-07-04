@@ -101,6 +101,10 @@
       "types": "./src/subscription-summary/index.ts",
       "import": "./dist/subscription-summary/index.js"
     },
+    "./audit": {
+      "types": "./src/audit/index.ts",
+      "import": "./dist/audit/index.js"
+    },
     "./document-series": {
       "types": "./src/document-series/index.ts",
       "import": "./dist/document-series/index.js"
