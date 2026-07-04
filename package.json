@@ -89,6 +89,18 @@
       "types": "./src/role-permission/index.ts",
       "import": "./dist/role-permission/index.js"
     },
+    "./tax": {
+      "types": "./src/tax/index.ts",
+      "import": "./dist/tax/index.js"
+    },
+    "./tenant-settings": {
+      "types": "./src/tenant-settings/index.ts",
+      "import": "./dist/tenant-settings/index.js"
+    },
+    "./document-series": {
+      "types": "./src/document-series/index.ts",
+      "import": "./dist/document-series/index.js"
+    },
     "./user": {
       "types": "./src/user/index.ts",
       "import": "./dist/user/index.js"
