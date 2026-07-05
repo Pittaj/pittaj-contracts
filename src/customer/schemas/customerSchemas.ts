@@ -6,6 +6,7 @@
 
 import { z } from 'zod';
 import { CUSTOMER_CONSTANTS } from '../constants';
+import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync';
 
 
 const { LIMITS, TYPES, STATUSES } = CUSTOMER_CONSTANTS;
@@ -30,18 +31,6 @@ const customerAddressSchema = z.object({
     state: z.string().min(1).max(LIMITS.MAX_ADDRESS_LINE_LENGTH),
     postalCode: z.string().min(1).max(LIMITS.MAX_POSTAL_CODE_LENGTH),
     country: z.string().min(1).max(LIMITS.MAX_ADDRESS_LINE_LENGTH),
-});
-
-/** Schema para cambios de sincronización */
-const syncChangeSchema = z.object({
-    id: z.string().uuid(),
-    entityType: z.string().min(1),
-    operation: z.enum(['create', 'update', 'delete', 'upsert']),
-    data: z.record(z.unknown()).optional(),
-    version: z.number().int(),
-    localTimestamp: z.coerce.date(),
-    deviceId: z.string().optional(),
-    tenantId: z.string().uuid(),
 });
 
 // ============================================================
@@ -154,17 +143,8 @@ export const searchForPosSchema = z.object({
 // SYNC
 // ============================================================
 
-/** POST /api/customers/sync/push */
-export const syncPushCustomerSchema = z.object({
-    tenantId: z.string().uuid(),
-    deviceId: z.string().min(1),
-    changes: z.array(syncChangeSchema).min(1),
-});
+/** POST /api/customers/sync/push — deriva del canónico src/sync */
+export const syncPushCustomerSchema = syncPushRequestSchema;
 
-/** POST /api/customers/sync/pull */
-export const syncPullCustomerSchema = z.object({
-    tenantId: z.string().uuid(),
-    lastSyncedAt: z.string().datetime().optional(),
-    limit: z.number().int().min(1).max(1000).optional(),
-    offset: z.number().int().min(0).optional(),
-});
+/** POST /api/customers/sync/pull — deriva del canónico src/sync */
+export const syncPullCustomerSchema = syncPullRequestSchema;

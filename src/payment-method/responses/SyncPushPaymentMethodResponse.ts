@@ -1,19 +1,14 @@
 /**
  * @fileoverview Response del comando SyncPush de PaymentMethod
  * @module SyncPushPaymentMethodResponse
- * @version 1.0.0
+ * @version 2.0.0
+ *
+ * Deriva del response genérico canónico de src/sync (compat: se
+ * conservan los nombres exportados existentes).
  */
 
-export interface SyncPushItemResult {
-    readonly id: string;
-    readonly success: boolean;
-    readonly operation: 'create' | 'update' | 'delete' | 'upsert';
-    readonly error?: string;
-}
+import type { SyncPushResponse, SyncPushItemResult } from '../../sync';
 
-export interface SyncPushPaymentMethodResponse {
-    readonly processed: number;
-    readonly succeeded: number;
-    readonly failed: number;
-    readonly results: SyncPushItemResult[];
-}
+export type { SyncPushItemResult };
+
+export type SyncPushPaymentMethodResponse = SyncPushResponse;

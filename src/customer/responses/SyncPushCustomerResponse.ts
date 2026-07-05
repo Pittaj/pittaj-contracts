@@ -1,19 +1,14 @@
 /**
  * @fileoverview Response del comando SyncPush de Customer
  * @module SyncPushCustomerResponse
- * @version 1.0.0
+ * @version 2.0.0
+ *
+ * Deriva del response genérico canónico de src/sync (compat: se
+ * conservan los nombres exportados existentes).
  */
 
-export interface SyncPushItemResult {
-    readonly id: string;
-    readonly success: boolean;
-    readonly operation: 'create' | 'update' | 'delete' | 'upsert';
-    readonly error?: string;
-}
+import type { SyncPushResponse, SyncPushItemResult } from '../../sync';
 
-export interface SyncPushCustomerResponse {
-    readonly processed: number;
-    readonly succeeded: number;
-    readonly failed: number;
-    readonly results: SyncPushItemResult[];
-}
+export type { SyncPushItemResult };
+
+export type SyncPushCustomerResponse = SyncPushResponse;

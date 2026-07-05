@@ -6,6 +6,7 @@
 
 import { z } from 'zod';
 import { PAYMENT_METHOD_CONSTANTS } from '../constants';
+import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync';
 
 
 const { LIMITS, TYPES, STATUSES } = PAYMENT_METHOD_CONSTANTS;
@@ -20,18 +21,6 @@ const paymentMethodConfigSchema = z.object({
     requiresCustomer: z.boolean().default(false),
     requiresReference: z.boolean().default(false),
     commission: z.number().min(0).max(LIMITS.MAX_COMMISSION_PERCENT).default(0),
-});
-
-/** Schema para cambios de sincronización */
-const syncChangeSchema = z.object({
-    id: z.string().uuid(),
-    entityType: z.string().min(1),
-    operation: z.enum(['create', 'update', 'delete', 'upsert']),
-    data: z.record(z.unknown()).optional(),
-    version: z.number().int(),
-    localTimestamp: z.coerce.date(),
-    deviceId: z.string().optional(),
-    tenantId: z.string().uuid(),
 });
 
 // ============================================================
@@ -105,17 +94,8 @@ export const getPaymentMethodsSchema = z.object({
 // SYNC
 // ============================================================
 
-/** POST /api/payment-methods/sync/push */
-export const syncPushPaymentMethodSchema = z.object({
-    tenantId: z.string().uuid(),
-    deviceId: z.string().min(1),
-    changes: z.array(syncChangeSchema).min(1),
-});
+/** POST /api/payment-methods/sync/push — deriva del canónico src/sync */
+export const syncPushPaymentMethodSchema = syncPushRequestSchema;
 
-/** POST /api/payment-methods/sync/pull */
-export const syncPullPaymentMethodSchema = z.object({
-    tenantId: z.string().uuid(),
-    lastSyncedAt: z.string().datetime().optional(),
-    limit: z.number().int().min(1).max(1000).optional(),
-    offset: z.number().int().min(0).optional(),
-});
+/** POST /api/payment-methods/sync/pull — deriva del canónico src/sync */
+export const syncPullPaymentMethodSchema = syncPullRequestSchema;
