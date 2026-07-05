@@ -5,3 +5,5 @@
 
 export type { TaxResponse } from './TaxResponse';
 export type { CreateTaxResponse } from './CreateTaxResponse';
+export type { SyncPushTaxResponse, SyncPushItemResult } from './SyncPushTaxResponse';
+export type { SyncPullTaxResponse } from './SyncPullTaxResponse';

@@ -6,3 +6,4 @@
 export * from './createTax.schema';
 export * from './taxIdParam.schema';
 export * from './getTaxes.schema';
+export { syncPushTaxSchema, syncPullTaxSchema } from './syncTax.schema';
