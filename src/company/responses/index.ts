@@ -5,3 +5,5 @@
 
 export type { CompanyResponse } from './CompanyResponse';
 export type { CreateCompanyResponse } from './CreateCompanyResponse';
+export type { SyncPushCompanyResponse, SyncPushItemResult } from './SyncPushCompanyResponse';
+export type { SyncPullCompanyResponse } from './SyncPullCompanyResponse';
