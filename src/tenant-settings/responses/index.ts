@@ -4,3 +4,12 @@
  */
 
 export type { TenantSettingsResponse } from './TenantSettingsResponse';
+export type {
+    SyncSettingsSkipReason,
+    SyncPushSettingsItemResult,
+    SyncPushSettingsResponse,
+} from './SyncPushSettingsResponse';
+export type {
+    SyncPullSettingsEntry,
+    SyncPullSettingsResponse,
+} from './SyncPullSettingsResponse';

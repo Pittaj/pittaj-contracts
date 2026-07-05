@@ -4,3 +4,4 @@
  */
 
 export * from './tenantSettings.schema';
+export * from './syncTenantSettings.schema';
