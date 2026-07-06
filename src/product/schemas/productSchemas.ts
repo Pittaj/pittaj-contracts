@@ -49,8 +49,7 @@ const productInventoryConfigSchema = z.object({
  * Campos con defaults para coincidir con ProductTaxInfoPrimitives.
  */
 const productTaxInfoSchema = z.object({
-    taxType: z.enum(['IVA_16', 'IVA_8', 'IVA_0', 'EXENTO', 'IEPS']).default('IVA_16'),
-    taxIncluded: z.boolean().default(true),
+    taxId: z.string().uuid().default('22222222-2222-2222-2222-222222222221'),
     satProductCode: z.string().nullable().default(null),
     satUnitCode: z.string().nullable().default(null),
 });
