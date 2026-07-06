@@ -12,8 +12,13 @@ import { z } from 'zod';
 
 /**
  * Operaciones de sincronización válidas.
+ *
+ * Incluye `upsert` (espejo del protocolo canónico @pittaj/contracts/sync): el
+ * desktop emite `upsert` para todo cambio que no sea borrado, y el servicio lo
+ * aplica de forma idempotente (crea o actualiza según exista) — evita que un
+ * re-push del mismo cambio reviente por conflicto de PK.
  */
-export const SyncOperationEnum = z.enum(['create', 'update', 'delete']);
+export const SyncOperationEnum = z.enum(['create', 'update', 'delete', 'upsert']);
 
 /**
  * Esquema para un cambio individual en sync push.
