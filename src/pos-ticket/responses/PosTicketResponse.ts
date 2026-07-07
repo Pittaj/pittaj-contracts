@@ -9,6 +9,7 @@
 
 import type { PosTicketLinePrimitives } from '../primitives';
 import type { PosTicketPaymentPrimitives } from '../primitives';
+import type { PosTicketPromotionPrimitives } from '../primitives';
 
 /**
  * Response DTO para ticket POS individual.
@@ -26,6 +27,7 @@ export interface PosTicketResponse {
   readonly customerId: string | null;
   readonly lines: PosTicketLinePrimitives[];
   readonly payments: PosTicketPaymentPrimitives[];
+  readonly promotions: PosTicketPromotionPrimitives[];
   readonly subtotalAmount: number;
   readonly discountAmount: number;
   readonly taxAmount: number;

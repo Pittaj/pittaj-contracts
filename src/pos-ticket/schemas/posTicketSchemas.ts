@@ -129,3 +129,34 @@ export const lineIdParamSchema = z.object({
   id: z.string().uuid('El ID debe ser un UUID valido'),
   lineId: z.string().uuid('El lineId debe ser un UUID valido'),
 });
+
+// ============================================================
+// SYNC
+// ============================================================
+
+/** Schema de un cambio individual de sincronización (Desktop → Cloud). */
+const syncChangeSchema = z.object({
+  id: z.string().uuid(),
+  entityType: z.string().min(1),
+  operation: z.enum(['create', 'update', 'delete', 'upsert']),
+  data: z.record(z.unknown()).optional(),
+  version: z.number().int(),
+  localTimestamp: z.coerce.date(),
+  deviceId: z.string().optional(),
+  tenantId: z.string().uuid(),
+});
+
+/** POST /api/pos-tickets/sync/push — Sincroniza cambios locales hacia el servidor. */
+export const syncPushPosTicketSchema = z.object({
+  tenantId: z.string().uuid(),
+  deviceId: z.string().min(1),
+  changes: z.array(syncChangeSchema).min(1),
+});
+
+/** POST /api/pos-tickets/sync/pull — Obtiene cambios desde el servidor. */
+export const syncPullPosTicketSchema = z.object({
+  tenantId: z.string().uuid(),
+  lastSyncedAt: z.string().datetime().optional(),
+  limit: z.number().int().min(1).max(1000).optional(),
+  offset: z.number().int().min(0).optional(),
+});

@@ -7,3 +7,5 @@ export * from './PosTicketListResponse';
 export * from './PosTicketResponse';
 export * from './RemoveLineFromTicketResponse';
 export * from './UpdateLineQuantityResponse';
+export * from './SyncPullPosTicketResponse';
+export * from './SyncPushPosTicketResponse';
