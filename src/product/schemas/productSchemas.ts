@@ -312,7 +312,7 @@ export const getProductsSchema = z.object({
     maxPrice: z.coerce.number().min(0).optional(),
     tags: z.string().optional(),
     unitOfMeasure: z.string().optional(),
-    taxType: z.string().optional(),
+    taxId: z.string().optional(),
     sortBy: productSortFieldEnum.optional(),
     sortOrder: sortDirectionEnum.optional(),
 });
@@ -353,7 +353,7 @@ export const getProductsCursorSchema = z.object({
     maxPrice: z.coerce.number().min(0).optional(),
     tags: z.string().optional(),
     unitOfMeasure: z.string().optional(),
-    taxType: z.string().optional(),
+    taxId: z.string().optional(),
     sortBy: productSortFieldEnum.optional(),
     sortDir: sortDirectionEnum.optional(),
 });

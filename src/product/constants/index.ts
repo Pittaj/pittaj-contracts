@@ -120,14 +120,6 @@ export const PRODUCT_CONSTANTS = {
     },
   } as const,
 
-  TAX_TYPES: {
-    IVA_16: { value: 'IVA_16', rate: 0.16, label: 'IVA 16%' },
-    IVA_8: { value: 'IVA_8', rate: 0.08, label: 'IVA 8%' },
-    IVA_0: { value: 'IVA_0', rate: 0.0, label: 'IVA 0%' },
-    EXENTO: { value: 'EXENTO', rate: 0.0, label: 'Exento' },
-    IEPS: { value: 'IEPS', rate: 0.0, label: 'IEPS (variable)' },
-  } as const,
-
   UNITS_OF_MEASURE: {
     UNIT: { value: 'UNIT', label: 'Pieza', allowsFractional: false },
     KG: { value: 'KG', label: 'Kilogramo', allowsFractional: true },
