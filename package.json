@@ -105,6 +105,10 @@
       "types": "./src/purchase/index.ts",
       "import": "./dist/purchase/index.js"
     },
+    "./inventory": {
+      "types": "./src/inventory/index.ts",
+      "import": "./dist/inventory/index.js"
+    },
     "./tenant-settings": {
       "types": "./src/tenant-settings/index.ts",
       "import": "./dist/tenant-settings/index.js"
