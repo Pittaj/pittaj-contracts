@@ -37,6 +37,10 @@ export interface CategoryResponse {
     readonly parentId: string | null;
     readonly displayOrder: number;
     readonly attributes: Record<string, any> | null;
+    /** Color hex del botón POS (del desktop; null si no se capturó). */
+    readonly color: string | null;
+    /** Descripción libre (del desktop). */
+    readonly description: string | null;
     readonly path: string;
     readonly level: number;
     readonly createdAt: Date;
