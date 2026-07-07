@@ -101,6 +101,10 @@
       "types": "./src/price-list/index.ts",
       "import": "./dist/price-list/index.js"
     },
+    "./purchase": {
+      "types": "./src/purchase/index.ts",
+      "import": "./dist/purchase/index.js"
+    },
     "./tenant-settings": {
       "types": "./src/tenant-settings/index.ts",
       "import": "./dist/tenant-settings/index.js"
