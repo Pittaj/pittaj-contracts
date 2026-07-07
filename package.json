@@ -97,6 +97,10 @@
       "types": "./src/tax/index.ts",
       "import": "./dist/tax/index.js"
     },
+    "./price-list": {
+      "types": "./src/price-list/index.ts",
+      "import": "./dist/price-list/index.js"
+    },
     "./tenant-settings": {
       "types": "./src/tenant-settings/index.ts",
       "import": "./dist/tenant-settings/index.js"
