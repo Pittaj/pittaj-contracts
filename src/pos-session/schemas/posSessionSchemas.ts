@@ -118,7 +118,10 @@ export const syncPushPosSessionSchema = z.object({
     changes: z.array(syncChangeSchema).min(1),
 });
 
+/** POST /api/pos-sessions/sync/pull */
 export const syncPullPosSessionsSchema = z.object({
-    page: z.number().int().min(1).optional(),
+    tenantId: z.string().uuid(),
+    lastSyncedAt: z.string().datetime().optional(),
     limit: z.number().int().min(1).max(1000).optional(),
+    offset: z.number().int().min(0).optional(),
 });
