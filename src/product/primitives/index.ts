@@ -3,3 +3,4 @@ export type { ProductInventoryConfigPrimitives } from './ProductInventoryConfigP
 export type { ProductPosConfigPrimitives } from './ProductPosConfigPrimitives';
 export type { ProductPricePrimitives } from './ProductPricePrimitives';
 export type { ProductTaxInfoPrimitives } from './ProductTaxInfoPrimitives';
+export type { ProductUnitPrimitives } from './ProductUnitPrimitives';

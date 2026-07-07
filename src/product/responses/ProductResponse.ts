@@ -11,6 +11,7 @@ import type { ProductPricePrimitives } from '../primitives';
 import type { ProductInventoryConfigPrimitives } from '../primitives';
 import type { ProductTaxInfoPrimitives } from '../primitives';
 import type { ProductPosConfigPrimitives } from '../primitives';
+import type { ProductUnitPrimitives } from '../primitives';
 import type { AttributeValue } from '../primitives';
 
 /**
@@ -37,6 +38,8 @@ export interface ProductResponse {
     readonly canBeSold: boolean;
     /** Aparece en búsquedas de compra; false = no se compra (del desktop). */
     readonly canBePurchased: boolean;
+    /** Unidades de venta alternas (del desktop). */
+    readonly units: ProductUnitPrimitives[];
     readonly tags: string[];
     readonly weight: number | null;
     readonly attributes: Record<string, AttributeValue>;
