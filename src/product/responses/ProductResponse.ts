@@ -31,6 +31,12 @@ export interface ProductResponse {
     readonly status: string;
     readonly price: ProductPricePrimitives;
     readonly description: string | null;
+    /** Descripción corta (del desktop). */
+    readonly shortDescription: string | null;
+    /** Aparece en búsquedas de venta; false = insumo (del desktop). */
+    readonly canBeSold: boolean;
+    /** Aparece en búsquedas de compra; false = no se compra (del desktop). */
+    readonly canBePurchased: boolean;
     readonly tags: string[];
     readonly weight: number | null;
     readonly attributes: Record<string, AttributeValue>;
