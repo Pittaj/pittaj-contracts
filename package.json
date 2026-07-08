@@ -105,6 +105,10 @@
       "types": "./src/purchase/index.ts",
       "import": "./dist/purchase/index.js"
     },
+    "./promotion": {
+      "types": "./src/promotion/index.ts",
+      "import": "./dist/promotion/index.js"
+    },
     "./inventory": {
       "types": "./src/inventory/index.ts",
       "import": "./dist/inventory/index.js"
