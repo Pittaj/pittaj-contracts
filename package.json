@@ -117,6 +117,10 @@
       "types": "./src/register/index.ts",
       "import": "./dist/register/index.js"
     },
+    "./credit-note": {
+      "types": "./src/credit-note/index.ts",
+      "import": "./dist/credit-note/index.js"
+    },
     "./inventory": {
       "types": "./src/inventory/index.ts",
       "import": "./dist/inventory/index.js"
