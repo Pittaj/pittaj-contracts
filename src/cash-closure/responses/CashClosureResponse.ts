@@ -17,6 +17,11 @@ export interface CashClosureResponse {
     readonly posSessionId: string;
     readonly locationId: string;
     readonly userId: string;
+    /**
+     * Folio secuencial del cierre (CLS-######), generado por el desktop.
+     * `null` en filas creadas en la nube o previas a la migración del campo.
+     */
+    readonly sequence: number | null;
     readonly openingFund: MoneyPrimitives;
     readonly paymentSummaries: CashClosurePaymentSummaryPrimitives[];
     readonly notes: string | null;
