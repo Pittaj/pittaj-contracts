@@ -12,3 +12,6 @@ export * from './SyncPullStockItemResponse';
 export * from './SyncPushStockItemResponse';
 export * from './SyncPullStockMovementResponse';
 export * from './SyncPushStockMovementResponse';
+export * from './GetWarehousesResponse';
+export * from './GetStockItemsResponse';
+export * from './GetStockMovementsResponse';
