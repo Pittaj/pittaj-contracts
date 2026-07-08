@@ -74,6 +74,12 @@ export const addPaymentSchema = z.object({
   version: z.number().int().min(0),
 });
 
+/** POST /api/pos-tickets/:id/customer — Asignar/cambiar cliente del ticket (null = cliente de mostrador). */
+export const assignCustomerSchema = z.object({
+  customerId: z.string().uuid().nullable(),
+  version: z.number().int().min(0),
+});
+
 /** POST /api/pos-tickets/:id/complete — Completar ticket. */
 export const completePosTicketSchema = z.object({
   version: z.number().int().min(0),

@@ -1,5 +1,6 @@
 export * from './AddLineToTicketResponse';
 export * from './AddPaymentToTicketResponse';
+export * from './AssignCustomerToTicketResponse';
 export * from './CompletePosTicketResponse';
 export * from './CreatePosTicketResponse';
 export * from './DailySummaryResponse';
