@@ -29,6 +29,10 @@
       "types": "./src/category/index.ts",
       "import": "./dist/category/index.js"
     },
+    "./cashier": {
+      "types": "./src/cashier/index.ts",
+      "import": "./dist/cashier/index.js"
+    },
     "./company": {
       "types": "./src/company/index.ts",
       "import": "./dist/company/index.js"
