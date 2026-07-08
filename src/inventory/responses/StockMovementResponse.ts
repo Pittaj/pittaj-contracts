@@ -34,6 +34,14 @@ export interface StockMovementResponse {
     readonly id: string;
     /** Producto (soft ref al catálogo). */
     readonly productId: string;
+    /**
+     * Nombre del producto resuelto en la nube (proyección de lectura acotada a la
+     * página; null = producto no encontrado). NO viaja en el round-trip de sync
+     * (el desktop ignora este campo enriquecido).
+     */
+    readonly productName: string | null;
+    /** Código del producto resuelto en la nube (null = no encontrado). */
+    readonly productCode?: string | null;
     /** Bodega (soft ref al catálogo de bodegas). */
     readonly warehouseId: string;
     readonly direction: MovementDirection;
