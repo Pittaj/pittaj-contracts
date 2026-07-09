@@ -157,6 +157,10 @@
       "types": "./src/sales-order/index.ts",
       "import": "./dist/sales-order/index.js"
     },
+    "./sales-return": {
+      "types": "./src/sales-return/index.ts",
+      "import": "./dist/sales-return/index.js"
+    },
 "./tenant": {
       "types": "./src/tenant/index.ts",
       "import": "./dist/tenant/index.js"
