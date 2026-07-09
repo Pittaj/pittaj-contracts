@@ -161,6 +161,10 @@
       "types": "./src/sales-return/index.ts",
       "import": "./dist/sales-return/index.js"
     },
+    "./layaway": {
+      "types": "./src/layaway/index.ts",
+      "import": "./dist/layaway/index.js"
+    },
 "./tenant": {
       "types": "./src/tenant/index.ts",
       "import": "./dist/tenant/index.js"
