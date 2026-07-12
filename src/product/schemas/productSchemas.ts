@@ -73,6 +73,17 @@ const productPosConfigSchema = z.object({
 });
 
 /**
+ * Schema de una unidad de venta alterna (multi-UoM).
+ * Coincide con ProductUnitPrimitives (tabla product_units).
+ */
+const productUnitSchema = z.object({
+    name: z.string().min(1).max(50),
+    factor: z.number().positive(),
+    price: z.number().min(0).nullable().optional(),
+    barcode: z.string().max(LIMITS.MAX_BARCODE_LENGTH).nullable().optional(),
+});
+
+/**
  * Schema para cambios de sincronización.
  * Coincide con SyncChange<unknown> de @pittaj/module-shared.
  */
@@ -177,6 +188,11 @@ export const createProductSchema = z.object({
         .max(LIMITS.MAX_DESCRIPTION_LENGTH)
         .nullable()
         .optional(),
+    shortDescription: z
+        .string()
+        .max(255)
+        .nullable()
+        .optional(),
     tags: z
         .array(z.string().max(LIMITS.MAX_TAG_LENGTH))
         .max(LIMITS.MAX_TAGS)
@@ -187,6 +203,9 @@ export const createProductSchema = z.object({
         .max(LIMITS.MAX_WEIGHT)
         .nullable()
         .optional(),
+    canBeSold: z.boolean().optional(),
+    canBePurchased: z.boolean().optional(),
+    units: z.array(productUnitSchema).optional(),
     attributes: z.record(attributeValueSchema).optional(),
     inventoryConfig: productInventoryConfigSchema.optional(),
     taxInfo: productTaxInfoSchema.optional(),
@@ -223,6 +242,11 @@ export const updateProductSchema = z.object({
         .max(LIMITS.MAX_DESCRIPTION_LENGTH)
         .nullable()
         .optional(),
+    shortDescription: z
+        .string()
+        .max(255)
+        .nullable()
+        .optional(),
     tags: z
         .array(z.string().max(LIMITS.MAX_TAG_LENGTH))
         .max(LIMITS.MAX_TAGS)
@@ -233,6 +257,9 @@ export const updateProductSchema = z.object({
         .max(LIMITS.MAX_WEIGHT)
         .nullable()
         .optional(),
+    canBeSold: z.boolean().optional(),
+    canBePurchased: z.boolean().optional(),
+    units: z.array(productUnitSchema).optional(),
     attributes: z.record(attributeValueSchema).optional(),
     inventoryConfig: productInventoryConfigSchema.optional(),
     taxInfo: productTaxInfoSchema.optional(),

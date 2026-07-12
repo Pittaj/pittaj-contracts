@@ -86,6 +86,16 @@ export const createCategorySchema = z.object({
         .max(999999, 'El orden no debe exceder 999999')
         .optional(),
     status: CategoryStatusEnum.optional(),
+    color: z
+        .string()
+        .max(20, 'El color no debe exceder 20 caracteres')
+        .nullable()
+        .optional(),
+    description: z
+        .string()
+        .max(500, 'La descripción no debe exceder 500 caracteres')
+        .nullable()
+        .optional(),
     attributes: z.record(z.unknown()).optional(),
     deviceId: z
         .string()
@@ -128,6 +138,16 @@ export const updateCategorySchema = z.object({
         .int('El orden debe ser un número entero')
         .min(0, 'El orden no puede ser negativo')
         .max(999999, 'El orden no debe exceder 999999')
+        .optional(),
+    color: z
+        .string()
+        .max(20, 'El color no debe exceder 20 caracteres')
+        .nullable()
+        .optional(),
+    description: z
+        .string()
+        .max(500, 'La descripción no debe exceder 500 caracteres')
+        .nullable()
         .optional(),
     attributes: z.record(z.unknown()).optional(),
 });
