@@ -262,8 +262,10 @@ export const updateProductSchema = z.object({
     units: z.array(productUnitSchema).optional(),
     attributes: z.record(attributeValueSchema).optional(),
     inventoryConfig: productInventoryConfigSchema.optional(),
-    taxInfo: productTaxInfoSchema.optional(),
-    posConfig: productPosConfigSchema.optional(),
+    // En UPDATE, tax/pos son PARCIALES: se puede mandar solo un subcampo (p. ej. edición
+    // masiva de impuesto o "Visible en POS") y el backend fusiona con lo actual (no reemplaza).
+    taxInfo: productTaxInfoSchema.partial().optional(),
+    posConfig: productPosConfigSchema.partial().optional(),
     categoryId: z.string().uuid().nullable().optional(),
 });
 
