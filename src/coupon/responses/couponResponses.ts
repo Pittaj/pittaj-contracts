@@ -11,3 +11,10 @@ export type CouponListResponse = {
         readonly totalPages: number;
     };
 };
+
+export type CouponDetailResponse = {
+    readonly coupon: CouponPrimitives;
+};
+
+export type CreateCouponResponse = CouponDetailResponse;
+export type UpdateCouponResponse = CouponDetailResponse;
