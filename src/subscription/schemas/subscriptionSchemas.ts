@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 // ─── Constants ─────────────────────────────────────────────────
 export const SUBSCRIPTION_CONSTANTS = {
-  STATUSES: ['TRIAL', 'ACTIVE', 'PAST_DUE', 'CANCELLED', 'EXPIRED'],
+  STATUSES: ['TRIAL', 'ACTIVE', 'PAST_DUE', 'CANCELLED', 'EXPIRED', 'SUSPENDED'],
 } as const;
 
 // ─── Params ────────────────────────────────────────────────────
@@ -11,37 +11,37 @@ export const subscriptionIdParamSchema = z.object({
 });
 export type SubscriptionIdParam = z.infer<typeof subscriptionIdParamSchema>;
 
-// ─── List ──────────────────────────────────────────────────────
+// ─── List (backoffice admin) ───────────────────────────────────
 export const listSubscriptionsSchema = z.object({
   page: z.coerce.number().int().min(1).optional().default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).optional().default(10),
-  status: z.string().optional(),
+  pageSize: z.coerce.number().int().min(1).max(100).optional().default(20),
+  status: z.enum(['TRIAL', 'ACTIVE', 'PAST_DUE', 'CANCELLED', 'EXPIRED', 'SUSPENDED']).optional(),
   tenantId: z.string().uuid().optional(),
-  plan: z.string().optional(),
+  search: z.string().optional(),
   sortBy: z.enum(['createdAt', 'updatedAt', 'trialEndsAt']).optional(),
   sortOrder: z.enum(['asc', 'desc']).optional(),
 });
 
 // ─── Create Trial ──────────────────────────────────────────────
+// Modelo de precio único por sucursal: sin plan.
 export const createTrialSubscriptionSchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string().uuid(),
-  plan: z.enum(['FREE', 'STARTER', 'PRO', 'ENTERPRISE']).optional(),
 });
 
-// ─── Cancel ────────────────────────────────────────────────────
+// ─── Lifecycle (admin) ─────────────────────────────────────────
 export const cancelSubscriptionSchema = z.object({
-  version: z.number().int().min(1),
+  reason: z.string().max(500).optional(),
 });
 
-// ─── Change Plan ───────────────────────────────────────────────
-export const changePlanSchema = z.object({
-  version: z.number().int().min(1),
-  plan: z.enum(['FREE', 'STARTER', 'PRO', 'ENTERPRISE']),
+export const suspendSubscriptionSchema = z.object({
+  reason: z.string().max(500).optional(),
 });
+
+export const reactivateSubscriptionSchema = z.object({});
 
 // ─── Inferred types ────────────────────────────────────────────
 export type CreateTrialSubscriptionRequest = z.infer<typeof createTrialSubscriptionSchema>;
 export type CancelSubscriptionRequest = z.infer<typeof cancelSubscriptionSchema>;
-export type ChangePlanRequest = z.infer<typeof changePlanSchema>;
+export type SuspendSubscriptionRequest = z.infer<typeof suspendSubscriptionSchema>;
 export type ListSubscriptionsInput = z.infer<typeof listSubscriptionsSchema>;

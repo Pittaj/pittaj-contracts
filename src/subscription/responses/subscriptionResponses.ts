@@ -1,10 +1,11 @@
-import type { SubscriptionSummaryPrimitives } from '../primitives';
+import type { SubscriptionSummaryPrimitives, SubscriptionPrimitives } from '../primitives';
 
 export type SubscriptionListItem = SubscriptionSummaryPrimitives & {
-    readonly planId: string;
-    readonly currentPeriodStart: string;
-    readonly currentPeriodEnd: string;
+    readonly pricePerLocation: number;
     readonly currency: string;
+    readonly currentPeriodStart: string | null;
+    readonly currentPeriodEnd: string | null;
+    readonly trialEndsAt: string | null;
     readonly createdAt: string;
 };
 
@@ -16,4 +17,9 @@ export type SubscriptionListResponse = {
         readonly total: number;
         readonly totalPages: number;
     };
+};
+
+/** Detalle admin de una suscripción (para "Ver"). */
+export type SubscriptionDetailResponse = {
+    readonly subscription: SubscriptionPrimitives;
 };

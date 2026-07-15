@@ -17,6 +17,7 @@ export const MY_SUBSCRIPTION_STATUSES = [
     'PAST_DUE',
     'CANCELLED',
     'EXPIRED',
+    'SUSPENDED',
 ] as const;
 export type MySubscriptionStatus = (typeof MY_SUBSCRIPTION_STATUSES)[number];
 
