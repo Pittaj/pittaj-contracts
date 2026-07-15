@@ -11,3 +11,10 @@ export type FeatureFlagListResponse = {
         readonly totalPages: number;
     };
 };
+
+export type FeatureFlagDetailResponse = {
+    readonly flag: FeatureFlagPrimitives;
+};
+
+export type CreateFeatureFlagResponse = FeatureFlagDetailResponse;
+export type UpdateFeatureFlagResponse = FeatureFlagDetailResponse;
