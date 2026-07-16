@@ -56,6 +56,11 @@ export const adminLoginSchema = z.object({
     deviceId: z.string().optional(),
 });
 
+/** Body de POST /api/admin/auth/refresh. */
+export const adminRefreshSchema = z.object({
+    refreshToken: z.string().min(1),
+});
+
 /** Body de POST /api/admin/admin-users/:id/set-password (activa la cuenta). */
 export const setAdminPasswordSchema = z.object({
     clientHash: z.string().min(1),
@@ -64,6 +69,7 @@ export const setAdminPasswordSchema = z.object({
 
 export type GetAdminSaltInput = z.infer<typeof getAdminSaltSchema>;
 export type AdminLoginInput = z.infer<typeof adminLoginSchema>;
+export type AdminRefreshInput = z.infer<typeof adminRefreshSchema>;
 export type SetAdminPasswordInput = z.infer<typeof setAdminPasswordSchema>;
 
 export type ListAdminUsersInput = z.infer<typeof listAdminUsersSchema>;

@@ -31,6 +31,7 @@ export type AdminSaltResponse = {
 
 export type AdminLoginResponse = {
     readonly accessToken: string;
+    readonly refreshToken: string;
     readonly expiresIn: number;
     readonly adminUser: {
         readonly id: string;
