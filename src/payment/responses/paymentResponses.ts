@@ -1,14 +1,19 @@
-import type { PaymentSummaryPrimitives } from '../primitives';
+/**
+ * @fileoverview Respuestas de Pagos.
+ * @module Contracts/Payment/Responses
+ */
 
-export type PaymentListItem = PaymentSummaryPrimitives & {
-    readonly currency: string;
-    readonly transactionId: string | null;
-    readonly paidAt: string | null;
-    readonly createdAt: string;
+import type { PaymentPrimitives } from '../primitives';
+
+/** Renglón del listado de pagos (incluye el folio de su factura). */
+export type PaymentListItem = PaymentPrimitives & {
+    readonly invoiceNumber: string;
 };
 
 export type PaymentListResponse = {
     readonly payments: readonly PaymentListItem[];
+    /** Suma de los pagos COMPLETED del filtro actual (sin paginar). */
+    readonly collectedAmount: number;
     readonly pagination: {
         readonly page: number;
         readonly pageSize: number;
