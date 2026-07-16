@@ -25,6 +25,8 @@ export const ADMIN_PERMISSIONS: readonly AdminPermissionDef[] = [
     { group: 'Cupones', key: 'coupons.manage', label: 'Gestionar cupones' },
     { group: 'Feature Flags', key: 'feature-flags.view', label: 'Ver feature flags' },
     { group: 'Feature Flags', key: 'feature-flags.manage', label: 'Gestionar feature flags' },
+    { group: 'Uso y Límites', key: 'usage-limits.view', label: 'Ver uso por tenant' },
+    { group: 'Uso y Límites', key: 'usage-limits.manage', label: 'Gestionar cuotas de timbres' },
     { group: 'Configuración', key: 'platform-config.view', label: 'Ver configuración' },
     { group: 'Configuración', key: 'platform-config.manage', label: 'Gestionar configuración' },
     { group: 'Métricas', key: 'metrics.view', label: 'Ver métricas y dashboard' },
