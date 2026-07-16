@@ -32,6 +32,16 @@ export const deactivateAdminUserSchema = z.object({
     reason: z.string().max(500).optional(),
 });
 
+/** Param `:id` de las rutas de detalle/desactivación. */
+export const adminUserIdParamSchema = z.object({
+    id: z.string().uuid(),
+});
+
+/** Body de POST /:id/deactivate (el id va en el path). */
+export const deactivateAdminUserBodySchema = z.object({
+    reason: z.string().max(500).optional(),
+});
+
 export type ListAdminUsersInput = z.infer<typeof listAdminUsersSchema>;
 export type CreateAdminUserInput = z.infer<typeof createAdminUserSchema>;
 export type DeactivateAdminUserInput = z.infer<typeof deactivateAdminUserSchema>;
