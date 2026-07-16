@@ -193,6 +193,10 @@
       "types": "./src/feature-flag/index.ts",
       "import": "./dist/feature-flag/index.js"
     },
+    "./kb-article": {
+      "types": "./src/kb-article/index.ts",
+      "import": "./dist/kb-article/index.js"
+    },
     "./announcement": {
       "types": "./src/announcement/index.ts",
       "import": "./dist/announcement/index.js"
