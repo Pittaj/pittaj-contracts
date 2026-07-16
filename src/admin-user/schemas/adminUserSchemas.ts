@@ -42,6 +42,30 @@ export const deactivateAdminUserBodySchema = z.object({
     reason: z.string().max(500).optional(),
 });
 
+// ── Auth del backoffice (login dedicado contra admin_users) ──
+
+/** Query de GET /api/admin/auth/salt (público, anti-enumeración). */
+export const getAdminSaltSchema = z.object({
+    email: z.string().email('Email inválido'),
+});
+
+/** Body de POST /api/admin/auth/login (clientHash = Argon2id(password, salt) del cliente). */
+export const adminLoginSchema = z.object({
+    email: z.string().email('Email inválido'),
+    clientHash: z.string().min(1),
+    deviceId: z.string().optional(),
+});
+
+/** Body de POST /api/admin/admin-users/:id/set-password (activa la cuenta). */
+export const setAdminPasswordSchema = z.object({
+    clientHash: z.string().min(1),
+    salt: z.string().min(1).max(64),
+});
+
+export type GetAdminSaltInput = z.infer<typeof getAdminSaltSchema>;
+export type AdminLoginInput = z.infer<typeof adminLoginSchema>;
+export type SetAdminPasswordInput = z.infer<typeof setAdminPasswordSchema>;
+
 export type ListAdminUsersInput = z.infer<typeof listAdminUsersSchema>;
 export type CreateAdminUserInput = z.infer<typeof createAdminUserSchema>;
 export type DeactivateAdminUserInput = z.infer<typeof deactivateAdminUserSchema>;

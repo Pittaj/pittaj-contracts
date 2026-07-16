@@ -22,3 +22,21 @@ export type AdminUserDetailResponse = {
 export type CreateAdminUserResponse = {
     readonly adminUser: AdminUserPrimitives;
 };
+
+// ── Auth del backoffice ──
+
+export type AdminSaltResponse = {
+    readonly salt: string;
+};
+
+export type AdminLoginResponse = {
+    readonly accessToken: string;
+    readonly expiresIn: number;
+    readonly adminUser: {
+        readonly id: string;
+        readonly email: string;
+        readonly firstName: string;
+        readonly lastName: string;
+        readonly roleName: string;
+    };
+};
