@@ -11,3 +11,10 @@ export type AdminRoleListResponse = {
         readonly totalPages: number;
     };
 };
+
+export type AdminRoleDetailResponse = {
+    readonly role: AdminRolePrimitives;
+};
+
+export type CreateAdminRoleResponse = AdminRoleDetailResponse;
+export type UpdateAdminRoleResponse = AdminRoleDetailResponse;
