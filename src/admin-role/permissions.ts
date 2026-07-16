@@ -34,6 +34,8 @@ export const ADMIN_PERMISSIONS: readonly AdminPermissionDef[] = [
     { group: 'Configuración', key: 'platform-config.view', label: 'Ver configuración' },
     { group: 'Configuración', key: 'platform-config.manage', label: 'Gestionar configuración' },
     { group: 'Métricas', key: 'metrics.view', label: 'Ver métricas y dashboard' },
+    { group: 'Anuncios', key: 'announcements.view', label: 'Ver anuncios' },
+    { group: 'Anuncios', key: 'announcements.manage', label: 'Crear y publicar anuncios' },
     { group: 'Bitácora', key: 'audit.view', label: 'Ver bitácora' },
     { group: 'Operadores', key: 'admin-users.view', label: 'Ver operadores' },
     { group: 'Operadores', key: 'admin-users.manage', label: 'Gestionar operadores' },

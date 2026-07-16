@@ -193,6 +193,10 @@
       "types": "./src/feature-flag/index.ts",
       "import": "./dist/feature-flag/index.js"
     },
+    "./announcement": {
+      "types": "./src/announcement/index.ts",
+      "import": "./dist/announcement/index.js"
+    },
     "./usage-limit": {
       "types": "./src/usage-limit/index.ts",
       "import": "./dist/usage-limit/index.js"
