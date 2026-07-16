@@ -15,6 +15,8 @@ export interface AdminPermissionDef {
 export const ADMIN_PERMISSIONS: readonly AdminPermissionDef[] = [
     { group: 'Tenants', key: 'tenants.view', label: 'Ver tenants' },
     { group: 'Tenants', key: 'tenants.manage', label: 'Gestionar tenants' },
+    { group: 'Onboarding', key: 'onboarding.view', label: 'Ver onboarding' },
+    { group: 'Onboarding', key: 'onboarding.manage', label: 'Gestionar onboarding' },
     { group: 'Suscripciones', key: 'subscriptions.view', label: 'Ver suscripciones' },
     { group: 'Suscripciones', key: 'subscriptions.manage', label: 'Gestionar suscripciones' },
     { group: 'Planes', key: 'plans.view', label: 'Ver planes' },
