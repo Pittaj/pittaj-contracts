@@ -163,3 +163,56 @@ export type MyTicketDetailResponse = MyTicketListItem & {
 export type MyTicketUnreadCountResponse = {
     readonly unreadCount: number;
 };
+
+// ── Contexto del tenant (F4) ──
+
+/** Datos básicos del negocio que abrió el ticket. */
+export type TenantContextBasics = {
+    readonly name: string;
+    readonly code: string;
+    readonly createdAt: string;
+};
+
+/** Estado de la suscripción. */
+export type TenantContextSubscription = {
+    readonly status: string;
+    readonly trialEndsAt: string | null;
+    readonly allowsAccess: boolean;
+    readonly isTrialExpired: boolean;
+};
+
+/** Actividad y cobro estimado del tenant. */
+export type TenantContextUsage = {
+    readonly activeLocations: number;
+    readonly activeUsers: number;
+    readonly activeCompanies: number;
+    readonly estimatedMonthly: number;
+    readonly currency: string;
+    readonly includedStamps: number;
+    /** Timbres usados; null mientras el TPV no reporte a la nube. */
+    readonly stampsUsed: number | null;
+};
+
+/** Cobranza pendiente del tenant. */
+export type TenantContextBilling = {
+    readonly overdueCount: number;
+    readonly outstandingAmount: number;
+    readonly currency: string;
+};
+
+/**
+ * Contexto del tenant, para contestar con lo que un tercero no sabe.
+ *
+ * Cada sección es independiente: si un módulo falla, esa sección viene `null` y
+ * su nombre aparece en `failed`, pero el resto del panel se pinta igual. La UI
+ * dice "no disponible" en lugar de romperse o —peor— mentir con un cero.
+ */
+export type TenantContextResponse = {
+    readonly tenantId: string;
+    readonly basics: TenantContextBasics | null;
+    readonly subscription: TenantContextSubscription | null;
+    readonly usage: TenantContextUsage | null;
+    readonly billing: TenantContextBilling | null;
+    /** Secciones que no se pudieron cargar (p.ej. ['billing']). */
+    readonly failed: readonly string[];
+};
