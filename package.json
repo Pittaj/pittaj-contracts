@@ -193,6 +193,10 @@
       "types": "./src/feature-flag/index.ts",
       "import": "./dist/feature-flag/index.js"
     },
+    "./system-health": {
+      "types": "./src/system-health/index.ts",
+      "import": "./dist/system-health/index.js"
+    },
     "./kb-article": {
       "types": "./src/kb-article/index.ts",
       "import": "./dist/kb-article/index.js"
