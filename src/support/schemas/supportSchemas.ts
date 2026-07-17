@@ -32,6 +32,13 @@ export const listSupportTicketsSchema = z.object({
     assigneeId: z.string().optional(),
     /** Busca por folio, asunto o nombre del tenant. */
     search: z.string().trim().max(120).optional(),
+    /**
+     * Cola: atajo a "qué me toca ahora". Se combina con los demás filtros.
+     *
+     * MINE se resuelve contra el operador de la sesión, no contra un id que
+     * venga del cliente: quién eres lo dice el token.
+     */
+    queue: z.enum(['UNASSIGNED', 'MINE', 'BREACHED', 'WAITING']).optional(),
 });
 
 export type ListSupportTicketsInput = z.infer<typeof listSupportTicketsSchema>;

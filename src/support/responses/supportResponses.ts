@@ -64,6 +64,29 @@ export type SupportTicketListItem = {
     readonly solvedAt: string | null;
     readonly closedAt: string | null;
     readonly createdAt: string;
+
+    /**
+     * SLA. Solo del lado del BACKOFFICE: es NUESTRO compromiso interno, no una
+     * promesa que le enseñamos al cliente. Por eso no existe en MyTicket*.
+     *
+     * Los plazos se congelan al abrir el ticket; el vencimiento se DERIVA al
+     * leer (no hay job que lo marque, y uno que lo marcara mentiría en cuanto
+     * dejara de correr).
+     */
+    readonly firstResponseDueAt: string;
+    readonly resolutionDueAt: string;
+    readonly isFirstResponseBreached: boolean;
+    readonly isResolutionBreached: boolean;
+    /** True si el reloj está detenido porque la pelota no está de nuestro lado. */
+    readonly isSlaClockPaused: boolean;
+};
+
+/** Cuántos tickets hay en cada cola. Responde a "¿qué me toca ahora?". */
+export type SupportQueueCountsResponse = {
+    readonly unassigned: number;
+    readonly mine: number;
+    readonly breached: number;
+    readonly waiting: number;
 };
 
 export type SupportTicketListResponse = {

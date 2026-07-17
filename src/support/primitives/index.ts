@@ -36,6 +36,26 @@ export type SupportTicketStatus =
 /** Estados en los que el turno es NUESTRO (alimentan la cola "me toca"). */
 export const OUR_TURN_STATUSES = ['NEW', 'OPEN'] as const;
 
+/**
+ * Colas de la bandeja: atajos a "¿qué me toca ahora?".
+ *
+ * Una bandeja que solo se filtra por estado obliga al operador a reconstruir en
+ * su cabeza qué es urgente. Estas cuatro preguntas son las que se hace de
+ * verdad al abrir la pantalla.
+ */
+export const SUPPORT_QUEUE = {
+    /** Sin dueño: el riesgo de que a nadie le toque. */
+    UNASSIGNED: 'UNASSIGNED',
+    /** Míos y con el turno de mi lado. */
+    MINE: 'MINE',
+    /** Fuera de plazo. Lo primero. */
+    BREACHED: 'BREACHED',
+    /** Esperando al cliente o a un tercero: no los toco, pero no los pierdo. */
+    WAITING: 'WAITING',
+} as const;
+
+export type SupportQueue = (typeof SUPPORT_QUEUE)[keyof typeof SUPPORT_QUEUE];
+
 export const SUPPORT_TICKET_TYPE = {
     QUESTION: 'QUESTION',
     INCIDENT: 'INCIDENT',
