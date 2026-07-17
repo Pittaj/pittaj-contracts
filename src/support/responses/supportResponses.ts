@@ -79,6 +79,11 @@ export type SupportTicketListItem = {
     readonly isResolutionBreached: boolean;
     /** True si el reloj está detenido porque la pelota no está de nuestro lado. */
     readonly isSlaClockPaused: boolean;
+
+    /** CSAT: 1-5 que puso el cliente, o null si no calificó. */
+    readonly csatRating: number | null;
+    readonly csatComment: string | null;
+    readonly csatAt: string | null;
 };
 
 /** Cuántos tickets hay en cada cola. Responde a "¿qué me toca ahora?". */
@@ -147,4 +152,14 @@ export type MyTicketListResponse = {
 
 export type MyTicketDetailResponse = MyTicketListItem & {
     readonly messages: readonly MyTicketMessageView[];
+    /** True si el ticket ya terminó y el cliente puede calificar. */
+    readonly canRate: boolean;
+    /** Calificación que dejó el cliente, o null. Puede recalificar mientras pueda. */
+    readonly csatRating: number | null;
+    readonly csatComment: string | null;
+};
+
+/** Respuesta de la campana del tenant: cuántos hilos con respuesta sin leer. */
+export type MyTicketUnreadCountResponse = {
+    readonly unreadCount: number;
 };

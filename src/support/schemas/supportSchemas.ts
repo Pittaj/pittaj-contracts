@@ -124,6 +124,18 @@ export const replyMyTicketSchema = z.object({ body });
 
 export type ReplyMyTicketInput = z.infer<typeof replyMyTicketSchema>;
 
+/** CSAT: el cliente califica del 1 al 5, con comentario opcional. */
+export const rateMyTicketSchema = z.object({
+    rating: z.coerce
+        .number()
+        .int('La calificación debe ser un número entero')
+        .min(1, 'La calificación va del 1 al 5')
+        .max(5, 'La calificación va del 1 al 5'),
+    comment: z.string().trim().max(1000).optional(),
+});
+
+export type RateMyTicketInput = z.infer<typeof rateMyTicketSchema>;
+
 /** Filtros de "mis tickets". */
 export const listMyTicketsSchema = z.object({
     page: z.coerce.number().int().positive().default(1),
