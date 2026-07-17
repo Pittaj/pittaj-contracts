@@ -36,6 +36,8 @@ export const ADMIN_PERMISSIONS: readonly AdminPermissionDef[] = [
     { group: 'Métricas', key: 'metrics.view', label: 'Ver métricas y dashboard' },
     { group: 'Anuncios', key: 'announcements.view', label: 'Ver anuncios' },
     { group: 'Anuncios', key: 'announcements.manage', label: 'Crear y publicar anuncios' },
+    { group: 'Soporte', key: 'support.view', label: 'Ver tickets de soporte' },
+    { group: 'Soporte', key: 'support.manage', label: 'Atender tickets de soporte' },
     { group: 'Base de conocimiento', key: 'kb.view', label: 'Ver artículos de ayuda' },
     { group: 'Base de conocimiento', key: 'kb.manage', label: 'Escribir y publicar ayuda' },
     { group: 'Bitácora', key: 'audit.view', label: 'Ver bitácora' },
