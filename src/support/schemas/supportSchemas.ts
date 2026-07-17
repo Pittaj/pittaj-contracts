@@ -152,3 +152,38 @@ export const ticketNumberParamSchema = z.object({
 });
 
 export type TicketNumberParam = z.infer<typeof ticketNumberParamSchema>;
+
+// ── Respuestas guardadas (F4) ──
+
+const cannedTitle = z
+    .string()
+    .trim()
+    .min(3, 'Ponle un nombre para reconocerla')
+    .max(120);
+
+const cannedBody = z
+    .string()
+    .trim()
+    .min(1, 'La plantilla no puede ir vacía')
+    .max(5000);
+
+/**
+ * Alta/edición de una plantilla de respuesta.
+ *
+ * El cuerpo puede llevar variables `{{tenantName}}`, `{{requesterName}}`,
+ * `{{ticketNumber}}`, `{{operatorName}}`, que se sustituyen al insertarla. El
+ * operador SIEMPRE revisa el texto antes de enviar, así que una variable que no
+ * exista se queda tal cual, sin romper nada.
+ */
+export const cannedResponseInputSchema = z.object({
+    title: cannedTitle,
+    body: cannedBody,
+});
+
+export type CannedResponseInput = z.infer<typeof cannedResponseInputSchema>;
+
+export const cannedResponseIdParamSchema = z.object({
+    id: z.string().uuid('El ID de la plantilla debe ser un UUID válido'),
+});
+
+export type CannedResponseIdParam = z.infer<typeof cannedResponseIdParamSchema>;

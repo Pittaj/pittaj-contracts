@@ -200,6 +200,22 @@ export type TenantContextBilling = {
     readonly currency: string;
 };
 
+// ── Respuestas guardadas (F4) ──
+
+/** Plantilla de respuesta reutilizable del backoffice. */
+export type CannedResponseItem = {
+    readonly id: string;
+    readonly title: string;
+    /** Puede llevar variables {{tenantName}} etc.; se sustituyen al insertar. */
+    readonly body: string;
+    readonly createdAt: string;
+    readonly updatedAt: string | null;
+};
+
+export type CannedResponseListResponse = {
+    readonly items: readonly CannedResponseItem[];
+};
+
 /**
  * Contexto del tenant, para contestar con lo que un tercero no sabe.
  *
