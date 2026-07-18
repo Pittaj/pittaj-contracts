@@ -231,6 +231,26 @@ export type CannedResponseListResponse = {
     readonly items: readonly CannedResponseItem[];
 };
 
+// ── Macros (F5) ──
+
+/** Macro: acciones que el operador aplica en un clic. */
+export type MacroItem = {
+    readonly id: string;
+    readonly title: string;
+    /** Respuesta pública a enviar (con variables); null si la macro no responde. */
+    readonly body: string | null;
+    /** Estado a fijar; null si no cambia el estado. */
+    readonly setStatus: string | null;
+    /** 'ME' (tomarlo) | 'UNASSIGN' (soltarlo) | null. */
+    readonly assignAction: string | null;
+    readonly createdAt: string;
+    readonly updatedAt: string | null;
+};
+
+export type MacroListResponse = {
+    readonly items: readonly MacroItem[];
+};
+
 /**
  * Contexto del tenant, para contestar con lo que un tercero no sabe.
  *

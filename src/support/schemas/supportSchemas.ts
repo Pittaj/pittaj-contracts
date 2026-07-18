@@ -198,3 +198,38 @@ export const cannedResponseIdParamSchema = z.object({
 });
 
 export type CannedResponseIdParam = z.infer<typeof cannedResponseIdParamSchema>;
+
+// ── Macros (F5) ──
+
+/** Estados que una macro puede fijar (NEW no: es con el que nace el ticket). */
+export const MACRO_SET_STATUS = ['OPEN', 'PENDING', 'ON_HOLD', 'SOLVED', 'CLOSED'] as const;
+
+/** Acción de asignación de una macro: tomarlo o soltarlo. */
+export const MACRO_ASSIGN_ACTION = ['ME', 'UNASSIGN'] as const;
+
+/**
+ * Alta/edición de una macro: acciones que se aplican en UN clic.
+ *
+ * Al menos una acción debe existir (una macro vacía no hace nada). El `body`
+ * puede llevar variables, que se sustituyen AL APLICAR —en el servidor, porque
+ * la macro no pasa por la caja de revisión: es un gesto de un clic.
+ */
+export const macroInputSchema = z
+    .object({
+        title: z.string().trim().min(3, 'Ponle un nombre').max(120),
+        body: z.string().trim().max(5000).optional(),
+        setStatus: z.enum(MACRO_SET_STATUS).optional(),
+        assignAction: z.enum(MACRO_ASSIGN_ACTION).optional(),
+    })
+    .refine((v) => Boolean(v.body?.trim() || v.setStatus || v.assignAction), {
+        message: 'La macro debe hacer al menos una cosa (responder, cambiar estado o asignar)',
+        path: ['body'],
+    });
+
+export type MacroInput = z.infer<typeof macroInputSchema>;
+
+export const macroIdParamSchema = z.object({
+    id: z.string().uuid('El ID de la macro debe ser un UUID válido'),
+});
+
+export type MacroIdParam = z.infer<typeof macroIdParamSchema>;
