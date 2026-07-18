@@ -18,6 +18,17 @@ import type {
     TicketEventKind,
 } from '../primitives';
 
+// ── Adjuntos (F5) ──
+
+/** Metadatos de un adjunto (los bytes se piden aparte, por el endpoint de descarga). */
+export type AttachmentView = {
+    readonly id: string;
+    readonly filename: string;
+    readonly contentType: string;
+    readonly sizeBytes: number;
+    readonly createdAt: string;
+};
+
 // ── Backoffice ──
 
 /** Mensaje del hilo, tal como lo ve un operador (incluye notas internas). */
@@ -30,6 +41,8 @@ export type TicketMessageView = {
     readonly visibility: MessageVisibility;
     readonly body: string;
     readonly createdAt: string;
+    /** Adjuntos que cuelgan de este mensaje. */
+    readonly attachments: readonly AttachmentView[];
 };
 
 /** Entrada del timeline. */
@@ -124,6 +137,8 @@ export type MyTicketMessageView = {
     readonly authorName: string;
     readonly body: string;
     readonly createdAt: string;
+    /** Adjuntos de este mensaje (por construcción, solo de mensajes públicos). */
+    readonly attachments: readonly AttachmentView[];
 };
 
 export type MyTicketListItem = {

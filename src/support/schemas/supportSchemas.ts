@@ -6,6 +6,14 @@
 import { z } from 'zod';
 import { SUPPORT_LIMITS } from '../primitives';
 
+/**
+ * Ids de adjuntos ya subidos, para colgar del mensaje que se envía.
+ *
+ * El backend solo liga los que sean de ESE ticket y los subió quien envía; un
+ * id ajeno simplemente no engancha. Máximo 5 por mensaje.
+ */
+const attachmentIds = z.array(z.string().uuid()).max(5).optional();
+
 const subject = z
     .string()
     .trim()
@@ -66,6 +74,7 @@ export const createTicketOnBehalfSchema = z.object({
     requesterUserId: z.string().uuid().nullable().optional(),
     /** Nombre de quien pidió ayuda cuando no es un usuario identificado. */
     requesterName: z.string().trim().max(SUPPORT_LIMITS.REQUESTER_NAME_MAX_LENGTH).optional(),
+    attachmentIds,
 });
 
 export type CreateTicketOnBehalfInput = z.infer<typeof createTicketOnBehalfSchema>;
@@ -75,12 +84,13 @@ export const replyTicketSchema = z.object({
     body,
     /** Si además deja el ticket esperando al cliente. */
     markPending: z.boolean().default(false),
+    attachmentIds,
 });
 
 export type ReplyTicketInput = z.infer<typeof replyTicketSchema>;
 
 /** Nota interna: NO la ve el cliente. */
-export const addInternalNoteSchema = z.object({ body });
+export const addInternalNoteSchema = z.object({ body, attachmentIds });
 
 export type AddInternalNoteInput = z.infer<typeof addInternalNoteSchema>;
 
@@ -115,12 +125,13 @@ export const createMyTicketSchema = z.object({
     subject,
     body,
     type: z.enum(['QUESTION', 'INCIDENT', 'BUG', 'REQUEST']).default('QUESTION'),
+    attachmentIds,
 });
 
 export type CreateMyTicketInput = z.infer<typeof createMyTicketSchema>;
 
 /** Respuesta del cliente en su hilo. */
-export const replyMyTicketSchema = z.object({ body });
+export const replyMyTicketSchema = z.object({ body, attachmentIds });
 
 export type ReplyMyTicketInput = z.infer<typeof replyMyTicketSchema>;
 
