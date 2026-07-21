@@ -55,7 +55,15 @@ export type InvoicePrimitives = {
     /** Sucursales activas al generar: base del cálculo. */
     readonly activeLocations: number;
     readonly pricePerLocation: number;
-    /** activeLocations × pricePerLocation. */
+    /** Cargo base del mes: activeLocations × pricePerLocation. */
+    readonly baseAmount: number;
+    /** Prorrateo de altas de sucursal del periodo anterior (0 si no hay). */
+    readonly prorationAmount: number;
+    /** Descuento por cupón aplicado (0 si no hay). */
+    readonly discountAmount: number;
+    /** Código del cupón aplicado (snapshot), null si no hay. */
+    readonly couponCode: string | null;
+    /** Importe a cobrar: (base + prorrateo) − descuento. */
     readonly amount: number;
     /** Suma de los pagos no reembolsados. */
     readonly paidAmount: number;
