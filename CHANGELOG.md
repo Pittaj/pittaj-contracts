@@ -1,5 +1,52 @@
 # Changelog
 
+## [2.0.0](https://github.com/Pittaj/pittaj-contracts/compare/v1.4.8...v2.0.0) (2026-07-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* **subscription:** alinea contract al modelo de precio por sucursal
+
+### Features
+
+* **admin-role:** catálogo de permisos del backoffice ([ad447cf](https://github.com/Pittaj/pittaj-contracts/commit/ad447cf5c7b6628890f3182027821cd7707074f7))
+* **admin-role:** permisos onboarding.view/manage en el catálogo ([3212c2f](https://github.com/Pittaj/pittaj-contracts/commit/3212c2f559aed42dbf7d028e1c77fcfd67fa29b9))
+* **admin-role:** schemas CRUD + responses de detalle ([23f4b90](https://github.com/Pittaj/pittaj-contracts/commit/23f4b90a60041320516483c066040d004e333edf))
+* **admin-user:** adminUserIdParamSchema + body de desactivación ([7e035cc](https://github.com/Pittaj/pittaj-contracts/commit/7e035ccae32f2d0da7bb1419dcfcd5d2ac23aa50))
+* **admin-user:** refresh token en login + adminRefreshSchema ([85b6dae](https://github.com/Pittaj/pittaj-contracts/commit/85b6daec0a3d212887581808c755b27a4a7ddcc6))
+* **admin-user:** schemas/responses de auth del backoffice ([6761c5d](https://github.com/Pittaj/pittaj-contracts/commit/6761c5ddd0e85af6d21468b4fe7e0ff210fe2f42))
+* **audit-log:** userId/userEmail nullable (eventos de sistema) ([7187c4a](https://github.com/Pittaj/pittaj-contracts/commit/7187c4a73a8a22b80c32d8fc65991592e662f3d0))
+* **cash-closure:** folio (sequence) en el contrato ([5e311cb](https://github.com/Pittaj/pittaj-contracts/commit/5e311cba051ec76423bda7ebcaf0f60b18629f25))
+* **cashier:** contratos (sync + lectura) para cajeros ([ac0c6e0](https://github.com/Pittaj/pittaj-contracts/commit/ac0c6e03dece806cf67c02846568933475586d51))
+* **coupon:** schemas create/update/toggle + responses de detalle ([9af46d2](https://github.com/Pittaj/pittaj-contracts/commit/9af46d2eff98a3569d6d7a2fd21af59227b45370))
+* **credit-note:** contracts (subpath ./credit-note) para NC en la nube ([eed3585](https://github.com/Pittaj/pittaj-contracts/commit/eed358587c83922a1343d396dac61aad304a85ae))
+* **customer:** datos fiscales del receptor para el CFDI 4.0 ([72fd656](https://github.com/Pittaj/pittaj-contracts/commit/72fd6562a662724febb6e1249d702ecba80e38f4))
+* **document-series:** assign-next-folio schema + response ([88a5b33](https://github.com/Pittaj/pittaj-contracts/commit/88a5b331d70187768ffca6dfbcae9989e7db3ee8))
+* **feature-flag:** schemas create/update/toggle/idParam + responses detalle ([da45feb](https://github.com/Pittaj/pittaj-contracts/commit/da45feb3c88205bd2fd366f2735db775ec0e578c))
+* **inventory:** contratos de lectura (list responses + schemas) ([58a8615](https://github.com/Pittaj/pittaj-contracts/commit/58a8615fabfa93437d0d43fe6cb9d77b6f351b00))
+* **inventory:** productName/productCode en los responses de lectura ([785362d](https://github.com/Pittaj/pittaj-contracts/commit/785362dbb93fbc0d28e96a67cf79e3225a75081c))
+* **invoice:** exponer base/prorrateo/descuento/cupón en el DTO ([5f992bc](https://github.com/Pittaj/pittaj-contracts/commit/5f992bc596c2484e7fa0549ecf978a5bab8e9372))
+* **layaway:** contracts (subpath ./layaway) para apartados ([3691a95](https://github.com/Pittaj/pittaj-contracts/commit/3691a95fbbc99f99ea4c34eb6110bd44c723c7ba))
+* **platform-config:** schema de update (config singleton editable) ([0e88f72](https://github.com/Pittaj/pittaj-contracts/commit/0e88f7256ab82f195a238e73559c97637b8bd79a))
+* **pos-ticket:** addLineSchema acepta unitName/unitFactor (multi-UoM) ([04f108b](https://github.com/Pittaj/pittaj-contracts/commit/04f108b373d050962936f7b5108a79a8c82694d2))
+* **pos-ticket:** assignCustomerSchema (asignar/cambiar cliente del ticket) ([e8d9ec9](https://github.com/Pittaj/pittaj-contracts/commit/e8d9ec9e7a8d0e506d3d0c7b47be4f44c8ecae91))
+* **pos-ticket:** línea con fidelidad fiscal (contratos) ([81142e9](https://github.com/Pittaj/pittaj-contracts/commit/81142e951305275061fe1b0cdc47a4118285783a))
+* **price-list:** contratos de lectura (list response + schemas) ([2c7018d](https://github.com/Pittaj/pittaj-contracts/commit/2c7018d79e1fddef9b2398069fcf3620febb93d1))
+* **price-list:** resolvePrice schema + response (Caja web) ([1df384c](https://github.com/Pittaj/pittaj-contracts/commit/1df384cefcbb862fcd13bdc85c197248564f0c40))
+* **product,category:** campos de paridad con desktop (shortDescription, canBeSold/Purchased, units[]; color, description) ([ffe1cd9](https://github.com/Pittaj/pittaj-contracts/commit/ffe1cd9063539c817f8989f5b7e3a823f9138bdd))
+* **product:** update acepta taxInfo/posConfig PARCIALES (para edicion en lote) ([e655276](https://github.com/Pittaj/pittaj-contracts/commit/e655276f971589a9611d666990b25106d6a0def8))
+* **promotion:** contratos de lectura (list response + schemas) ([d1dba65](https://github.com/Pittaj/pittaj-contracts/commit/d1dba65a040cba2b052cb641b5dc5182e5047d0e))
+* **promotion:** contratos de sync (nuevo subpath ./promotion) ([5788eba](https://github.com/Pittaj/pittaj-contracts/commit/5788eba81eee23243646001053e2435a20d488f0))
+* **purchase:** contratos de lectura (list response + schemas) ([0e156ea](https://github.com/Pittaj/pittaj-contracts/commit/0e156eac928af0d51be1c76fccedfce17497a7b4))
+* **register:** contratos (sync + lectura) para cajas registradoras ([99954bc](https://github.com/Pittaj/pittaj-contracts/commit/99954bce9c3cced042798cae5fd2747366ca10e4))
+* **saas-metrics:** getSaasMetricsSchema (período) ([1f2cfe4](https://github.com/Pittaj/pittaj-contracts/commit/1f2cfe4bb477cfc283d204c4c1ea44982cb60d1f))
+* **sales-return:** contracts (subpath ./sales-return) para devoluciones ([bf4f5ab](https://github.com/Pittaj/pittaj-contracts/commit/bf4f5ab91147730e55c92c67e1c24ba952707433))
+* **subscription:** alinea contract al modelo de precio por sucursal ([795be19](https://github.com/Pittaj/pittaj-contracts/commit/795be1991a596280c1f3f6a88b0b0a636a275dc4))
+* **sync S4:** contratos inventory (3 agregados) para sync ([25ad4ff](https://github.com/Pittaj/pittaj-contracts/commit/25ad4ff6c5930739ea8974c98ea1a3c4bb3229ed))
+* **sync S4:** contratos pos-ticket para sync (promociones + push/pull) ([12e4e51](https://github.com/Pittaj/pittaj-contracts/commit/12e4e5198a8a097837fe2c67deee1b18048de914))
+* **sync S4:** contratos purchase (compras) para sync ([b91ee13](https://github.com/Pittaj/pittaj-contracts/commit/b91ee13ad511287e2762828fd3b4adf5fdbe89a1))
+* **sync S4:** PosSyncPull canónico para pos-session ([fcfbd0a](https://github.com/Pittaj/pittaj-contracts/commit/fcfbd0a7246c04bcdca4982e2c2e8c8317ae1267))
+
 ## [1.4.8](https://github.com/Pittaj/pittaj-contracts/compare/v1.4.7...v1.4.8) (2026-04-08)
 
 
