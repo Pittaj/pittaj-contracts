@@ -40,6 +40,13 @@ const customerAddressSchema = z.object({
 const customerTypeEnum = z.enum(TYPES as unknown as [string, ...string[]]);
 const customerStatusEnum = z.enum(STATUSES as unknown as [string, ...string[]]);
 
+/** Datos fiscales del receptor para el CFDI 4.0 */
+const customerFiscalProfileSchema = z.object({
+    fiscalRegime: z.string().regex(/^[A-Za-z0-9]{2,5}$/, 'Clave de régimen fiscal del SAT inválida'),
+    cfdiUse: z.string().regex(/^[A-Za-z0-9]{2,5}$/, 'Clave de uso del CFDI inválida').default('G03'),
+    taxZipCode: z.string().regex(/^\d{5}$/, 'El código postal fiscal debe tener 5 dígitos'),
+});
+
 // ============================================================
 // PARAMS
 // ============================================================
@@ -62,6 +69,7 @@ export const createCustomerSchema = z.object({
     email: z.string().email().max(LIMITS.MAX_EMAIL_LENGTH).nullable().optional(),
     phone: z.string().min(LIMITS.MIN_PHONE_LENGTH).max(LIMITS.MAX_PHONE_LENGTH).nullable().optional(),
     taxId: z.string().min(LIMITS.MIN_TAX_ID_LENGTH).max(LIMITS.MAX_TAX_ID_LENGTH).nullable().optional(),
+    fiscalProfile: customerFiscalProfileSchema.nullable().optional(),
     creditConfig: customerCreditConfigSchema.optional(),
     address: customerAddressSchema.nullable().optional(),
     notes: z.string().max(LIMITS.MAX_NOTES_LENGTH).nullable().optional(),
@@ -74,6 +82,7 @@ export const updateCustomerSchema = z.object({
     email: z.string().email().max(LIMITS.MAX_EMAIL_LENGTH).nullable().optional(),
     phone: z.string().min(LIMITS.MIN_PHONE_LENGTH).max(LIMITS.MAX_PHONE_LENGTH).nullable().optional(),
     taxId: z.string().min(LIMITS.MIN_TAX_ID_LENGTH).max(LIMITS.MAX_TAX_ID_LENGTH).nullable().optional(),
+    fiscalProfile: customerFiscalProfileSchema.nullable().optional(),
     address: customerAddressSchema.nullable().optional(),
     creditConfig: customerCreditConfigSchema.optional(),
     notes: z.string().max(LIMITS.MAX_NOTES_LENGTH).nullable().optional(),

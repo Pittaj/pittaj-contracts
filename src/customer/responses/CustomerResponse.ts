@@ -6,6 +6,7 @@
 
 import type { CustomerCreditConfigPrimitives } from '../primitives';
 import type { CustomerAddressPrimitives } from '../primitives';
+import type { CustomerFiscalProfilePrimitives } from '../primitives';
 
 export interface CustomerResponse {
     readonly id: string;
@@ -16,6 +17,8 @@ export interface CustomerResponse {
     readonly email: string | null;
     readonly phone: string | null;
     readonly taxId: string | null;
+    /** Datos fiscales del receptor para el CFDI 4.0 (null si no factura). */
+    readonly fiscalProfile: CustomerFiscalProfilePrimitives | null;
     readonly creditConfig: CustomerCreditConfigPrimitives;
     readonly address: CustomerAddressPrimitives | null;
     readonly notes: string | null;
