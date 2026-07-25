@@ -36,7 +36,11 @@ export const syncTierEnum = z.enum(['hot', 'warm', 'cold']);
  */
 export const syncFeedPullRequestSchema = z.object({
     tenantId: z.string().uuid(),
-    cursor: z.string().max(200).optional(),
+    // El cursor de hoy es base64({ seq, ts }) con un timestamp POR FUENTE del
+    // feed: crece con el número de entidades (~55 chars/entrada → ~9 KB a 120
+    // entidades). El tope anterior de 200 hacía que el servidor rechazara sus
+    // PROPIOS nextCursor. 16384 = techo de sanidad anti-abuso, no de formato.
+    cursor: z.string().max(16384).optional(),
     tiers: z.array(syncTierEnum).nonempty().optional(),
     limit: z.number().int().min(1).max(500).default(200),
 });
