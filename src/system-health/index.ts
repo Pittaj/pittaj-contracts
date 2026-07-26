@@ -24,6 +24,7 @@ export const SYSTEM_CHECK_KEY = {
     MIGRATIONS: 'migrations',
     SYNC_QUEUE: 'sync-queue',
     AUTH: 'auth',
+    TIMBRADO: 'timbrado',
 } as const;
 
 export type SystemCheckKey = (typeof SYSTEM_CHECK_KEY)[keyof typeof SYSTEM_CHECK_KEY];
