@@ -16,6 +16,8 @@ export interface PosSessionResponse {
     readonly sequence: number;
     readonly locationId: string;
     readonly userId: string;
+    /** Snapshot del nombre del operador (el Operator local del desktop no sincroniza). */
+    readonly userName: string | null;
     readonly openingBalance: OpeningBalancePrimitives;
     readonly closingBalance: ClosingBalancePrimitives | null;
     readonly cashMovements: CashMovementPrimitives[];

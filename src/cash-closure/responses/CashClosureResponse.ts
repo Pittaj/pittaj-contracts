@@ -17,6 +17,8 @@ export interface CashClosureResponse {
     readonly posSessionId: string;
     readonly locationId: string;
     readonly userId: string;
+    /** Snapshot del nombre del operador (el Operator local del desktop no sincroniza). */
+    readonly userName: string | null;
     /**
      * Folio secuencial del cierre (CLS-######), generado por el desktop.
      * `null` en filas creadas en la nube o previas a la migración del campo.

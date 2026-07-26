@@ -24,6 +24,8 @@ export interface PosTicketResponse {
   readonly posSessionId: string;
   readonly locationId: string;
   readonly userId: string;
+  /** Snapshot del nombre del operador (el Operator local del desktop no sincroniza). */
+  readonly userName: string | null;
   readonly customerId: string | null;
   readonly lines: PosTicketLinePrimitives[];
   readonly payments: PosTicketPaymentPrimitives[];
