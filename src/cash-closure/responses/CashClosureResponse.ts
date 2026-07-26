@@ -19,6 +19,8 @@ export interface CashClosureResponse {
     readonly userId: string;
     /** Snapshot del nombre del operador (el Operator local del desktop no sincroniza). */
     readonly userName: string | null;
+    /** Dispositivo de origen (anti-rebote: el feed lo expone como originDeviceId). */
+    readonly deviceId?: string | null;
     /**
      * Folio secuencial del cierre (CLS-######), generado por el desktop.
      * `null` en filas creadas en la nube o previas a la migración del campo.

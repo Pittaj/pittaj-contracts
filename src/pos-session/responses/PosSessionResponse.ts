@@ -18,6 +18,8 @@ export interface PosSessionResponse {
     readonly userId: string;
     /** Snapshot del nombre del operador (el Operator local del desktop no sincroniza). */
     readonly userName: string | null;
+    /** Dispositivo de origen (anti-rebote: el feed lo expone como originDeviceId). */
+    readonly deviceId?: string | null;
     readonly openingBalance: OpeningBalancePrimitives;
     readonly closingBalance: ClosingBalancePrimitives | null;
     readonly cashMovements: CashMovementPrimitives[];

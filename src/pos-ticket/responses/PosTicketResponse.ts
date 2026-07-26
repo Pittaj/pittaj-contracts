@@ -26,6 +26,8 @@ export interface PosTicketResponse {
   readonly userId: string;
   /** Snapshot del nombre del operador (el Operator local del desktop no sincroniza). */
   readonly userName: string | null;
+  /** Dispositivo de origen (anti-rebote: el feed lo expone como originDeviceId). */
+  readonly deviceId?: string | null;
   readonly customerId: string | null;
   readonly lines: PosTicketLinePrimitives[];
   readonly payments: PosTicketPaymentPrimitives[];
