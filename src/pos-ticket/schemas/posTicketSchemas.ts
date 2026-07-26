@@ -44,6 +44,8 @@ export const addLineSchema = z.object({
   unitPrice: z.number().min(0).max(LIMITS.MAX_UNIT_PRICE),
   discountPercent: z.number().min(0).max(100).optional(),
   taxRate: z.number().min(0).max(1).optional(),
+  /** El precio de etiqueta YA trae el impuesto (Tax.isIncluded): base/IVA por residuo. */
+  taxIncluded: z.boolean().optional(),
   /** Nombre de la unidad de venta seleccionada (multi-UoM); null/omitido = unidad base. */
   unitName: z.string().max(50).nullable().optional(),
   /** Factor de la unidad a la unidad base (>0, default 1). qty_base = quantity * unitFactor. */
