@@ -232,6 +232,10 @@
     "./platform-config": {
       "types": "./src/platform-config/index.ts",
       "import": "./dist/platform-config/index.js"
+    },
+    "./seed": {
+      "types": "./src/seed/index.ts",
+      "import": "./dist/seed/index.js"
     }
   },
   "scripts": {
