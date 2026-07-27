@@ -59,6 +59,9 @@ export type InvoicePrimitives = {
     readonly baseAmount: number;
     /** Prorrateo de altas de sucursal del periodo anterior (0 si no hay). */
     readonly prorationAmount: number;
+    /** Cajas EXTRA (2ª+ dispositivo activo por sucursal) cobradas este periodo. */
+    readonly extraDevices: number;
+    readonly extraDevicesAmount: number;
     /** Descuento por cupón aplicado (0 si no hay). */
     readonly discountAmount: number;
     /** Código del cupón aplicado (snapshot), null si no hay. */
