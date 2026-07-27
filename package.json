@@ -117,6 +117,10 @@
       "types": "./src/purchase/index.ts",
       "import": "./dist/purchase/index.js"
     },
+    "./supplier": {
+      "types": "./src/supplier/index.ts",
+      "import": "./dist/supplier/index.js"
+    },
     "./promotion": {
       "types": "./src/promotion/index.ts",
       "import": "./dist/promotion/index.js"
