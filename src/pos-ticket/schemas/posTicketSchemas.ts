@@ -40,6 +40,8 @@ export const addLineSchema = z.object({
   productId: z.string().uuid(),
   productName: z.string().min(1).max(200),
   productSku: z.string().max(50).nullable().optional(),
+  /** Código interno del producto (PRD-####); si falta se cae al SKU o a un derivado del id. */
+  productCode: z.string().max(50).nullable().optional(),
   quantity: z.number().min(LIMITS.MIN_QUANTITY).max(LIMITS.MAX_QUANTITY),
   unitPrice: z.number().min(0).max(LIMITS.MAX_UNIT_PRICE),
   discountPercent: z.number().min(0).max(100).optional(),
