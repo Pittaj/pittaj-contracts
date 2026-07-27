@@ -9,6 +9,8 @@ export const updatePlatformConfigSchema = z.object({
     /** Timbres CFDI incluidos al mes por tenant; default del modelo: 100. */
     includedStampsPerMonth: z.number().int().min(0).max(1_000_000),
     maintenanceMode: z.boolean(),
+    /** Exigir dispositivo registrado para sincronizar (corta instalaciones sin alta). */
+    requireDeviceId: z.boolean(),
     features: z.object({
         onboardingEnabled: z.boolean(),
         couponSystemEnabled: z.boolean(),
