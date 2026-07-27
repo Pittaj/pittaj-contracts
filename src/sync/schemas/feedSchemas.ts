@@ -43,6 +43,11 @@ export const syncFeedPullRequestSchema = z.object({
     cursor: z.string().max(16384).optional(),
     tiers: z.array(syncTierEnum).nonempty().optional(),
     limit: z.number().int().min(1).max(500).default(200),
+    /**
+     * Dispositivo que drena el feed (F4): heartbeat implícito (last_seen_at) y
+     * kill-switch — un dispositivo REVOCADO recibe 403 DEVICE_REVOKED.
+     */
+    deviceId: z.string().max(64).optional(),
 });
 
 // ============================================================

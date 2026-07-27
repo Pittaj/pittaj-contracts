@@ -45,6 +45,10 @@
       "types": "./src/sync/index.ts",
       "import": "./dist/sync/index.js"
     },
+    "./device": {
+      "types": "./src/device/index.ts",
+      "import": "./dist/device/index.js"
+    },
     "./license": {
       "types": "./src/license/index.ts",
       "import": "./dist/license/index.js"
