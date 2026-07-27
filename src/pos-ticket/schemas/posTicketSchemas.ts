@@ -56,9 +56,16 @@ export const addLineSchema = z.object({
   version: z.number().int().min(0),
 });
 
-/** PUT /api/pos-tickets/:id/lines/:lineId — Actualizar cantidad. */
+/** PUT /api/pos-tickets/:id/lines/:lineId — Editar línea (cantidad/precio/descuento/nota/unidad). */
 export const updateLineQuantitySchema = z.object({
-  quantity: z.number().min(LIMITS.MIN_QUANTITY).max(LIMITS.MAX_QUANTITY),
+  quantity: z.number().min(LIMITS.MIN_QUANTITY).max(LIMITS.MAX_QUANTITY).optional(),
+  /** Precio manual (permiso del operador; la UI muestra el candado). */
+  unitPrice: z.number().min(0).max(LIMITS.MAX_UNIT_PRICE).optional(),
+  discountPercent: z.number().min(0).max(100).optional(),
+  notes: z.string().max(200).nullable().optional(),
+  /** Cambio de unidad de venta (multi-UoM); el precio re-resuelto viaja en unitPrice. */
+  unitName: z.string().max(50).nullable().optional(),
+  unitFactor: z.number().positive().max(LIMITS.MAX_QUANTITY).optional(),
   version: z.number().int().min(0),
 });
 
