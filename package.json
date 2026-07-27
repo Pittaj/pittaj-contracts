@@ -105,6 +105,10 @@
       "types": "./src/tax/index.ts",
       "import": "./dist/tax/index.js"
     },
+    "./measure-unit": {
+      "types": "./src/measure-unit/index.ts",
+      "import": "./dist/measure-unit/index.js"
+    },
     "./price-list": {
       "types": "./src/price-list/index.ts",
       "import": "./dist/price-list/index.js"
