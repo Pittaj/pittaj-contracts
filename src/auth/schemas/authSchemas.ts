@@ -57,6 +57,14 @@ export const changePasswordSchema = z.object({
     newSalt: z.string().length(32, 'newSalt debe ser hex de 32 caracteres (16 bytes)'),
 });
 
+/** Schema para verificar credenciales de un supervisor (autorización puntual, sin crear sesión). */
+export const verifyCredentialsSchema = z.object({
+    email: z.string().email('Email inválido'),
+    clientHash: z.string().length(64, 'clientHash debe ser un hash hex de 64 caracteres'),
+    /** Permiso requerido; si se envía, el usuario verificado debe poseerlo. */
+    permission: z.string().max(120).optional(),
+});
+
 /** Schema para creación de usuario admin (sin registro público). */
 export const createAdminUserSchema = z.object({
     email: z.string().email('Email inválido'),

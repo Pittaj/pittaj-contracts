@@ -13,4 +13,5 @@ export * from './ResendVerificationResponse';
 export * from './RevokeSessionResponse';
 export * from './SessionListResponse';
 export * from './SessionResponse';
+export * from './VerifyCredentialsResponse';
 export * from './VerifyEmailResponse';
