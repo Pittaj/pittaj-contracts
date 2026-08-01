@@ -7,6 +7,7 @@ export * from './LogoutResult';
 export * from './OAuthCallbackResponse';
 export * from './OAuthInitiateResponse';
 export * from './RefreshTokenResult';
+export * from './DeviceLinkResponses';
 export * from './RegisterResponse';
 export * from './RequestPasswordResetResult';
 export * from './ResendVerificationResponse';

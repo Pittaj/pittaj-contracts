@@ -83,3 +83,24 @@ export const revokeSessionSchema = z.object({
 export const sessionIdParamSchema = z.object({
     sessionId: z.string().uuid('El sessionId debe ser un UUID válido'),
 });
+
+/**
+ * Generar un código para vincular una caja.
+ *
+ * La identidad NO viaja aquí: sale del token. Aceptarla del cuerpo sería
+ * dejar que cualquiera con sesión emita códigos a nombre de otro.
+ */
+export const createDeviceLinkCodeSchema = z.object({
+    locationId: z.string().uuid('La sucursal no es válida').optional(),
+    deviceName: z.string().max(120, 'El nombre del equipo es muy largo').optional(),
+    origin: z.enum(['browser', 'panel']).optional(),
+});
+
+/** Canjear el código desde la caja. Público: el código ES la credencial. */
+export const redeemDeviceLinkCodeSchema = z.object({
+    // Se acepta con guiones, espacios y en minúsculas: el usuario lo teclea a
+    // mano, muchas veces dictado por teléfono. La normalización va en el dominio.
+    code: z.string().min(8, 'El código está incompleto').max(20, 'El código es muy largo'),
+    deviceId: z.string().min(1, 'Falta el identificador del equipo').max(64),
+    deviceName: z.string().max(120).optional(),
+});
