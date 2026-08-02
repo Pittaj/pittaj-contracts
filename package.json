@@ -21,6 +21,10 @@
       "types": "./src/auth/index.ts",
       "import": "./dist/auth/index.js"
     },
+    "./banking": {
+      "types": "./src/banking/index.ts",
+      "import": "./dist/banking/index.js"
+    },
     "./cash-closure": {
       "types": "./src/cash-closure/index.ts",
       "import": "./dist/cash-closure/index.js"
