@@ -13,12 +13,19 @@ export type TenantUsageListItem = {
     readonly tenantCode: string;
     /** Estado de la suscripción; null si el tenant aún no tiene fila. */
     readonly subscriptionStatus: string | null;
+    /** Sucursales activas. Informativo: no cuestan. */
     readonly activeLocations: number;
     readonly activeUsers: number;
     readonly activeCompanies: number;
-    /** Precio por sucursal/mes vigente para el tenant (MXN, IVA incluido). */
-    readonly pricePerLocation: number;
-    /** Sucursales activas × precio por sucursal. */
+    /** Cajas activas: lo único que mueve el cobro. */
+    readonly activeDevices: number;
+    /** Cajas por encima de las incluidas en la mensualidad. */
+    readonly extraDevices: number;
+    /** Mensualidad vigente del tenant (MXN, IVA incluido). */
+    readonly basePrice: number;
+    /** Precio de cada caja adicional al mes (MXN, IVA incluido). */
+    readonly pricePerExtraDevice: number;
+    /** basePrice + extraDevices × pricePerExtraDevice. */
     readonly estimatedMonthly: number;
     readonly currency: 'MXN';
     /** Timbres CFDI incluidos al mes (override del tenant o default de plataforma). */

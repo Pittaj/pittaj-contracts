@@ -1,11 +1,12 @@
 /**
  * @fileoverview DTO de "Mi Suscripción" para el tenant autenticado.
  *
- * Modelo de negocio (decisión 2026-07-03): precio único con COBRO POR
- * SUCURSAL — sin planes por niveles. El estimado mensual es
- * sucursales activas × precio por sucursal (setting billing.price-per-location,
- * $399 MXN IVA incluido por decisión 2026-07-04; incluye 100 timbres
- * CFDI/mes, timbres adicionales por paquete).
+ * Modelo de negocio: precio único con COBRO POR CAJA — sin planes por niveles
+ * y sin cobro por sucursal. La mensualidad (setting billing.base-price, $399
+ * MXN IVA incluido) cubre 3 cajas en TODA la cuenta, y de ahí en adelante se
+ * cobra por caja. Abrir sucursales no cuesta.
+ *
+ * Incluye 100 timbres CFDI/mes POR CUENTA (no por sucursal), extras por paquete.
  *
  * @module Contracts/SubscriptionSummary
  */
@@ -25,17 +26,26 @@ export type MySubscriptionStatus = (typeof MY_SUBSCRIPTION_STATUSES)[number];
 export interface SubscriptionUsage {
     readonly users: number;
     readonly companies: number;
+    /** Sucursales activas. Informativo: no cuestan. */
     readonly locations: number;
+    /** Cajas activas hoy en toda la cuenta: lo único que se cobra. */
+    readonly devices: number;
 }
 
 /** Datos de cobro estimado (preliminar hasta integrar pagos). */
 export interface SubscriptionBilling {
-    /** Sucursales activas: la base del cobro. */
+    /** Sucursales activas. Se conserva por compatibilidad; ya no cobra nada. */
     readonly activeLocations: number;
-    /** Precio por sucursal/mes, IVA incluido (setting billing.price-per-location). */
-    readonly pricePerLocation: number;
+    /** Mensualidad, IVA incluido (setting billing.base-price). */
+    readonly basePrice: number;
+    /** Cajas cubiertas por la mensualidad. */
+    readonly includedDevices: number;
+    /** Cajas activas por encima de las incluidas. */
+    readonly extraDevices: number;
+    /** Precio de cada caja adicional al mes, IVA incluido. */
+    readonly pricePerExtraDevice: number;
     readonly currency: 'MXN';
-    /** activeLocations × pricePerLocation. */
+    /** basePrice + extraDevices × pricePerExtraDevice, menos el cupón vigente. */
     readonly estimatedMonthly: number;
     /** true mientras no exista integración de pagos (precio preliminar). */
     readonly preliminary: boolean;
