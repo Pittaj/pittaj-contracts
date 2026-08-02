@@ -35,6 +35,12 @@ export interface CashClosureResponse {
     readonly totalExpected: MoneyPrimitives;
     readonly totalActual: MoneyPrimitives;
     readonly totalDifference: MoneyPrimitives;
+    /**
+     * Efectivo a depositar (contado − fondo que queda al siguiente turno).
+     * Lo consume Bancos como "depósito esperado" del corte. Null en cierres
+     * previos a la migración o sin captura.
+     */
+    readonly cashToDeposit: MoneyPrimitives | null;
     readonly createdBy: string;
     readonly createdAt: string;
     readonly updatedAt: string;

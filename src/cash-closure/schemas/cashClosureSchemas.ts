@@ -89,6 +89,15 @@ export const versionBodySchema = z.object({
     version: z.number().int().min(1),
 });
 
+/**
+ * POST /api/cash-closures/:id/approve — Aprobar, capturando opcionalmente el
+ * efectivo a depositar (monto en la moneda del cierre). Ver dominio/cash-closure.md.
+ */
+export const approveCashClosureSchema = z.object({
+    version: z.number().int().min(1),
+    cashToDeposit: z.number().min(0).max(LIMITS.MAX_OPENING_FUND).nullable().optional(),
+});
+
 /** POST /api/cash-closures/:id/reject — Rechazar con razón */
 export const rejectCashClosureSchema = z.object({
     version: z.number().int().min(1),
