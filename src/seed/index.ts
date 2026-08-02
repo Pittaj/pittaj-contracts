@@ -21,12 +21,16 @@ export const SEED_TAXES = [
     { name: 'Exento', rate: 0, kind: 'EXEMPT', isIncluded: true, satFactor: 'Exento', satCode: null, isDefault: false },
 ] as const;
 
-/** Métodos de pago base (system-managed: no se eliminan, sí se pueden desactivar). */
+/**
+ * Métodos de pago base (system-managed: no se eliminan, sí se pueden desactivar).
+ * `satFormaPago` = clave SAT c_FormaPago (misma tabla que FORMA_PAGO_POR_TIPO del CFDI);
+ * la consume Bancos para la conciliación TPV.
+ */
 export const SEED_PAYMENT_METHODS = [
-    { name: 'Efectivo', type: 'CASH', isCashCount: true, requiresCustomer: false, requiresReference: false, commission: 0, displayOrder: 0 },
-    { name: 'Tarjeta', type: 'CARD', isCashCount: false, requiresCustomer: false, requiresReference: false, commission: 0, displayOrder: 1 },
-    { name: 'Transferencia', type: 'TRANSFER', isCashCount: false, requiresCustomer: false, requiresReference: true, commission: 0, displayOrder: 2 },
-    { name: 'Credito', type: 'CREDIT', isCashCount: false, requiresCustomer: true, requiresReference: false, commission: 0, displayOrder: 3 },
+    { name: 'Efectivo', type: 'CASH', isCashCount: true, requiresCustomer: false, requiresReference: false, commission: 0, displayOrder: 0, satFormaPago: '01' },
+    { name: 'Tarjeta', type: 'CARD', isCashCount: false, requiresCustomer: false, requiresReference: false, commission: 0, displayOrder: 1, satFormaPago: '04' },
+    { name: 'Transferencia', type: 'TRANSFER', isCashCount: false, requiresCustomer: false, requiresReference: true, commission: 0, displayOrder: 2, satFormaPago: '03' },
+    { name: 'Credito', type: 'CREDIT', isCashCount: false, requiresCustomer: true, requiresReference: false, commission: 0, displayOrder: 3, satFormaPago: '99' },
 ] as const;
 
 /** Series de folios base (reinicio anual, alcance GLOBAL). */

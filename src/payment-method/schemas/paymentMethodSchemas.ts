@@ -30,6 +30,9 @@ const paymentMethodConfigSchema = z.object({
 const paymentMethodTypeEnum = z.enum(TYPES as unknown as [string, ...string[]]);
 const paymentMethodStatusEnum = z.enum(STATUSES as unknown as [string, ...string[]]);
 
+/** Clave SAT c_FormaPago: 2 dígitos ('01', '03', '04', '28', '99'…) */
+const satFormaPagoSchema = z.string().trim().regex(/^\d{2}$/, 'Clave c_FormaPago de 2 dígitos');
+
 // ============================================================
 // PARAMS
 // ============================================================
@@ -50,6 +53,8 @@ export const createPaymentMethodSchema = z.object({
     type: paymentMethodTypeEnum,
     displayOrder: z.number().int().min(LIMITS.MIN_DISPLAY_ORDER).max(LIMITS.MAX_DISPLAY_ORDER).optional(),
     config: paymentMethodConfigSchema.optional(),
+    satFormaPago: satFormaPagoSchema.nullish(),
+    settlementAccountId: z.string().uuid().nullish(),
     deviceId: z.string().optional(),
 });
 
@@ -65,6 +70,8 @@ export const updatePaymentMethodSchema = z.object({
     type: paymentMethodTypeEnum.optional(),
     displayOrder: z.number().int().min(LIMITS.MIN_DISPLAY_ORDER).max(LIMITS.MAX_DISPLAY_ORDER).optional(),
     config: paymentMethodConfigSchema.optional(),
+    satFormaPago: satFormaPagoSchema.nullish(),
+    settlementAccountId: z.string().uuid().nullish(),
 });
 
 /** DELETE /api/payment-methods/:id (query params) */

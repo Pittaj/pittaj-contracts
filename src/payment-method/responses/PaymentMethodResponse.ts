@@ -14,6 +14,16 @@ export interface PaymentMethodResponse {
     readonly config: PaymentMethodConfigPrimitives;
     readonly displayOrder: number;
     /**
+     * Clave SAT c_FormaPago ('01' efectivo, '03' transferencia, '04' tarjeta…).
+     * Null = sin mapear. La usa Bancos para identificar métodos que liquidan por TPV.
+     */
+    readonly satFormaPago: string | null;
+    /**
+     * Cuenta de tesorería donde liquida este método (BankAccountId).
+     * Campo DORMIDO hasta la app Bancos: hoy siempre null, sin FK.
+     */
+    readonly settlementAccountId: string | null;
+    /**
      * Método gestionado por el sistema (defaults de Pittaj).
      * No se puede eliminar, solo desactivar.
      */
