@@ -1,7 +1,6 @@
 import type { SubscriptionSummaryPrimitives, SubscriptionPrimitives } from '../primitives';
 
 export type SubscriptionListItem = SubscriptionSummaryPrimitives & {
-    readonly pricePerLocation: number;
     readonly currency: string;
     readonly currentPeriodStart: string | null;
     readonly currentPeriodEnd: string | null;
