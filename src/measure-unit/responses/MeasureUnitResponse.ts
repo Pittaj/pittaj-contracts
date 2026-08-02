@@ -22,6 +22,12 @@ export interface MeasureUnitResponse {
 
     /** Estado: ACTIVE | INACTIVE. */
     readonly status: MeasureUnitStatus;
+    /**
+     * Versión OCC. El escritorio la lee como campo REQUERIDO al aplicar el pull
+     * (`GetProperty("version")`), así que omitirla tumba el sync del catálogo
+     * entero con "The given key was not present in the dictionary".
+     */
+    readonly version: number;
 
     /** Fecha de creación (ISO 8601). */
     readonly createdAt?: string;
