@@ -68,6 +68,59 @@ export const BANKING_CONSTANTS = {
 
   /** Nombre de la cuenta puente del sistema (singleton por tenant). */
   TRANSIT_ACCOUNT_NAME: 'Fondos en tránsito',
+
+  // ── N2 · Conciliación ────────────────────────────────────────────
+
+  /** De dónde salieron las líneas del estado de cuenta. */
+  STATEMENT_SOURCES: ['PDF', 'IMAGE', 'CSV', 'XLSX', 'OFX', 'MANUAL', 'FEED'] as const,
+
+  /** Estados de la conciliación. RECONCILED es terminal (no se reabre). */
+  STATEMENT_STATUSES: ['IMPORTED', 'IN_PROGRESS', 'RECONCILED'] as const,
+
+  /** Estado de emparejamiento de una línea del banco. */
+  MATCH_STATUSES: ['UNMATCHED', 'SUGGESTED', 'MATCHED', 'CREATED'] as const,
+
+  /**
+   * De dónde vino la sugerencia, en el orden de prioridad del spec (§5).
+   * Se guarda en la línea para poder auditar por qué se propuso el match.
+   */
+  MATCH_ORIGINS: [
+    'EXACT_REFERENCE',
+    'AMOUNT_AND_DATE',
+    'CASH_CLOSURE',
+    'TPV_SETTLEMENT',
+    'RULE',
+    'MANUAL',
+  ] as const,
+
+  /** Acción de una regla de conciliación. */
+  RULE_ACTIONS: ['SET_CATEGORY', 'TPV_SPLIT'] as const,
+
+  RECONCILIATION_LIMITS: {
+    /** Días de tolerancia al emparejar por monto + fecha (spec §5.2). */
+    DATE_TOLERANCE_DAYS: 3,
+
+    /**
+     * Tolerancia en centavos para *sugerir* un match. Nunca aplica nada
+     * automáticamente: por debajo de este umbral la línea se propone, no se concilia.
+     */
+    AMOUNT_TOLERANCE_CENTS: 2,
+
+    /** Líneas máximas por estado de cuenta importado. */
+    MAX_STATEMENT_LINES: 2000,
+
+    /** Longitud máxima de la descripción que manda el banco. */
+    MAX_LINE_DESCRIPTION_LENGTH: 300,
+
+    /** Movimientos máximos ligados a una sola línea (cardinalidad 1:N). */
+    MAX_MATCHED_TRANSACTIONS: 50,
+
+    /** Reglas de conciliación máximas por tenant. */
+    MAX_RULES: 200,
+
+    /** Tasa de comisión TPV máxima aceptada (fracción, no porcentaje). */
+    MAX_COMMISSION_RATE: 0.2,
+  },
 } as const;
 
 export type BankAccountKindValue = (typeof BANKING_CONSTANTS.ACCOUNT_KINDS)[number];
@@ -77,6 +130,11 @@ export type TransactionDirectionValue = (typeof BANKING_CONSTANTS.DIRECTIONS)[nu
 export type TransactionStatusValue = (typeof BANKING_CONSTANTS.TRANSACTION_STATUSES)[number];
 export type TransactionSourceTypeValue = (typeof BANKING_CONSTANTS.SOURCE_TYPES)[number];
 export type CounterpartyTypeValue = (typeof BANKING_CONSTANTS.COUNTERPARTY_TYPES)[number];
+export type StatementSourceValue = (typeof BANKING_CONSTANTS.STATEMENT_SOURCES)[number];
+export type StatementStatusValue = (typeof BANKING_CONSTANTS.STATEMENT_STATUSES)[number];
+export type MatchStatusValue = (typeof BANKING_CONSTANTS.MATCH_STATUSES)[number];
+export type MatchOriginValue = (typeof BANKING_CONSTANTS.MATCH_ORIGINS)[number];
+export type ReconciliationRuleActionValue = (typeof BANKING_CONSTANTS.RULE_ACTIONS)[number];
 
 /** Definición de una categoría de sistema (seed por tenant, estilo CONTPAQi). */
 export interface SystemCategoryDef {

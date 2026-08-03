@@ -183,3 +183,157 @@ export const getBankTransactionsSchema = z.object({
   page: z.coerce.number().int().min(1).optional(),
   limit: z.coerce.number().int().min(1).max(LIMITS.MAX_PAGE_SIZE).optional(),
 });
+
+// ============================================================
+// N2 · CONCILIACIÓN
+// ============================================================
+
+const { RECONCILIATION_LIMITS: RECON } = BANKING_CONSTANTS;
+
+const statementSourceEnum = z.enum(BANKING_CONSTANTS.STATEMENT_SOURCES);
+const statementStatusEnum = z.enum(BANKING_CONSTANTS.STATEMENT_STATUSES);
+const ruleActionEnum = z.enum(BANKING_CONSTANTS.RULE_ACTIONS);
+
+/**
+ * Una línea extraída del documento. Es también la forma que debe devolver
+ * cualquier extractor (modelo multimodal, parser CSV, agregador), así que se
+ * valida igual venga de donde venga.
+ */
+export const extractedStatementLineSchema = z.object({
+  date: isoDateSchema,
+  description: z.string().trim().min(1).max(RECON.MAX_LINE_DESCRIPTION_LENGTH),
+  reference: z.string().trim().max(LIMITS.MAX_REFERENCE_LENGTH).nullish(),
+  /** Con signo: + abono, − cargo. Cero no es un movimiento. */
+  amount: z
+    .number()
+    .refine((v) => v !== 0, 'El monto no puede ser cero')
+    .refine((v) => Math.abs(v) <= LIMITS.MAX_AMOUNT, 'Monto fuera de rango'),
+});
+
+/** Lo que produce el puerto de extracción: saldos declarados + líneas. */
+export const statementExtractionSchema = z
+  .object({
+    openingBalance: z.number(),
+    closingBalance: z.number(),
+    periodStart: isoDateSchema,
+    periodEnd: isoDateSchema,
+    lines: z.array(extractedStatementLineSchema).min(1).max(RECON.MAX_STATEMENT_LINES),
+  })
+  .refine((v) => v.periodStart <= v.periodEnd, {
+    message: 'El periodo inicia después de terminar',
+    path: ['periodEnd'],
+  });
+
+/**
+ * POST /api/bank-statements — Importar un estado de cuenta ya extraído.
+ *
+ * El archivo se sube aparte (va por el worker a R2, como los adjuntos de
+ * soporte) y aquí se referencia por su llave: así el import es idempotente y
+ * se puede reintentar la extracción sin volver a subir el documento.
+ */
+export const importBankStatementSchema = z.object({
+  id: z.string().uuid().optional(),
+  accountId: z.string().uuid(),
+  source: statementSourceEnum,
+  /** Llave del original en R2; null solo cuando la captura fue manual. */
+  sourceFileKey: z.string().trim().max(300).nullish(),
+  /** Qué extractor produjo las líneas; null en captura manual. */
+  extractor: z.string().trim().max(100).nullish(),
+  extraction: statementExtractionSchema,
+});
+
+/** Condición de una regla sobre la línea del banco. */
+const reconciliationMatchSchema = z
+  .object({
+    descriptionContains: z.string().trim().min(2).max(100),
+    sign: directionEnum.nullish(),
+    amountMin: z.number().min(0).max(LIMITS.MAX_AMOUNT).nullish(),
+    amountMax: z.number().min(0).max(LIMITS.MAX_AMOUNT).nullish(),
+  })
+  .refine((v) => v.amountMin == null || v.amountMax == null || v.amountMin <= v.amountMax, {
+    message: 'El monto mínimo no puede exceder al máximo',
+    path: ['amountMax'],
+  });
+
+/** Acción de la regla. TPV_SPLIT no lleva categoría: usa las del sistema. */
+const reconciliationActionSchema = z
+  .object({
+    type: ruleActionEnum,
+    categoryId: z.string().uuid().nullish(),
+    commissionRate: z.number().min(0).max(RECON.MAX_COMMISSION_RATE).nullish(),
+  })
+  .refine((v) => v.type !== 'SET_CATEGORY' || Boolean(v.categoryId), {
+    message: 'SET_CATEGORY exige una categoría',
+    path: ['categoryId'],
+  });
+
+/** POST/PUT /api/reconciliation-rules */
+export const upsertReconciliationRuleSchema = z.object({
+  id: z.string().uuid().optional(),
+  name: z.string().trim().min(LIMITS.MIN_NAME_LENGTH).max(LIMITS.MAX_NAME_LENGTH),
+  /** null = aplica a todas las cuentas. */
+  accountId: z.string().uuid().nullish(),
+  match: reconciliationMatchSchema,
+  action: reconciliationActionSchema,
+  priority: z.number().int().min(0).max(9999),
+});
+
+/**
+ * POST /api/bank-statements/:id/lines/:lineId/match — Ligar a movimientos existentes.
+ * Acepta varios para la cardinalidad 1:N (un depósito que junta dos cortes).
+ */
+export const matchStatementLineSchema = z.object({
+  transactionIds: z
+    .array(z.string().uuid())
+    .min(1)
+    .max(RECON.MAX_MATCHED_TRANSACTIONS),
+});
+
+/**
+ * POST /api/bank-statements/:id/lines/:lineId/create-transaction — Crear el
+ * movimiento que falta y ligarlo. La categoría es obligatoria, como en todo
+ * el ledger: no existen movimientos sin clasificar.
+ */
+export const createTransactionForLineSchema = z.object({
+  categoryId: z.string().uuid(),
+  counterparty: counterpartySchema.nullish(),
+  notes: z.string().trim().max(LIMITS.MAX_NOTES_LENGTH).nullish(),
+});
+
+/**
+ * POST /api/bank-statements/:id/lines/:lineId/tpv-split — Aplicar el split TPV.
+ *
+ * Los tres montos los captura el usuario con los centavos reales del banco; el
+ * sistema los propone pero no los impone (spec §6).
+ */
+export const applyTpvSplitSchema = z
+  .object({
+    grossAmount: z.number().positive().max(LIMITS.MAX_AMOUNT),
+    commissionAmount: z.number().min(0).max(LIMITS.MAX_AMOUNT),
+    commissionTaxAmount: z.number().min(0).max(LIMITS.MAX_AMOUNT),
+    cashClosureIds: z.array(z.string().uuid()).max(100).optional(),
+  })
+  .refine((v) => v.commissionAmount + v.commissionTaxAmount < v.grossAmount, {
+    message: 'La comisión y su IVA no pueden igualar o superar la venta bruta',
+    path: ['commissionAmount'],
+  });
+
+/** POST /api/bank-statements/:id/close — Cerrar la conciliación (irreversible). */
+export const closeBankStatementSchema = z.object({
+  /** Confirmación explícita: cerrar no se deshace, se corrige con contramovimientos. */
+  confirm: z.literal(true),
+});
+
+/** GET /api/bank-statements — Listar conciliaciones de una cuenta. */
+export const getBankStatementsSchema = z.object({
+  accountId: z.string().uuid().optional(),
+  status: statementStatusEnum.optional(),
+  page: z.coerce.number().int().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(LIMITS.MAX_PAGE_SIZE).optional(),
+});
+
+/** GET /api/reconciliation-rules */
+export const getReconciliationRulesSchema = z.object({
+  accountId: z.string().uuid().optional(),
+  status: statusEnum.optional(),
+});
