@@ -125,6 +125,12 @@ export interface MatchSuggestionPrimitives {
   readonly ruleId?: string | null;
   /** Categoría propuesta cuando hay que crear el movimiento. */
   readonly categoryId?: string | null;
+  /**
+   * Cortes de caja que originan la línea. Los llena el match por corte
+   * (un depósito de efectivo) y también el split TPV (un lote de tarjeta):
+   * en ambos casos son el documento origen del movimiento que se va a crear.
+   */
+  readonly cashClosureIds?: readonly string[] | null;
   /** Desglose propuesto cuando el origen es TPV_SETTLEMENT. */
   readonly tpvSplit?: TpvSplitPrimitives | null;
   /** Diferencia en centavos entre la línea y lo propuesto (0 = exacto). */
