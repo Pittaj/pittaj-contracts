@@ -40,6 +40,32 @@ export const SEED_DOCUMENT_SERIES = [
     { documentType: 'CREDIT_NOTE', series: 'NC', scope: 'GLOBAL', format: 'NC-{folio:0000}' },
 ] as const;
 
+/**
+ * Unidades de medida base.
+ *
+ * Las sembraba el ESCRITORIO con ids fijos, y eso chocaba: `measure_units.id` es
+ * PK global, así que el segundo tenant que instalara habría intentado insertar
+ * los mismos ids y su sync se habría atascado para siempre. Con la nube como
+ * único sembrador el problema desaparece — ids aleatorios por tenant, como el
+ * resto del catálogo.
+ */
+export const SEED_MEASURE_UNITS = [
+    { name: 'Pieza', abbreviation: 'pza' },
+    { name: 'Caja', abbreviation: 'cja' },
+    { name: 'Paquete', abbreviation: 'paq' },
+    { name: 'Kilogramo', abbreviation: 'kg' },
+    { name: 'Gramo', abbreviation: 'g' },
+    { name: 'Litro', abbreviation: 'L' },
+    { name: 'Mililitro', abbreviation: 'ml' },
+    { name: 'Metro', abbreviation: 'm' },
+] as const;
+
+/** Categoría inicial: que el primer producto no obligue a crear una antes. */
+export const SEED_DEFAULT_CATEGORY = { name: 'General', code: 'GENERAL' } as const;
+
+/** Lista de precios por defecto (la que resuelve el PriceResolver si no hay otra). */
+export const SEED_DEFAULT_PRICE_LIST = { name: 'General' } as const;
+
 /** Bodega default de cada sucursal creada en onboarding. */
 export const SEED_DEFAULT_WAREHOUSE = { name: 'Principal', code: 'PRINCIPAL' } as const;
 
