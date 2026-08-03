@@ -121,6 +121,19 @@ export const BANKING_CONSTANTS = {
     /** Tasa de comisión TPV máxima aceptada (fracción, no porcentaje). */
     MAX_COMMISSION_RATE: 0.2,
   },
+
+  /**
+   * Epsilon para comparar dinero.
+   *
+   * Los montos son decimales de 2 posiciones, así que medio centavo separa
+   * "igual" de "distinto" sin que la aritmética de punto flotante genere
+   * falsos descuadres (`0.1 + 0.2 !== 0.3` en binario).
+   *
+   * Vive en el contrato a propósito: backend y frontend deben coincidir en
+   * qué cuenta como cuadrado. Si cada capa lo declarara por su cuenta,
+   * podrían discrepar en silencio sobre si una conciliación puede cerrarse.
+   */
+  MONEY_EPSILON: 0.005,
 } as const;
 
 export type BankAccountKindValue = (typeof BANKING_CONSTANTS.ACCOUNT_KINDS)[number];
