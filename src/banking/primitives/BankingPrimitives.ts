@@ -56,6 +56,35 @@ export interface ExtractedStatementLinePrimitives {
 }
 
 /**
+ * Cifras de control que el propio estado de cuenta imprime en su resumen.
+ *
+ * Todas opcionales porque no todos los bancos las publican, pero cada una que
+ * llegue es una ecuación independiente más contra la cual comprobar la lectura.
+ *
+ * Importan por un punto ciego concreto: el cuadre neto
+ * (`inicial + Σ movimientos = final`) **no detecta dos signos invertidos que se
+ * cancelan**. Si un abono se lee como cargo y un cargo de monto parecido como
+ * abono, el neto casi no se mueve y el cuadre pasa estando mal. Comparar la
+ * suma de abonos y la de cargos por separado sí lo detecta.
+ */
+export interface StatementDeclaredTotalsPrimitives {
+  /** Suma de abonos según el resumen del banco. */
+  readonly totalCredits?: number | null;
+  /** Suma de cargos según el resumen del banco (positiva). */
+  readonly totalDebits?: number | null;
+  /** Cuántos movimientos dice el banco que hay. */
+  readonly movementCount?: number | null;
+  /**
+   * Últimos dígitos de la cuenta impresos en el documento.
+   *
+   * Sirven para confirmar que el estado pertenece a la cuenta que se está
+   * conciliando: importar el de otro banco es un error trivial de cometer y
+   * caro de descubrir tarde.
+   */
+  readonly accountNumberTail?: string | null;
+}
+
+/**
  * Lo que devuelve un extractor de estados de cuenta, sea cual sea el proveedor.
  *
  * Trae los saldos declarados **además** de las líneas porque son el verificador:
@@ -74,6 +103,28 @@ export interface StatementExtractionPrimitives {
   readonly periodEnd: string;
   /** Movimientos en el orden en que aparecen en el documento. */
   readonly lines: readonly ExtractedStatementLinePrimitives[];
+  /** Cifras de control del resumen, cuando el documento las trae. */
+  readonly declared?: StatementDeclaredTotalsPrimitives | null;
+}
+
+/** Resultado de una de las comprobaciones que se le hacen a la lectura. */
+export interface ExtractionCheckPrimitives {
+  /** Qué se comprobó. */
+  readonly check:
+    | 'NET_BALANCE'
+    | 'TOTAL_CREDITS'
+    | 'TOTAL_DEBITS'
+    | 'MOVEMENT_COUNT'
+    | 'DATES_IN_PERIOD'
+    | 'ACCOUNT_MATCH';
+  /** null = el documento no declaró el dato, así que no se pudo comprobar. */
+  readonly passed: boolean | null;
+  /** Lo que dio la lectura. */
+  readonly computed?: number | string | null;
+  /** Lo que declara el documento. */
+  readonly declared?: number | string | null;
+  /** Explicación lista para mostrar cuando falla. */
+  readonly detail?: string | null;
 }
 
 /**
@@ -89,6 +140,14 @@ export interface StatementExtractionAttemptPrimitives {
   readonly balanced: boolean;
   /** Diferencia encontrada (0 cuando cuadra). Útil para mostrar el descuadre. */
   readonly difference: number;
+  /**
+   * Todas las comprobaciones que se le pudieron hacer a la lectura.
+   *
+   * `balanced` sigue siendo el veredicto que decide si la extracción entra —
+   * es la ecuación que siempre se puede evaluar. Esto es el detalle que
+   * permite mostrar *qué* se comprobó y qué no, en vez de un sí/no opaco.
+   */
+  readonly checks?: readonly ExtractionCheckPrimitives[];
   readonly extraction: StatementExtractionPrimitives;
 }
 

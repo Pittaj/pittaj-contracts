@@ -210,6 +210,36 @@ export const extractedStatementLineSchema = z.object({
     .refine((v) => Math.abs(v) <= LIMITS.MAX_AMOUNT, 'Monto fuera de rango'),
 });
 
+/**
+ * Cifras de control del resumen del estado de cuenta.
+ *
+ * Opcionales porque no todos los bancos las imprimen; cada una que llegue es
+ * una comprobación independiente más sobre la lectura.
+ */
+export const statementDeclaredTotalsSchema = z.object({
+  totalCredits: z.number().min(0).max(LIMITS.MAX_AMOUNT).nullish(),
+  totalDebits: z.number().min(0).max(LIMITS.MAX_AMOUNT).nullish(),
+  movementCount: z.number().int().min(0).max(RECON.MAX_STATEMENT_LINES).nullish(),
+  /**
+   * Solo la cola de la cuenta: no se guarda el número completo.
+   *
+   * Se normaliza en vez de exigir el formato porque quien llena este campo es
+   * una lectura automática, y llega de mil formas: `**** 4521`, el número
+   * completo, con guiones. Exigir cuatro dígitos exactos tiraría la extracción
+   * entera —los 17 movimientos ya bien leídos— por el formato de un dato
+   * accesorio. Lo que no alcance a cuatro dígitos se queda en null, que el
+   * verificador reporta como "no comprobable" y no como fallo.
+   */
+  accountNumberTail: z
+    .union([z.string(), z.number()])
+    .nullish()
+    .transform((value) => {
+      if (value === null || value === undefined) return null;
+      const digits = String(value).replace(/\D/g, '');
+      return digits.length >= 4 ? digits.slice(-4) : null;
+    }),
+});
+
 /** Lo que produce el puerto de extracción: saldos declarados + líneas. */
 export const statementExtractionSchema = z
   .object({
@@ -218,6 +248,7 @@ export const statementExtractionSchema = z
     periodStart: isoDateSchema,
     periodEnd: isoDateSchema,
     lines: z.array(extractedStatementLineSchema).min(1).max(RECON.MAX_STATEMENT_LINES),
+    declared: statementDeclaredTotalsSchema.nullish(),
   })
   .refine((v) => v.periodStart <= v.periodEnd, {
     message: 'El periodo inicia después de terminar',
