@@ -4,7 +4,7 @@
  * @version 1.0.0
  */
 
-import type { ProductResponse } from './ProductResponse';
+import type { ProductResponse } from './ProductResponse.js';
 
 /**
  * Tipo reutilizado de ProductResponse para items de lista cursor.

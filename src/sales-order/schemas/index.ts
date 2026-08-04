@@ -1,1 +1,1 @@
-export * from './salesOrderSchemas';
+export * from './salesOrderSchemas.js';

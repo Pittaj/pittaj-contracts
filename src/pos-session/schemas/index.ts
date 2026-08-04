@@ -1,1 +1,1 @@
-export * from './posSessionSchemas';
+export * from './posSessionSchemas.js';

@@ -1,3 +1,3 @@
-export * from './syncPromotion.schema';
-export * from './getPromotions.schema';
-export * from './promotionIdParam.schema';
+export * from './syncPromotion.schema.js';
+export * from './getPromotions.schema.js';
+export * from './promotionIdParam.schema.js';

@@ -1,1 +1,1 @@
-export * from './salesReturnPrimitives';
+export * from './salesReturnPrimitives.js';

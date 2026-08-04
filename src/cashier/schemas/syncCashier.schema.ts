@@ -7,7 +7,7 @@
  * igual que register/promotion/tax/customer. NO se redefinen aquí.
  */
 
-import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync';
+import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync/index.js';
 
 /** POST /api/cashiers/sync/push — deriva del canónico src/sync */
 export const syncPushCashierSchema = syncPushRequestSchema;

@@ -9,4 +9,4 @@ export type {
     AuditPageResponse,
     AuditLogsPageResponse,
     AccessLogsPageResponse,
-} from './AuditResponses';
+} from './AuditResponses.js';

@@ -4,7 +4,7 @@
  * @version 1.0.0
  */
 
-import type { SupplierResponse } from './SupplierResponse';
+import type { SupplierResponse } from './SupplierResponse.js';
 
 export interface GetSuppliersResponse {
     readonly items: SupplierResponse[];

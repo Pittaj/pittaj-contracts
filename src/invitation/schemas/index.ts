@@ -1,1 +1,1 @@
-export * from './invitationSchemas';
+export * from './invitationSchemas.js';

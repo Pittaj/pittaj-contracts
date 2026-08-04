@@ -3,4 +3,4 @@
  * @module Contracts/Audit
  */
 
-export * from './audit.schema';
+export * from './audit.schema.js';

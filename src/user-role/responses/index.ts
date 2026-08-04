@@ -1,1 +1,1 @@
-export * from './UserRoleResponse';
+export * from './UserRoleResponse.js';

@@ -1,4 +1,4 @@
-import type { AdminRolePrimitives } from '../primitives';
+import type { AdminRolePrimitives } from '../primitives/index.js';
 
 export type AdminRoleListItem = AdminRolePrimitives;
 

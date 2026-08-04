@@ -3,6 +3,6 @@
  * @module Contracts/User
  */
 
-export * from './schemas';
-export * from './responses';
+export * from './schemas/index.js';
+export * from './responses/index.js';
 

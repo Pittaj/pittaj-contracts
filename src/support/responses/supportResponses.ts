@@ -16,7 +16,7 @@ import type {
     MessageVisibility,
     RequesterKind,
     TicketEventKind,
-} from '../primitives';
+} from '../primitives/index.js';
 
 // ── Adjuntos (F5) ──
 

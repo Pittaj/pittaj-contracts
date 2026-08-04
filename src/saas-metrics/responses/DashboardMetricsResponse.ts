@@ -1,8 +1,8 @@
-import type { TenantMetricsPrimitives } from '../primitives';
-import type { MrrMetricsPrimitives } from '../primitives';
-import type { ChurnMetricsPrimitives } from '../primitives';
-import type { OnboardingMetricsPrimitives } from '../primitives';
-import type { AlertPrimitives } from '../primitives';
+import type { TenantMetricsPrimitives } from '../primitives/index.js';
+import type { MrrMetricsPrimitives } from '../primitives/index.js';
+import type { ChurnMetricsPrimitives } from '../primitives/index.js';
+import type { OnboardingMetricsPrimitives } from '../primitives/index.js';
+import type { AlertPrimitives } from '../primitives/index.js';
 
 export type DashboardMetricsResponse = {
     readonly period: string;

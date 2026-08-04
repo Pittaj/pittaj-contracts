@@ -1,2 +1,2 @@
-export * from './getPermissionsSchema';
-export * from './getPermissionByIdSchema';
+export * from './getPermissionsSchema.js';
+export * from './getPermissionByIdSchema.js';

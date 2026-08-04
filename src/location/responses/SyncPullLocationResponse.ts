@@ -7,7 +7,7 @@
  * son DTOs planos de Location (shape que ya parsea el desktop).
  */
 
-import type { LocationResponse } from './LocationResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { LocationResponse } from './LocationResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullLocationResponse = SyncPullResponse<LocationResponse>;

@@ -1,2 +1,2 @@
-export { ResponseBase } from './ResponseBase';
-export type { ErrorDetail } from './ResponseBase';
+export { ResponseBase } from './ResponseBase.js';
+export type { ErrorDetail } from './ResponseBase.js';

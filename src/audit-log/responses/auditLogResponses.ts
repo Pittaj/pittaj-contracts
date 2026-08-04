@@ -1,4 +1,4 @@
-import type { AuditLogPrimitives } from '../primitives';
+import type { AuditLogPrimitives } from '../primitives/index.js';
 
 export type AuditLogListItem = AuditLogPrimitives;
 

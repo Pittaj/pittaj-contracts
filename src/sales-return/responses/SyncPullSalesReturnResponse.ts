@@ -7,7 +7,7 @@
  * son DTOs de SalesReturn (con líneas hijas anidadas; shape que parsea el desktop).
  */
 
-import type { SalesReturnResponse } from './SalesReturnResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { SalesReturnResponse } from './SalesReturnResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullSalesReturnResponse = SyncPullResponse<SalesReturnResponse>;

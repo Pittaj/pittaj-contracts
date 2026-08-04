@@ -7,7 +7,7 @@
  * Idéntico a ProductResponse para consistencia.
  */
 
-import type { ProductResponse } from './ProductResponse';
+import type { ProductResponse } from './ProductResponse.js';
 
 /**
  * Response DTO para item de lista de productos.

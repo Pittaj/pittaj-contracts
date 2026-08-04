@@ -1,3 +1,3 @@
-export * from './syncRegister.schema';
-export * from './getRegisters.schema';
-export * from './registerIdParam.schema';
+export * from './syncRegister.schema.js';
+export * from './getRegisters.schema.js';
+export * from './registerIdParam.schema.js';

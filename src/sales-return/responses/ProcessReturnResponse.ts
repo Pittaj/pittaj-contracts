@@ -6,7 +6,7 @@
  * persistida tras la orquestación (reingreso de inventario + resolución del importe).
  */
 
-import type { SalesReturnResponse } from './SalesReturnResponse';
+import type { SalesReturnResponse } from './SalesReturnResponse.js';
 
 /** Respuesta de POST /api/sales-returns/process. */
 export type ProcessReturnResponse = SalesReturnResponse;

@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { DEPARTMENT_STATUSES } from './createDepartment.schema';
+import { DEPARTMENT_STATUSES } from './createDepartment.schema.js';
 
 /**
  * Query params de GET /departments.

@@ -8,7 +8,7 @@ import type {
   MatchOriginValue,
   ReconciliationRuleActionValue,
   TransactionSourceTypeValue,
-} from '../constants';
+} from '../constants/index.js';
 
 /** Configuración de tarjeta de crédito (solo cuentas kind=CREDIT_CARD). */
 export interface CreditCardConfigPrimitives {

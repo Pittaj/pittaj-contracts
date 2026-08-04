@@ -4,7 +4,7 @@
  * @version 1.0.0
  */
 
-import type { CashClosureResponse } from './CashClosureResponse';
+import type { CashClosureResponse } from './CashClosureResponse.js';
 
 export interface SyncPullCashClosureResponse {
     readonly changes: CashClosureResponse[];

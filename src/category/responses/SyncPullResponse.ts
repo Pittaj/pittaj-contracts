@@ -1,4 +1,4 @@
-import type { CategoryListResponse } from './CategoryListResponse';
+import type { CategoryListResponse } from './CategoryListResponse.js';
 
 export interface SyncPullResponse {
     changes: CategoryListResponse[];

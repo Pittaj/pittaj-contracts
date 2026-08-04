@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { KB_ARTICLE_LIMITS } from '../primitives';
+import { KB_ARTICLE_LIMITS } from '../primitives/index.js';
 
 /** Filtros del listado del backoffice. */
 export const listKbArticlesSchema = z.object({

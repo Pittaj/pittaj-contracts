@@ -1,4 +1,4 @@
-import type { PosSessionResponse } from './PosSessionResponse';
+import type { PosSessionResponse } from './PosSessionResponse.js';
 
 export interface GetPosSessionsResponse {
     readonly items: PosSessionResponse[];

@@ -5,7 +5,7 @@
  */
 
 import { z } from 'zod';
-import { SALES_ORDER_CONSTANTS } from '../constants';
+import { SALES_ORDER_CONSTANTS } from '../constants/index.js';
 
 
 const { LIMITS } = SALES_ORDER_CONSTANTS;

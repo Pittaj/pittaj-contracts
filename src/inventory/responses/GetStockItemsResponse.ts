@@ -3,7 +3,7 @@
  * @module Contracts/Inventory
  */
 
-import type { StockItemResponse } from './StockItemResponse';
+import type { StockItemResponse } from './StockItemResponse.js';
 
 /** Respuesta de GET /api/stock-items (lista paginada). */
 export interface GetStockItemsResponse {

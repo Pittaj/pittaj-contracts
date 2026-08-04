@@ -4,9 +4,9 @@
  * @version 1.0.0
  */
 
-import type { CustomerCreditConfigPrimitives } from '../primitives';
-import type { CustomerAddressPrimitives } from '../primitives';
-import type { CustomerFiscalProfilePrimitives } from '../primitives';
+import type { CustomerCreditConfigPrimitives } from '../primitives/index.js';
+import type { CustomerAddressPrimitives } from '../primitives/index.js';
+import type { CustomerFiscalProfilePrimitives } from '../primitives/index.js';
 
 export interface CustomerResponse {
     readonly id: string;

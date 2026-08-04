@@ -3,6 +3,6 @@
  * @module Contracts/Layaway
  */
 
-export * from './primitives';
-export * from './schemas';
-export * from './responses';
+export * from './primitives/index.js';
+export * from './schemas/index.js';
+export * from './responses/index.js';

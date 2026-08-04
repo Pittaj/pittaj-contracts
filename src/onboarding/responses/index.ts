@@ -3,9 +3,9 @@
  * @module Onboarding/Contracts/Responses
  */
 
-export * from './OnboardingResponse';
-export * from './OnboardingStatusResponse';
-export * from './OnboardingFlowListResponse';
-export * from './OnboardingFlowDetailResponse';
-export * from './OnboardingMetricsResponse';
-export * from './OnboardingExportResponse';
+export * from './OnboardingResponse.js';
+export * from './OnboardingStatusResponse.js';
+export * from './OnboardingFlowListResponse.js';
+export * from './OnboardingFlowDetailResponse.js';
+export * from './OnboardingMetricsResponse.js';
+export * from './OnboardingExportResponse.js';

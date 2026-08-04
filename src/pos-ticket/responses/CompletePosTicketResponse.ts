@@ -4,7 +4,7 @@
  * @version 1.0.0
  */
 
-import type { PosTicketResponse } from './PosTicketResponse';
+import type { PosTicketResponse } from './PosTicketResponse.js';
 
 /**
  * Response DTO para ticket completado.

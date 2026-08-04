@@ -1,3 +1,3 @@
-export type { PosTicketLinePrimitives } from './PosTicketLinePrimitives';
-export type { PosTicketPaymentPrimitives } from './PosTicketPaymentPrimitives';
-export type { PosTicketPromotionPrimitives } from './PosTicketPromotionPrimitives';
+export type { PosTicketLinePrimitives } from './PosTicketLinePrimitives.js';
+export type { PosTicketPaymentPrimitives } from './PosTicketPaymentPrimitives.js';
+export type { PosTicketPromotionPrimitives } from './PosTicketPromotionPrimitives.js';

@@ -9,7 +9,7 @@
  */
 
 import { z } from 'zod';
-import { CategoryScopeEnum, CategoryStatusEnum } from './createCategory.schema';
+import { CategoryScopeEnum, CategoryStatusEnum } from './createCategory.schema.js';
 
 /**
  * Esquema de validación para actualizar una categoría.

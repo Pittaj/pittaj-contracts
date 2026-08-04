@@ -1,3 +1,3 @@
-export * from './SaasMetricsResponse';
-export * from './DashboardMetricsResponse';
-export * from './usageAnalyticsResponses';
+export * from './SaasMetricsResponse.js';
+export * from './DashboardMetricsResponse.js';
+export * from './usageAnalyticsResponses.js';

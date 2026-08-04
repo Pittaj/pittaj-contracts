@@ -7,7 +7,7 @@
  * @module Contracts/DocumentSeries
  */
 
-import type { DocumentType, SeriesScope } from '../schemas/createDocumentSeries.schema';
+import type { DocumentType, SeriesScope } from '../schemas/createDocumentSeries.schema.js';
 
 /** DTO de respuesta para consultas de series. */
 export interface DocumentSeriesResponse {

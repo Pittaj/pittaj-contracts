@@ -3,4 +3,4 @@
  * @module Contracts/SubscriptionSummary
  */
 
-export * from './responses';
+export * from './responses/index.js';

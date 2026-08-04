@@ -8,7 +8,7 @@
  */
 
 import { z } from 'zod';
-import { CategoryScopeEnum } from './createCategory.schema';
+import { CategoryScopeEnum } from './createCategory.schema.js';
 
 /**
  * Esquema de validación para obtener categoría por ID.

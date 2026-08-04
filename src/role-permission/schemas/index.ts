@@ -3,4 +3,4 @@ export {
   rolePermissionRoleIdParamSchema,
   revokePermissionParamSchema,
   type AssignPermissionToRoleRequest,
-} from './schemas';
+} from './schemas.js';

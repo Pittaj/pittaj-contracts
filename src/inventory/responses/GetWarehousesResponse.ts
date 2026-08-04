@@ -3,7 +3,7 @@
  * @module Contracts/Inventory
  */
 
-import type { WarehouseResponse } from './WarehouseResponse';
+import type { WarehouseResponse } from './WarehouseResponse.js';
 
 /** Respuesta de GET /api/warehouses (lista paginada). */
 export interface GetWarehousesResponse {

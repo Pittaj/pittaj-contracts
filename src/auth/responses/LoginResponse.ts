@@ -1,4 +1,4 @@
-import type { AuthUserPrimitives, AuthClaimsPrimitives } from '../primitives';
+import type { AuthUserPrimitives, AuthClaimsPrimitives } from '../primitives/index.js';
 
 /** Respuesta del endpoint POST /api/auth/login. */
 export interface LoginResponse {

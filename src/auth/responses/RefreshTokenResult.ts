@@ -1,4 +1,4 @@
-import type { AuthClaimsPrimitives } from '../primitives';
+import type { AuthClaimsPrimitives } from '../primitives/index.js';
 
 /** Resultado de la renovación de tokens. */
 export interface RefreshTokenResult {

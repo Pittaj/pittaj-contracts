@@ -7,7 +7,7 @@
  * son DTOs planos de Register (shape que ya parsea el desktop).
  */
 
-import type { RegisterResponse } from './RegisterResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { RegisterResponse } from './RegisterResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullRegisterResponse = SyncPullResponse<RegisterResponse>;

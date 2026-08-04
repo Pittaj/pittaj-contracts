@@ -1,4 +1,4 @@
-import type { SyncChangeResult } from './SyncChangeResult';
+import type { SyncChangeResult } from './SyncChangeResult.js';
 
 export interface SyncBatchResult {
   readonly applied: number;

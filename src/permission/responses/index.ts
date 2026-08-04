@@ -1,2 +1,2 @@
-export * from './PermissionResponse';
-export * from './PaginatedPermissionsResponse';
+export * from './PermissionResponse.js';
+export * from './PaginatedPermissionsResponse.js';

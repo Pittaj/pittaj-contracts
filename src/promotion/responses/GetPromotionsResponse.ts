@@ -3,7 +3,7 @@
  * @module Contracts/Promotion
  */
 
-import type { PromotionResponse } from './PromotionResponse';
+import type { PromotionResponse } from './PromotionResponse.js';
 
 /** Respuesta de GET /api/promotions (lista paginada). */
 export interface GetPromotionsResponse {

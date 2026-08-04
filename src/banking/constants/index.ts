@@ -1,1 +1,1 @@
-export * from './bankingConstants';
+export * from './bankingConstants.js';

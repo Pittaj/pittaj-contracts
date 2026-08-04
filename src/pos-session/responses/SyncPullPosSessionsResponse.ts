@@ -4,7 +4,7 @@
  * @version 2.0.0
  */
 
-import type { PosSessionResponse } from './PosSessionResponse';
+import type { PosSessionResponse } from './PosSessionResponse.js';
 
 export interface SyncPullPosSessionsResponse {
     readonly changes: PosSessionResponse[];

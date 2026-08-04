@@ -7,7 +7,7 @@
  * son DTOs planos de DocumentSeries (shape que ya parsea el desktop).
  */
 
-import type { DocumentSeriesResponse } from './DocumentSeriesResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { DocumentSeriesResponse } from './DocumentSeriesResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullDocumentSeriesResponse = SyncPullResponse<DocumentSeriesResponse>;

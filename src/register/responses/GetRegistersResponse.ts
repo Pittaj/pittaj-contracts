@@ -3,7 +3,7 @@
  * @module Contracts/Register
  */
 
-import type { RegisterResponse } from './RegisterResponse';
+import type { RegisterResponse } from './RegisterResponse.js';
 
 /** Respuesta de GET /api/registers (lista paginada). */
 export interface GetRegistersResponse {

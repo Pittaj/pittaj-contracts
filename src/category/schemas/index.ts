@@ -1,1 +1,1 @@
-export * from './categorySchemas';
+export * from './categorySchemas.js';

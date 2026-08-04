@@ -3,10 +3,10 @@
  * @module Contracts/MeasureUnit
  */
 
-export * from './createMeasureUnit.schema';
-export * from './measureUnitIdParam.schema';
-export * from './getMeasureUnits.schema';
+export * from './createMeasureUnit.schema.js';
+export * from './measureUnitIdParam.schema.js';
+export * from './getMeasureUnits.schema.js';
 export {
     syncPushMeasureUnitSchema,
     syncPullMeasureUnitSchema,
-} from './syncMeasureUnit.schema';
+} from './syncMeasureUnit.schema.js';

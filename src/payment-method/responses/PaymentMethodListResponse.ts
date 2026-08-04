@@ -1,3 +1,3 @@
-import type { PaymentMethodResponse } from './PaymentMethodResponse';
+import type { PaymentMethodResponse } from './PaymentMethodResponse.js';
 
 export type PaymentMethodListResponse = PaymentMethodResponse;

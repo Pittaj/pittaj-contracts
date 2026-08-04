@@ -3,7 +3,7 @@
  * @module Contracts/Location/Responses
  */
 
-export type { LocationResponse, LocationAddress, LocationCapabilities } from './LocationResponse';
-export type { CreateLocationResponse } from './CreateLocationResponse';
-export type { SyncPushLocationResponse, SyncPushItemResult } from './SyncPushLocationResponse';
-export type { SyncPullLocationResponse } from './SyncPullLocationResponse';
+export type { LocationResponse, LocationAddress, LocationCapabilities } from './LocationResponse.js';
+export type { CreateLocationResponse } from './CreateLocationResponse.js';
+export type { SyncPushLocationResponse, SyncPushItemResult } from './SyncPushLocationResponse.js';
+export type { SyncPullLocationResponse } from './SyncPullLocationResponse.js';

@@ -9,7 +9,7 @@
  * @since 11-11-2025
  */
 
-import type { LocationAddress, LocationCapabilities } from './LocationResponse';
+import type { LocationAddress, LocationCapabilities } from './LocationResponse.js';
 
 /**
  * DTO de respuesta después de POST /locations.

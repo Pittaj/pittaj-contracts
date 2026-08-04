@@ -9,4 +9,4 @@ export {
     type SubscriptionUsage,
     type SubscriptionBilling,
     type MySubscriptionResponse,
-} from './MySubscriptionResponse';
+} from './MySubscriptionResponse.js';

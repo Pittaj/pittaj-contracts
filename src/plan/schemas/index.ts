@@ -1,1 +1,1 @@
-export * from './planSchemas';
+export * from './planSchemas.js';

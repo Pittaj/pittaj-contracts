@@ -12,7 +12,7 @@
  */
 
 import { z } from 'zod';
-import { RETURN_RESOLUTIONS } from '../primitives/salesReturnPrimitives';
+import { RETURN_RESOLUTIONS } from '../primitives/salesReturnPrimitives.js';
 
 /** Renglón de la devolución en el body del comando. */
 export const processReturnLineSchema = z.object({

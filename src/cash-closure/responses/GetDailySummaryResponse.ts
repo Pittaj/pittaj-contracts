@@ -1,4 +1,4 @@
-import type { MoneyPrimitives } from '../../shared';
+import type { MoneyPrimitives } from '../../shared/index.js';
 
 /** Resumen diario de cierres. */
 export interface DailyCashClosureSummary {

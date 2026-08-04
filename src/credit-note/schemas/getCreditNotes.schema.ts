@@ -8,7 +8,7 @@
  */
 
 import { z } from 'zod';
-import { CREDIT_NOTE_STATUSES } from '../primitives/creditNotePrimitives';
+import { CREDIT_NOTE_STATUSES } from '../primitives/creditNotePrimitives.js';
 
 /** Query params de GET /api/credit-notes. */
 export const getCreditNotesSchema = z.object({

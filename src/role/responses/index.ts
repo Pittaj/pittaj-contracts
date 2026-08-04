@@ -3,5 +3,5 @@
  * @module Contracts/Role/Responses
  */
 
-export type { RoleResponse } from './RoleResponse';
-export type { CreateRoleResponse } from './CreateRoleResponse';
+export type { RoleResponse } from './RoleResponse.js';
+export type { CreateRoleResponse } from './CreateRoleResponse.js';

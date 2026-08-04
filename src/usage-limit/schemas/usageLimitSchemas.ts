@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { STAMP_QUOTA_LIMITS } from '../primitives';
+import { STAMP_QUOTA_LIMITS } from '../primitives/index.js';
 
 /** Filtros del listado de uso por tenant (backoffice). */
 export const listTenantUsageSchema = z.object({

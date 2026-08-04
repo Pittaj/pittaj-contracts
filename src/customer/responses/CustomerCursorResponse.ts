@@ -4,7 +4,7 @@
  * @version 1.0.0
  */
 
-import type { CustomerResponse } from './CustomerResponse';
+import type { CustomerResponse } from './CustomerResponse.js';
 
 /** Tipo reutilizado de CustomerResponse para items de lista cursor */
 export type CustomerCursorItemResponse = CustomerResponse;

@@ -3,7 +3,7 @@
  * @module Contracts/Payment/Responses
  */
 
-import type { PaymentPrimitives } from '../primitives';
+import type { PaymentPrimitives } from '../primitives/index.js';
 
 /** Renglón del listado de pagos (incluye el folio de su factura). */
 export type PaymentListItem = PaymentPrimitives & {

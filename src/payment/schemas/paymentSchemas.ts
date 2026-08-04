@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { PAYMENT_LIMITS } from '../primitives';
+import { PAYMENT_LIMITS } from '../primitives/index.js';
 
 /** Filtros del listado de pagos. */
 export const listPaymentsSchema = z.object({

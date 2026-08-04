@@ -1,4 +1,4 @@
-import type { CouponPrimitives } from '../primitives';
+import type { CouponPrimitives } from '../primitives/index.js';
 
 export type CouponListItem = CouponPrimitives;
 

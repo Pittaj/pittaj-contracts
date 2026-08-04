@@ -4,7 +4,7 @@
  * @version 1.0.0
  */
 
-import type { PermissionResponse } from './PermissionResponse';
+import type { PermissionResponse } from './PermissionResponse.js';
 
 /**
  * DTO para respuestas paginadas de permisos

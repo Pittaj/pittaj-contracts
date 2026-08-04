@@ -7,7 +7,7 @@
  * son DTOs planos de PriceList (shape que ya parsea el desktop).
  */
 
-import type { PriceListResponse } from './PriceListResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { PriceListResponse } from './PriceListResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullPriceListResponse = SyncPullResponse<PriceListResponse>;

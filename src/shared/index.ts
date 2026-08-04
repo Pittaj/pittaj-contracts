@@ -1,2 +1,2 @@
-export * from './http';
-export * from './primitives';
+export * from './http/index.js';
+export * from './primitives/index.js';

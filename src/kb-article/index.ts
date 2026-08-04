@@ -1,3 +1,3 @@
-export * from './primitives';
-export * from './responses/kbArticleResponses';
-export * from './schemas/kbArticleSchemas';
+export * from './primitives/index.js';
+export * from './responses/kbArticleResponses.js';
+export * from './schemas/kbArticleSchemas.js';

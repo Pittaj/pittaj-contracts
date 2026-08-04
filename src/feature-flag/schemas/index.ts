@@ -1,1 +1,1 @@
-export * from './featureFlagSchemas';
+export * from './featureFlagSchemas.js';

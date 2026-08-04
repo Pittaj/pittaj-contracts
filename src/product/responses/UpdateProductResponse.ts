@@ -6,7 +6,7 @@
  * Retorna el producto completo después de actualizar.
  */
 
-import type { ProductResponse } from './ProductResponse';
+import type { ProductResponse } from './ProductResponse.js';
 
 /**
  * Response DTO para producto actualizado.

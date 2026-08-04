@@ -3,7 +3,7 @@
  * @module Contracts/KbArticle/Responses
  */
 
-import type { KbArticlePrimitives } from '../primitives';
+import type { KbArticlePrimitives } from '../primitives/index.js';
 
 /** Renglón del listado del backoffice. */
 export type KbArticleListItem = KbArticlePrimitives;

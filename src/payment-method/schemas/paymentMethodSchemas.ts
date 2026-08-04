@@ -5,8 +5,8 @@
  */
 
 import { z } from 'zod';
-import { PAYMENT_METHOD_CONSTANTS } from '../constants';
-import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync';
+import { PAYMENT_METHOD_CONSTANTS } from '../constants/index.js';
+import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync/index.js';
 
 
 const { LIMITS, TYPES, STATUSES } = PAYMENT_METHOD_CONSTANTS;

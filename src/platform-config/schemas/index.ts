@@ -1,1 +1,1 @@
-export * from './platformConfigSchemas';
+export * from './platformConfigSchemas.js';

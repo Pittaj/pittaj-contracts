@@ -16,7 +16,7 @@
  * @module Contracts/CreditNote
  */
 
-import type { CreditNoteStatusPrimitive } from '../primitives/creditNotePrimitives';
+import type { CreditNoteStatusPrimitive } from '../primitives/creditNotePrimitives.js';
 
 /** DTO de respuesta para consultas/sync de notas de crédito. */
 export interface CreditNoteResponse {

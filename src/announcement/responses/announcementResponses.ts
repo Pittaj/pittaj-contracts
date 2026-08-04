@@ -3,7 +3,7 @@
  * @module Contracts/Announcement/Responses
  */
 
-import type { AnnouncementPrimitives } from '../primitives';
+import type { AnnouncementPrimitives } from '../primitives/index.js';
 
 /** Renglón del listado del backoffice. */
 export type AnnouncementListItem = AnnouncementPrimitives & {

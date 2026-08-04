@@ -7,9 +7,9 @@
  * Usado como base por todos los mapeos de respuesta.
  */
 
-import type { SalesOrderLinePrimitives } from '../primitives';
-import type { SalesOrderPaymentPrimitives } from '../primitives';
-import type { DeliveryAddressPrimitives } from '../primitives';
+import type { SalesOrderLinePrimitives } from '../primitives/index.js';
+import type { SalesOrderPaymentPrimitives } from '../primitives/index.js';
+import type { DeliveryAddressPrimitives } from '../primitives/index.js';
 
 /**
  * Response DTO para orden de venta individual.

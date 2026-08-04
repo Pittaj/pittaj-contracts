@@ -18,7 +18,7 @@
  * @module Contracts/Layaway
  */
 
-import type { LayawayStatusPrimitive } from '../primitives/layawayPrimitives';
+import type { LayawayStatusPrimitive } from '../primitives/layawayPrimitives.js';
 
 /** Renglón de un apartado (entidad hija). Snapshot del precio al apartar. */
 export interface LayawayLineResponse {

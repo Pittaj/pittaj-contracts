@@ -7,7 +7,7 @@
  * son DTOs planos de StockMovement (shape que ya parsea el desktop).
  */
 
-import type { StockMovementResponse } from './StockMovementResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { StockMovementResponse } from './StockMovementResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullStockMovementResponse = SyncPullResponse<StockMovementResponse>;

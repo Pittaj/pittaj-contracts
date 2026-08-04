@@ -7,7 +7,7 @@
  * son DTOs planos de Customer (shape que ya parsea el desktop).
  */
 
-import type { CustomerResponse } from './CustomerResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { CustomerResponse } from './CustomerResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullCustomerResponse = SyncPullResponse<CustomerResponse>;

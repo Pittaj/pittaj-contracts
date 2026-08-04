@@ -1,1 +1,1 @@
-export * from './paymentSchemas';
+export * from './paymentSchemas.js';

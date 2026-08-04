@@ -7,7 +7,7 @@
  * son DTOs planos de Department (shape que ya parsea el desktop).
  */
 
-import type { DepartmentResponse } from './DepartmentResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { DepartmentResponse } from './DepartmentResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullDepartmentResponse = SyncPullResponse<DepartmentResponse>;

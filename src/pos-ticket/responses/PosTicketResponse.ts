@@ -7,9 +7,9 @@
  * Usado como base por todos los mapeos de respuesta.
  */
 
-import type { PosTicketLinePrimitives } from '../primitives';
-import type { PosTicketPaymentPrimitives } from '../primitives';
-import type { PosTicketPromotionPrimitives } from '../primitives';
+import type { PosTicketLinePrimitives } from '../primitives/index.js';
+import type { PosTicketPaymentPrimitives } from '../primitives/index.js';
+import type { PosTicketPromotionPrimitives } from '../primitives/index.js';
 
 /**
  * Response DTO para ticket POS individual.

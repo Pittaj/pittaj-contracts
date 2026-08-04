@@ -4,7 +4,7 @@
  * @version 1.0.0
  */
 
-import type { CreditCardConfigPrimitives } from '../primitives';
+import type { CreditCardConfigPrimitives } from '../primitives/index.js';
 
 export interface BankAccountResponse {
   readonly id: string;

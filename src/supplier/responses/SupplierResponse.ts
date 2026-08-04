@@ -7,8 +7,8 @@
  * web. No cambiar sin coordinar las tres puntas.
  */
 
-import type { SupplierStatusValue } from '../constants';
-import type { SupplierAddressPrimitives } from '../primitives';
+import type { SupplierStatusValue } from '../constants/index.js';
+import type { SupplierAddressPrimitives } from '../primitives/index.js';
 
 export interface SupplierResponse {
     readonly id: string;

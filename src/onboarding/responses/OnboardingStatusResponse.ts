@@ -3,8 +3,8 @@
  * @module Onboarding/Contracts/Responses
  */
 
-import type { OnboardingStatusValue } from '../schemas';
-import type { OnboardingStepValue } from '../primitives';
+import type { OnboardingStatusValue } from '../schemas/index.js';
+import type { OnboardingStepValue } from '../primitives/index.js';
 
 export interface OnboardingStatusResponse {
     readonly isComplete: boolean;

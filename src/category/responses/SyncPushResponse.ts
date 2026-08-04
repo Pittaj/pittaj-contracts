@@ -1,4 +1,4 @@
-import type { SyncBatchResult } from '../../shared';
+import type { SyncBatchResult } from '../../shared/index.js';
 
 /**
  * Re-exportar el tipo de dominio como Response del Application Layer.

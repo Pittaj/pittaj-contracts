@@ -7,7 +7,7 @@
  * igual que tax/customer. NO se redefinen aquí.
  */
 
-import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync';
+import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync/index.js';
 
 /** POST /api/price-lists/sync/push — deriva del canónico src/sync */
 export const syncPushPriceListSchema = syncPushRequestSchema;

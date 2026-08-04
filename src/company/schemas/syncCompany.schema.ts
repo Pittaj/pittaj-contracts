@@ -7,7 +7,7 @@
  * igual que customer. NO se redefinen aquí.
  */
 
-import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync';
+import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync/index.js';
 
 /** POST /api/companies/sync/push — deriva del canónico src/sync */
 export const syncPushCompanySchema = syncPushRequestSchema;

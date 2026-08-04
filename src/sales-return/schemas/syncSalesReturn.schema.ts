@@ -7,7 +7,7 @@
  * igual que purchase/credit-note/pos-ticket. NO se redefinen aquí.
  */
 
-import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync';
+import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync/index.js';
 
 /** POST /api/sales-returns/sync/push — deriva del canónico src/sync */
 export const syncPushSalesReturnSchema = syncPushRequestSchema;

@@ -7,7 +7,7 @@
  * son DTOs planos de MeasureUnit (shape que ya parsea el desktop).
  */
 
-import type { MeasureUnitResponse } from './MeasureUnitResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { MeasureUnitResponse } from './MeasureUnitResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullMeasureUnitResponse = SyncPullResponse<MeasureUnitResponse>;

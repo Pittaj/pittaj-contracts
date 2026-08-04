@@ -1,4 +1,4 @@
-import type { FeatureFlagPrimitives } from '../primitives';
+import type { FeatureFlagPrimitives } from '../primitives/index.js';
 
 export type FeatureFlagListItem = FeatureFlagPrimitives;
 

@@ -1,1 +1,1 @@
-export { InvitationResponse } from './InvitationResponse';
+export { InvitationResponse } from './InvitationResponse.js';

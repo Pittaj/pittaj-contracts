@@ -4,8 +4,8 @@
  * @version 1.0.0
  */
 
-import type { SyncOperation } from '../schemas/syncSchemas';
-import type { SyncTier } from '../schemas/feedSchemas';
+import type { SyncOperation } from '../schemas/syncSchemas.js';
+import type { SyncTier } from '../schemas/feedSchemas.js';
 
 /**
  * Una entrada del feed = un hecho de cambio en la nube.

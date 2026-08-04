@@ -1,1 +1,1 @@
-export * from './adminRoleResponses';
+export * from './adminRoleResponses.js';

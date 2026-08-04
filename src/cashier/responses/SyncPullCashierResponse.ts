@@ -7,7 +7,7 @@
  * son DTOs planos de Cashier (shape que ya parsea el desktop, SIN pin).
  */
 
-import type { CashierResponse } from './CashierResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { CashierResponse } from './CashierResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullCashierResponse = SyncPullResponse<CashierResponse>;

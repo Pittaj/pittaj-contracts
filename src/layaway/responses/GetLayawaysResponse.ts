@@ -3,7 +3,7 @@
  * @module Contracts/Layaway
  */
 
-import type { LayawayResponse } from './LayawayResponse';
+import type { LayawayResponse } from './LayawayResponse.js';
 
 /** Respuesta de GET /api/layaways (lista paginada). */
 export interface GetLayawaysResponse {

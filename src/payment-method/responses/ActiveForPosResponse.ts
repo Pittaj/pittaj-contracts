@@ -4,7 +4,7 @@
  * @version 1.0.0
  */
 
-import type { PaymentMethodResponse } from './PaymentMethodResponse';
+import type { PaymentMethodResponse } from './PaymentMethodResponse.js';
 
 export interface ActiveForPosResponse {
     readonly items: PaymentMethodResponse[];

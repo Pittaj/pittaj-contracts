@@ -3,9 +3,9 @@
  * @module Contracts/DocumentSeries
  */
 
-export * from './createDocumentSeries.schema';
-export * from './documentSeriesIdParam.schema';
-export * from './getDocumentSeries.schema';
-export { syncPushDocumentSeriesSchema, syncPullDocumentSeriesSchema } from './syncDocumentSeries.schema';
-export { assignNextFolioSchema } from './assignNextFolio.schema';
-export type { AssignNextFolioRequest } from './assignNextFolio.schema';
+export * from './createDocumentSeries.schema.js';
+export * from './documentSeriesIdParam.schema.js';
+export * from './getDocumentSeries.schema.js';
+export { syncPushDocumentSeriesSchema, syncPullDocumentSeriesSchema } from './syncDocumentSeries.schema.js';
+export { assignNextFolioSchema } from './assignNextFolio.schema.js';
+export type { AssignNextFolioRequest } from './assignNextFolio.schema.js';

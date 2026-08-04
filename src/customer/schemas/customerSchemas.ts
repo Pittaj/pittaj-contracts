@@ -5,8 +5,8 @@
  */
 
 import { z } from 'zod';
-import { CUSTOMER_CONSTANTS } from '../constants';
-import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync';
+import { CUSTOMER_CONSTANTS } from '../constants/index.js';
+import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync/index.js';
 
 
 const { LIMITS, TYPES, STATUSES } = CUSTOMER_CONSTANTS;

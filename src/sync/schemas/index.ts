@@ -1,2 +1,2 @@
-export * from './syncSchemas';
-export * from './feedSchemas';
+export * from './syncSchemas.js';
+export * from './feedSchemas.js';

@@ -7,12 +7,12 @@
  * Co-ubicado con la query y handler para cohesión.
  */
 
-import type { ProductPricePrimitives } from '../primitives';
-import type { ProductInventoryConfigPrimitives } from '../primitives';
-import type { ProductTaxInfoPrimitives } from '../primitives';
-import type { ProductPosConfigPrimitives } from '../primitives';
-import type { ProductUnitPrimitives } from '../primitives';
-import type { AttributeValue } from '../primitives';
+import type { ProductPricePrimitives } from '../primitives/index.js';
+import type { ProductInventoryConfigPrimitives } from '../primitives/index.js';
+import type { ProductTaxInfoPrimitives } from '../primitives/index.js';
+import type { ProductPosConfigPrimitives } from '../primitives/index.js';
+import type { ProductUnitPrimitives } from '../primitives/index.js';
+import type { AttributeValue } from '../primitives/index.js';
 
 /**
  * Response DTO para consulta de producto individual.

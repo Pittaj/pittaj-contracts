@@ -3,6 +3,6 @@
  * @module Onboarding/Contracts
  */
 
-export * from './schemas';
-export * from './primitives';
-export * from './responses';
+export * from './schemas/index.js';
+export * from './primitives/index.js';
+export * from './responses/index.js';

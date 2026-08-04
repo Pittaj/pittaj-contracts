@@ -1,1 +1,1 @@
-export type { SupplierAddressPrimitives } from './SupplierAddressPrimitives';
+export type { SupplierAddressPrimitives } from './SupplierAddressPrimitives.js';

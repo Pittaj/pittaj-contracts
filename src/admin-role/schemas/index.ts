@@ -1,1 +1,1 @@
-export * from './adminRoleSchemas';
+export * from './adminRoleSchemas.js';

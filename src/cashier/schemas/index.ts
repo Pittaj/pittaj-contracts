@@ -1,3 +1,3 @@
-export * from './syncCashier.schema';
-export * from './getCashiers.schema';
-export * from './cashierIdParam.schema';
+export * from './syncCashier.schema.js';
+export * from './getCashiers.schema.js';
+export * from './cashierIdParam.schema.js';

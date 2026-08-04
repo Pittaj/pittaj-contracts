@@ -1,6 +1,6 @@
-export type { AttributeValue } from './AttributeValue';
-export type { ProductInventoryConfigPrimitives } from './ProductInventoryConfigPrimitives';
-export type { ProductPosConfigPrimitives } from './ProductPosConfigPrimitives';
-export type { ProductPricePrimitives } from './ProductPricePrimitives';
-export type { ProductTaxInfoPrimitives } from './ProductTaxInfoPrimitives';
-export type { ProductUnitPrimitives } from './ProductUnitPrimitives';
+export type { AttributeValue } from './AttributeValue.js';
+export type { ProductInventoryConfigPrimitives } from './ProductInventoryConfigPrimitives.js';
+export type { ProductPosConfigPrimitives } from './ProductPosConfigPrimitives.js';
+export type { ProductPricePrimitives } from './ProductPricePrimitives.js';
+export type { ProductTaxInfoPrimitives } from './ProductTaxInfoPrimitives.js';
+export type { ProductUnitPrimitives } from './ProductUnitPrimitives.js';

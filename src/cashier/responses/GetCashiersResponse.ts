@@ -3,7 +3,7 @@
  * @module Contracts/Cashier
  */
 
-import type { CashierResponse } from './CashierResponse';
+import type { CashierResponse } from './CashierResponse.js';
 
 /** Respuesta de GET /api/cashiers (lista paginada). */
 export interface GetCashiersResponse {

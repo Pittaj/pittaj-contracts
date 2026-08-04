@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { INVOICE_LIMITS } from '../primitives';
+import { INVOICE_LIMITS } from '../primitives/index.js';
 
 /** Filtros del listado de facturas. */
 export const listInvoicesSchema = z.object({

@@ -5,7 +5,7 @@
  */
 
 import { z } from 'zod';
-import { BANKING_CONSTANTS } from '../constants';
+import { BANKING_CONSTANTS } from '../constants/index.js';
 
 const { LIMITS } = BANKING_CONSTANTS;
 

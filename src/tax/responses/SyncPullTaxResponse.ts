@@ -7,7 +7,7 @@
  * son DTOs planos de Tax (shape que ya parsea el desktop).
  */
 
-import type { TaxResponse } from './TaxResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { TaxResponse } from './TaxResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullTaxResponse = SyncPullResponse<TaxResponse>;

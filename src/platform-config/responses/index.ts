@@ -1,1 +1,1 @@
-export * from './PlatformConfigResponse';
+export * from './PlatformConfigResponse.js';

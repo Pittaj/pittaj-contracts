@@ -3,5 +3,5 @@
  * @module Contracts/User/Responses
  */
 
-export type { UserResponse } from './UserResponse';
-export type { CreateUserResponse } from './CreateUserResponse';
+export type { UserResponse } from './UserResponse.js';
+export type { CreateUserResponse } from './CreateUserResponse.js';

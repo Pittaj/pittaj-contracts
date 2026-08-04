@@ -7,7 +7,7 @@
  * igual que purchase/tax/customer. NO se redefinen aquí.
  */
 
-import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync';
+import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync/index.js';
 
 // ── Warehouse ────────────────────────────────────────────────────────
 /** POST /api/warehouses/sync/push — deriva del canónico src/sync */

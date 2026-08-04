@@ -1,4 +1,4 @@
-import type { SubscriptionSummaryPrimitives, SubscriptionPrimitives } from '../primitives';
+import type { SubscriptionSummaryPrimitives, SubscriptionPrimitives } from '../primitives/index.js';
 
 export type SubscriptionListItem = SubscriptionSummaryPrimitives & {
     readonly currency: string;

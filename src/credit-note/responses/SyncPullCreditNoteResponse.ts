@@ -7,7 +7,7 @@
  * son DTOs planos de CreditNote (shape que ya parsea el desktop).
  */
 
-import type { CreditNoteResponse } from './CreditNoteResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { CreditNoteResponse } from './CreditNoteResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullCreditNoteResponse = SyncPullResponse<CreditNoteResponse>;

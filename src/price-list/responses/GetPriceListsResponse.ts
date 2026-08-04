@@ -3,7 +3,7 @@
  * @module Contracts/PriceList
  */
 
-import type { PriceListResponse } from './PriceListResponse';
+import type { PriceListResponse } from './PriceListResponse.js';
 
 /** Respuesta de GET /api/price-lists (lista paginada). */
 export interface GetPriceListsResponse {

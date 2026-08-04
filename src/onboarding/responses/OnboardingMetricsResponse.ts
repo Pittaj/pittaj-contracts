@@ -3,8 +3,8 @@
  * @module Onboarding/Contracts/Responses
  */
 
-import type { GroupByValue } from '../schemas';
-import type { OnboardingStepValue } from '../primitives';
+import type { GroupByValue } from '../schemas/index.js';
+import type { OnboardingStepValue } from '../primitives/index.js';
 
 export interface ConversionByStep {
     readonly step: OnboardingStepValue;

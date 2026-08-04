@@ -1,1 +1,1 @@
-export * from './tenantResponses';
+export * from './tenantResponses.js';

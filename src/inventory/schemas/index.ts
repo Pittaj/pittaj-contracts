@@ -3,8 +3,8 @@
  * @module Contracts/Inventory
  */
 
-export * from './syncInventory.schema';
-export * from './inventoryIdParam.schema';
-export * from './getWarehouses.schema';
-export * from './getStockItems.schema';
-export * from './getStockMovements.schema';
+export * from './syncInventory.schema.js';
+export * from './inventoryIdParam.schema.js';
+export * from './getWarehouses.schema.js';
+export * from './getStockItems.schema.js';
+export * from './getStockMovements.schema.js';

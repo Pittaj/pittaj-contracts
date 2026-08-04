@@ -3,5 +3,5 @@
  * @module Onboarding/Contracts/Primitives
  */
 
-export * from './OnboardingPrimitives';
-export * from './OnboardingStep';
+export * from './OnboardingPrimitives.js';
+export * from './OnboardingStep.js';

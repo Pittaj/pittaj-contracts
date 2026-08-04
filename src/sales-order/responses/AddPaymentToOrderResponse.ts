@@ -4,7 +4,7 @@
  * @version 1.0.0
  */
 
-import type { SalesOrderResponse } from './SalesOrderResponse';
+import type { SalesOrderResponse } from './SalesOrderResponse.js';
 
 /** Response DTO para orden con pago agregado. */
 export type AddPaymentToOrderResponse = SalesOrderResponse;

@@ -10,7 +10,7 @@
  */
 
 import { z } from 'zod';
-import { PRODUCT_CONSTANTS } from '../constants';
+import { PRODUCT_CONSTANTS } from '../constants/index.js';
 
 
 const { LIMITS } = PRODUCT_CONSTANTS;

@@ -7,7 +7,7 @@
  */
 
 import { z } from 'zod';
-import { RETURN_RESOLUTIONS } from '../primitives/salesReturnPrimitives';
+import { RETURN_RESOLUTIONS } from '../primitives/salesReturnPrimitives.js';
 
 /** Query params de GET /api/sales-returns. */
 export const getSalesReturnsSchema = z.object({

@@ -1,4 +1,4 @@
-import type { TenantPrimitives, TenantSummaryPrimitives } from '../primitives';
+import type { TenantPrimitives, TenantSummaryPrimitives } from '../primitives/index.js';
 
 export type TenantListItem = TenantSummaryPrimitives & {
     readonly maxUsers: number;

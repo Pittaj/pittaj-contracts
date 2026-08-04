@@ -1,3 +1,3 @@
-export * from './SyncPushResponse';
-export * from './SyncPullResponse';
-export * from './SyncFeedPullResponse';
+export * from './SyncPushResponse.js';
+export * from './SyncPullResponse.js';
+export * from './SyncFeedPullResponse.js';

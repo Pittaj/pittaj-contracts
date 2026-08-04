@@ -4,7 +4,7 @@
  * @version 1.1.0
  */
 
-export { CreateRoleSchema, type CreateRoleRequest } from './createRole.schema';
-export { UpdateRoleSchema, type UpdateRoleRequest } from './updateRole.schema';
-export { GetRolesSchema, type GetRolesQuery } from './getRoles.schema';
-export { RoleIdParamSchema, type RoleIdParam } from './roleIdParam.schema';
+export { CreateRoleSchema, type CreateRoleRequest } from './createRole.schema.js';
+export { UpdateRoleSchema, type UpdateRoleRequest } from './updateRole.schema.js';
+export { GetRolesSchema, type GetRolesQuery } from './getRoles.schema.js';
+export { RoleIdParamSchema, type RoleIdParam } from './roleIdParam.schema.js';

@@ -1,1 +1,1 @@
-export * from './couponSchemas';
+export * from './couponSchemas.js';

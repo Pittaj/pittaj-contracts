@@ -7,7 +7,7 @@
  * son DTOs planos de StockItem (shape que ya parsea el desktop).
  */
 
-import type { StockItemResponse } from './StockItemResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { StockItemResponse } from './StockItemResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullStockItemResponse = SyncPullResponse<StockItemResponse>;

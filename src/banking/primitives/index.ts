@@ -1,1 +1,1 @@
-export * from './BankingPrimitives';
+export * from './BankingPrimitives.js';

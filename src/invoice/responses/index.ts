@@ -1,1 +1,1 @@
-export * from './invoiceResponses';
+export * from './invoiceResponses.js';

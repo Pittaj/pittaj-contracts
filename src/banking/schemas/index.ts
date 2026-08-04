@@ -1,1 +1,1 @@
-export * from './bankingSchemas';
+export * from './bankingSchemas.js';

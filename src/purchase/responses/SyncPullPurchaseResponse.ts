@@ -7,7 +7,7 @@
  * son DTOs planos de Purchase (shape que ya parsea el desktop).
  */
 
-import type { PurchaseResponse } from './PurchaseResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { PurchaseResponse } from './PurchaseResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullPurchaseResponse = SyncPullResponse<PurchaseResponse>;

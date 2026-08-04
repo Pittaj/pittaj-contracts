@@ -1,1 +1,1 @@
-export * from './layawayPrimitives';
+export * from './layawayPrimitives.js';

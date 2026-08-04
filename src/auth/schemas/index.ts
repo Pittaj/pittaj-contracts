@@ -1,3 +1,3 @@
-export * from './authSchemas';
-export * from './authFormSchemas';
-export * from './oauthSchemas';
+export * from './authSchemas.js';
+export * from './authFormSchemas.js';
+export * from './oauthSchemas.js';

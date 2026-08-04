@@ -1,4 +1,4 @@
-import type { ProductListResponse } from './ProductListResponse';
+import type { ProductListResponse } from './ProductListResponse.js';
 
 /** Resultado paginado de productos. */
 export interface PaginatedProductsResult {

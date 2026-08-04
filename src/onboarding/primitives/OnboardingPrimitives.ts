@@ -3,13 +3,13 @@
  * @module Onboarding/Domain/Primitives
  */
 
-import type { OnboardingStatusValue } from '../schemas/listOnboardingFlows.schema';
-import type { OnboardingStepValue } from './OnboardingStep';
-import type { IndustryValue, EmployeeCountValue, ModuleValue, PlanValue } from '../schemas/completeOnboarding.schema';
+import type { OnboardingStatusValue } from '../schemas/listOnboardingFlows.schema.js';
+import type { OnboardingStepValue } from './OnboardingStep.js';
+import type { IndustryValue, EmployeeCountValue, ModuleValue, PlanValue } from '../schemas/completeOnboarding.schema.js';
 
 export type { IndustryValue, EmployeeCountValue, ModuleValue, PlanValue };
 export type { OnboardingStatusValue };
-export type { OnboardingStepValue } from './OnboardingStep';
+export type { OnboardingStepValue } from './OnboardingStep.js';
 
 export interface OnboardingProgressPrimitives {
     readonly currentStep: OnboardingStepValue;

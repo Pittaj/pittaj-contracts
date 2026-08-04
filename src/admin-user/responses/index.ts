@@ -1,1 +1,1 @@
-export * from './adminUserResponses';
+export * from './adminUserResponses.js';

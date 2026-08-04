@@ -7,7 +7,7 @@
  * son DTOs planos de Supplier (shape que parsea el desktop).
  */
 
-import type { SupplierResponse } from './SupplierResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { SupplierResponse } from './SupplierResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullSupplierResponse = SyncPullResponse<SupplierResponse>;

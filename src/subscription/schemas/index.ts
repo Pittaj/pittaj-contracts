@@ -1,1 +1,1 @@
-export * from './subscriptionSchemas';
+export * from './subscriptionSchemas.js';

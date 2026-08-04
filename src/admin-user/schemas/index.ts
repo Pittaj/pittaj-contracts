@@ -1,1 +1,1 @@
-export * from './adminUserSchemas';
+export * from './adminUserSchemas.js';

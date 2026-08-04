@@ -3,8 +3,8 @@
  * @module Contracts/Invoice/Responses
  */
 
-import type { InvoicePrimitives } from '../primitives';
-import type { PaymentPrimitives } from '../../payment/primitives';
+import type { InvoicePrimitives } from '../primitives/index.js';
+import type { PaymentPrimitives } from '../../payment/primitives/index.js';
 
 /** Renglón del listado de facturas. */
 export type InvoiceListItem = Omit<InvoicePrimitives, 'notes' | 'cancellationReason'>;

@@ -7,7 +7,7 @@
  * son DTOs de Layaway (con líneas hijas anidadas; shape que parsea el desktop).
  */
 
-import type { LayawayResponse } from './LayawayResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { LayawayResponse } from './LayawayResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullLayawayResponse = SyncPullResponse<LayawayResponse>;

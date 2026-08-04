@@ -3,7 +3,7 @@
  * @module Auth/Application/Commands/OAuthCallback
  */
 
-import type { AuthUserPrimitives, AuthClaimsPrimitives } from '../primitives';
+import type { AuthUserPrimitives, AuthClaimsPrimitives } from '../primitives/index.js';
 
 /**
  * Resultado del procesamiento del callback OAuth.

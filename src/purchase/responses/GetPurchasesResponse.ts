@@ -3,7 +3,7 @@
  * @module Contracts/Purchase
  */
 
-import type { PurchaseResponse } from './PurchaseResponse';
+import type { PurchaseResponse } from './PurchaseResponse.js';
 
 /** Respuesta de GET /api/purchases (lista paginada). */
 export interface GetPurchasesResponse {

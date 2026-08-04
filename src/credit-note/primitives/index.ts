@@ -1,1 +1,1 @@
-export * from './creditNotePrimitives';
+export * from './creditNotePrimitives.js';

@@ -4,7 +4,7 @@
  * @version 1.0.0
  */
 
-import type { BankTransactionResponse } from './BankTransactionResponse';
+import type { BankTransactionResponse } from './BankTransactionResponse.js';
 
 export interface BankTransferResponse {
   readonly id: string;

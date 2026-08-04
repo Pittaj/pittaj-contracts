@@ -4,11 +4,11 @@
  * @version 1.0.0
  */
 
-import type { BankingStatusValue } from '../constants';
+import type { BankingStatusValue } from '../constants/index.js';
 import type {
   ReconciliationActionPrimitives,
   ReconciliationMatchPrimitives,
-} from '../primitives';
+} from '../primitives/index.js';
 
 /**
  * Regla automática de conciliación, estilo Odoo.

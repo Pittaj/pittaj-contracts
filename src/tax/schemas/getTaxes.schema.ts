@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { TAX_STATUSES } from './createTax.schema';
+import { TAX_STATUSES } from './createTax.schema.js';
 
 /**
  * Query params de GET /taxes.

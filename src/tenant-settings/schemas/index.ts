@@ -3,5 +3,5 @@
  * @module Contracts/TenantSettings
  */
 
-export * from './tenantSettings.schema';
-export * from './syncTenantSettings.schema';
+export * from './tenantSettings.schema.js';
+export * from './syncTenantSettings.schema.js';

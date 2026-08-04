@@ -3,4 +3,4 @@
  * @module Contracts/Supplier
  */
 
-export * from './supplierSchemas';
+export * from './supplierSchemas.js';

@@ -1,4 +1,4 @@
-import type { CategoryListResponse } from './CategoryListResponse';
+import type { CategoryListResponse } from './CategoryListResponse.js';
 
 /** Resultado paginado de categorías. */
 export interface PaginatedCategoriesResult {

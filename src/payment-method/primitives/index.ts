@@ -1,1 +1,1 @@
-export type { PaymentMethodConfigPrimitives } from './PaymentMethodConfigPrimitives';
+export type { PaymentMethodConfigPrimitives } from './PaymentMethodConfigPrimitives.js';

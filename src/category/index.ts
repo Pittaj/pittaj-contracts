@@ -16,7 +16,7 @@
  */
 
 // Schemas Zod
-export * from './schemas';
+export * from './schemas/index.js';
 
 // Migrado desde módulos
-export * from './responses';
+export * from './responses/index.js';

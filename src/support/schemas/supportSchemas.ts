@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { SUPPORT_LIMITS } from '../primitives';
+import { SUPPORT_LIMITS } from '../primitives/index.js';
 
 /**
  * Ids de adjuntos ya subidos, para colgar del mensaje que se envía.

@@ -7,7 +7,7 @@
  * igual que tax/company/customer. NO se redefinen aquí.
  */
 
-import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync';
+import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync/index.js';
 
 /** POST /api/measure-units/sync/push — deriva del canónico src/sync */
 export const syncPushMeasureUnitSchema = syncPushRequestSchema;

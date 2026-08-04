@@ -4,7 +4,7 @@
  * @version 1.0.0
  */
 
-import type { SyncOperation } from '../schemas/syncSchemas';
+import type { SyncOperation } from '../schemas/syncSchemas.js';
 
 /** Resultado de procesar un cambio individual. */
 export interface SyncPushItemResult {

@@ -3,7 +3,7 @@
  * @module Contracts/Department
  */
 
-export * from './createDepartment.schema';
-export * from './getDepartments.schema';
-export * from './departmentIdParam.schema';
-export { syncPushDepartmentSchema, syncPullDepartmentSchema } from './syncDepartment.schema';
+export * from './createDepartment.schema.js';
+export * from './getDepartments.schema.js';
+export * from './departmentIdParam.schema.js';
+export { syncPushDepartmentSchema, syncPullDepartmentSchema } from './syncDepartment.schema.js';

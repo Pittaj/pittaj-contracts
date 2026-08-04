@@ -11,7 +11,7 @@
  * canónico lo permite (data es record) y el backend lo ignora.
  */
 
-import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync';
+import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync/index.js';
 
 /** POST /api/departments/sync/push — deriva del canónico src/sync */
 export const syncPushDepartmentSchema = syncPushRequestSchema;

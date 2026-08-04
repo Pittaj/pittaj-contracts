@@ -7,7 +7,7 @@
  * @module Contracts/MeasureUnit
  */
 
-import type { MeasureUnitStatus } from '../schemas/createMeasureUnit.schema';
+import type { MeasureUnitStatus } from '../schemas/createMeasureUnit.schema.js';
 
 /** DTO de respuesta para consultas de unidades de medida. */
 export interface MeasureUnitResponse {

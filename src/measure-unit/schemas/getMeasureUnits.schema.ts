@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { MEASURE_UNIT_STATUSES } from './createMeasureUnit.schema';
+import { MEASURE_UNIT_STATUSES } from './createMeasureUnit.schema.js';
 
 /**
  * Query params de GET /measure-units.

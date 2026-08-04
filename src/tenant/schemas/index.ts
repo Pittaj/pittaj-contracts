@@ -1,2 +1,2 @@
-export * from './tenantLifecycleSchemas';
-export * from './tenantCrudSchemas';
+export * from './tenantLifecycleSchemas.js';
+export * from './tenantCrudSchemas.js';

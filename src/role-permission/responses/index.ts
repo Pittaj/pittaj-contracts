@@ -1,1 +1,1 @@
-export type { RolePermissionResponse } from './RolePermissionResponse';
+export type { RolePermissionResponse } from './RolePermissionResponse.js';

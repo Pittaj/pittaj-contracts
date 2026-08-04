@@ -5,7 +5,7 @@
  */
 
 import { z } from 'zod';
-import { POS_SESSION_CONSTANTS } from '../constants';
+import { POS_SESSION_CONSTANTS } from '../constants/index.js';
 
 
 const { LIMITS, STATUSES, CASH_MOVEMENT_TYPES, CASH_MOVEMENT_REASONS, CURRENCIES } =

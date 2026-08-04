@@ -1,1 +1,1 @@
-export * from './auditLogSchemas';
+export * from './auditLogSchemas.js';

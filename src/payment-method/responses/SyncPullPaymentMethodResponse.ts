@@ -7,7 +7,7 @@
  * son DTOs planos de PaymentMethod (shape que ya parsea el desktop).
  */
 
-import type { PaymentMethodResponse } from './PaymentMethodResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { PaymentMethodResponse } from './PaymentMethodResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullPaymentMethodResponse = SyncPullResponse<PaymentMethodResponse>;

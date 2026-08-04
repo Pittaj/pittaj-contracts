@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { ANNOUNCEMENT_LIMITS } from '../primitives';
+import { ANNOUNCEMENT_LIMITS } from '../primitives/index.js';
 
 /** Filtros del listado del backoffice. */
 export const listAnnouncementsSchema = z.object({

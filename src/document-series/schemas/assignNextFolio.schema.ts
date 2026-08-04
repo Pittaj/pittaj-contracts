@@ -9,7 +9,7 @@
  */
 
 import { z } from 'zod';
-import { DOCUMENT_TYPES } from './createDocumentSeries.schema';
+import { DOCUMENT_TYPES } from './createDocumentSeries.schema.js';
 
 const ERROR_MESSAGES = {
     DOC_TYPE_INVALID: 'Tipo de documento inválido',

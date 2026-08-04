@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { DOCUMENT_TYPES } from './createDocumentSeries.schema';
+import { DOCUMENT_TYPES } from './createDocumentSeries.schema.js';
 
 /**
  * Query params de GET /document-series.

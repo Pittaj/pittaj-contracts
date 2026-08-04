@@ -3,7 +3,7 @@
  * @module Contracts/Department
  */
 
-import type { DepartmentStatus } from '../schemas/createDepartment.schema';
+import type { DepartmentStatus } from '../schemas/createDepartment.schema.js';
 
 /** DTO de respuesta para consultas de departamentos. */
 export interface DepartmentResponse {

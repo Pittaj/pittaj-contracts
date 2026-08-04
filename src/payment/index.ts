@@ -1,3 +1,3 @@
-export * from './primitives';
-export * from './responses';
-export * from './schemas';
+export * from './primitives/index.js';
+export * from './responses/index.js';
+export * from './schemas/index.js';

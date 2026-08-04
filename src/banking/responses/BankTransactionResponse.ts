@@ -7,7 +7,7 @@
 import type {
   CounterpartyPrimitives,
   TransactionSourcePrimitives,
-} from '../primitives';
+} from '../primitives/index.js';
 
 export interface BankTransactionResponse {
   readonly id: string;

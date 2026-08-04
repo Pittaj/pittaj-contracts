@@ -4,7 +4,7 @@
  * @version 1.0.0
  */
 
-import type { ProductResponse } from './ProductResponse';
+import type { ProductResponse } from './ProductResponse.js';
 
 /**
  * Resultado de sincronización Pull de productos.

@@ -1,4 +1,4 @@
-import type { SaleLineBasePrimitives } from '../../shared';
+import type { SaleLineBasePrimitives } from '../../shared/index.js';
 
 export interface PosTicketLinePrimitives extends SaleLineBasePrimitives {
   readonly notes: string | null;

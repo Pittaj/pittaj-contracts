@@ -5,7 +5,7 @@
  */
 
 import { z } from 'zod';
-import { POS_TICKET_CONSTANTS } from '../constants';
+import { POS_TICKET_CONSTANTS } from '../constants/index.js';
 
 
 const { LIMITS } = POS_TICKET_CONSTANTS;

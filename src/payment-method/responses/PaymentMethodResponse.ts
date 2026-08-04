@@ -4,7 +4,7 @@
  * @version 1.0.0
  */
 
-import type { PaymentMethodConfigPrimitives } from '../primitives';
+import type { PaymentMethodConfigPrimitives } from '../primitives/index.js';
 
 export interface PaymentMethodResponse {
     readonly id: string;

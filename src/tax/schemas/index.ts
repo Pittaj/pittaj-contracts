@@ -3,7 +3,7 @@
  * @module Contracts/Tax
  */
 
-export * from './createTax.schema';
-export * from './taxIdParam.schema';
-export * from './getTaxes.schema';
-export { syncPushTaxSchema, syncPullTaxSchema } from './syncTax.schema';
+export * from './createTax.schema.js';
+export * from './taxIdParam.schema.js';
+export * from './getTaxes.schema.js';
+export { syncPushTaxSchema, syncPullTaxSchema } from './syncTax.schema.js';

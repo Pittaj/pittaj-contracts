@@ -4,7 +4,7 @@
  * @version 1.0.0
  */
 
-import type { CustomerResponse } from './CustomerResponse';
+import type { CustomerResponse } from './CustomerResponse.js';
 
 export interface SearchCustomersForPosResponse {
     readonly items: CustomerResponse[];

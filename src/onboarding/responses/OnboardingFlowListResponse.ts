@@ -3,8 +3,8 @@
  * @module Onboarding/Contracts/Responses
  */
 
-import type { OnboardingStatusValue, IndustryValue, EmployeeCountValue, ModuleValue, PlanValue } from '../schemas';
-import type { OnboardingStepValue } from '../primitives';
+import type { OnboardingStatusValue, IndustryValue, EmployeeCountValue, ModuleValue, PlanValue } from '../schemas/index.js';
+import type { OnboardingStepValue } from '../primitives/index.js';
 
 export interface OnboardingFlowListItem {
     readonly id: string;

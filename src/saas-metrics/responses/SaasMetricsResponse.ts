@@ -1,3 +1,3 @@
-import type { SaasMetricsPrimitives } from '../primitives';
+import type { SaasMetricsPrimitives } from '../primitives/index.js';
 
 export type SaasMetricsResponse = SaasMetricsPrimitives;

@@ -17,7 +17,7 @@
  * @module Contracts/SalesReturn
  */
 
-import type { ReturnResolutionPrimitive } from '../primitives/salesReturnPrimitives';
+import type { ReturnResolutionPrimitive } from '../primitives/salesReturnPrimitives.js';
 
 /** Renglón de una devolución (entidad hija). Snapshot del producto devuelto. */
 export interface SalesReturnLineResponse {

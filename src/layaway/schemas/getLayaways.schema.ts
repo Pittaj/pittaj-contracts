@@ -6,7 +6,7 @@
  */
 
 import { z } from 'zod';
-import { LAYAWAY_STATUSES } from '../primitives/layawayPrimitives';
+import { LAYAWAY_STATUSES } from '../primitives/layawayPrimitives.js';
 
 /** Query params de GET /api/layaways. */
 export const getLayawaysSchema = z.object({

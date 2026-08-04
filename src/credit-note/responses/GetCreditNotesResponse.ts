@@ -3,7 +3,7 @@
  * @module Contracts/CreditNote
  */
 
-import type { CreditNoteResponse } from './CreditNoteResponse';
+import type { CreditNoteResponse } from './CreditNoteResponse.js';
 
 /** Respuesta de GET /api/credit-notes (lista paginada). */
 export interface GetCreditNotesResponse {

@@ -1,4 +1,4 @@
-import type { AdminUserPrimitives, AdminUserSummaryPrimitives } from '../primitives';
+import type { AdminUserPrimitives, AdminUserSummaryPrimitives } from '../primitives/index.js';
 
 export type AdminUserListItem = AdminUserSummaryPrimitives & {
     readonly lastLoginAt: string | null;

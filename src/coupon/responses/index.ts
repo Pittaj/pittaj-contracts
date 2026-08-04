@@ -1,1 +1,1 @@
-export * from './couponResponses';
+export * from './couponResponses.js';

@@ -1,1 +1,1 @@
-export * from './customerSchemas';
+export * from './customerSchemas.js';

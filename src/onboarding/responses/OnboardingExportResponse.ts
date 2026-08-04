@@ -3,7 +3,7 @@
  * @module Onboarding/Contracts/Responses
  */
 
-import type { ExportFormatValue } from '../schemas';
+import type { ExportFormatValue } from '../schemas/index.js';
 
 export interface OnboardingExportResponse {
     readonly format: ExportFormatValue;

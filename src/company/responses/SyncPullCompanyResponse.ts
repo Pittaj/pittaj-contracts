@@ -7,7 +7,7 @@
  * son DTOs planos de Company (shape que ya parsea el desktop).
  */
 
-import type { CompanyResponse } from './CompanyResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { CompanyResponse } from './CompanyResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullCompanyResponse = SyncPullResponse<CompanyResponse>;

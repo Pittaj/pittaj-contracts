@@ -4,7 +4,7 @@
  * @module Contracts/DocumentSeries
  */
 
-import type { DocumentType } from '../schemas/createDocumentSeries.schema';
+import type { DocumentType } from '../schemas/createDocumentSeries.schema.js';
 
 /** Respuesta de POST /document-series/assign-folio. */
 export interface AssignNextFolioResponse {

@@ -7,7 +7,7 @@
  * @module Contracts/Tax
  */
 
-import type { TaxKind, TaxStatus } from '../schemas/createTax.schema';
+import type { TaxKind, TaxStatus } from '../schemas/createTax.schema.js';
 
 /** DTO de respuesta para consultas de impuestos. */
 export interface TaxResponse {

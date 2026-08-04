@@ -3,7 +3,7 @@
  * @module Contracts/SalesReturn
  */
 
-import type { SalesReturnResponse } from './SalesReturnResponse';
+import type { SalesReturnResponse } from './SalesReturnResponse.js';
 
 /** Respuesta de GET /api/sales-returns (lista paginada). */
 export interface GetSalesReturnsResponse {

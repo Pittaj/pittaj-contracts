@@ -1,1 +1,1 @@
-export type { SessionSummaryPrimitives } from './SessionSummaryPrimitives';
+export type { SessionSummaryPrimitives } from './SessionSummaryPrimitives.js';

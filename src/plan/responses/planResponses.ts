@@ -1,4 +1,4 @@
-import type { PlanPrimitives } from '../primitives';
+import type { PlanPrimitives } from '../primitives/index.js';
 
 export type PlanListItem = {
     readonly id: string;

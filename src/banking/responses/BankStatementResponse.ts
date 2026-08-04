@@ -9,8 +9,8 @@ import type {
   MatchStatusValue,
   StatementSourceValue,
   StatementStatusValue,
-} from '../constants';
-import type { MatchSuggestionPrimitives } from '../primitives';
+} from '../constants/index.js';
+import type { MatchSuggestionPrimitives } from '../primitives/index.js';
 
 /** Una línea del estado de cuenta del banco, con su estado de emparejamiento. */
 export interface BankStatementLineResponse {

@@ -1,1 +1,1 @@
-export * from './posTicketSchemas';
+export * from './posTicketSchemas.js';

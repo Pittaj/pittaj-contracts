@@ -1,1 +1,1 @@
-export * from './featureFlagResponses';
+export * from './featureFlagResponses.js';

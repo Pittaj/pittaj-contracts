@@ -7,7 +7,7 @@
  * son DTOs planos de Promotion (shape que ya parsea el desktop).
  */
 
-import type { PromotionResponse } from './PromotionResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { PromotionResponse } from './PromotionResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullPromotionResponse = SyncPullResponse<PromotionResponse>;

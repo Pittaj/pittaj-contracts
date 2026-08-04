@@ -3,7 +3,7 @@
  * @module Contracts/UsageLimit/Responses
  */
 
-import type { StampQuotaSource } from '../primitives';
+import type { StampQuotaSource } from '../primitives/index.js';
 
 /** Renglón del listado de uso: consumo real + cobro estimado + cuota de timbres. */
 export type TenantUsageListItem = {

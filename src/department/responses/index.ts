@@ -3,7 +3,7 @@
  * @module Contracts/Department
  */
 
-export type { DepartmentResponse } from './DepartmentResponse';
-export type { CreateDepartmentResponse } from './CreateDepartmentResponse';
-export type { SyncPushDepartmentResponse, SyncPushItemResult } from './SyncPushDepartmentResponse';
-export type { SyncPullDepartmentResponse } from './SyncPullDepartmentResponse';
+export type { DepartmentResponse } from './DepartmentResponse.js';
+export type { CreateDepartmentResponse } from './CreateDepartmentResponse.js';
+export type { SyncPushDepartmentResponse, SyncPushItemResult } from './SyncPushDepartmentResponse.js';
+export type { SyncPullDepartmentResponse } from './SyncPullDepartmentResponse.js';

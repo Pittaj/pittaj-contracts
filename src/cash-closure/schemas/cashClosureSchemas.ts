@@ -5,7 +5,7 @@
  */
 
 import { z } from 'zod';
-import { CASH_CLOSURE_CONSTANTS } from '../constants';
+import { CASH_CLOSURE_CONSTANTS } from '../constants/index.js';
 
 
 const { LIMITS, STATUSES, SHIFTS, CURRENCIES } = CASH_CLOSURE_CONSTANTS;

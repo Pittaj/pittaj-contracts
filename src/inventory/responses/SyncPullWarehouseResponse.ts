@@ -7,7 +7,7 @@
  * son DTOs planos de Warehouse (shape que ya parsea el desktop).
  */
 
-import type { WarehouseResponse } from './WarehouseResponse';
-import type { SyncPullResponse } from '../../sync';
+import type { WarehouseResponse } from './WarehouseResponse.js';
+import type { SyncPullResponse } from '../../sync/index.js';
 
 export type SyncPullWarehouseResponse = SyncPullResponse<WarehouseResponse>;
