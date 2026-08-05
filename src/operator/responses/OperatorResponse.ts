@@ -24,7 +24,7 @@
  */
 
 /** Rol legado de tres niveles. Los permisos reales salen de los roles RBAC. */
-export type OperatorRole = 'ADMIN' | 'SUPERVISOR' | 'CASHIER';
+export type OperatorRole = 'CASHIER' | 'MANAGER' | 'ADMIN';
 
 /** DTO de respuesta para sync de operadores. */
 export interface OperatorResponse {
