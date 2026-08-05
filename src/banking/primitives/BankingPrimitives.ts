@@ -164,6 +164,22 @@ export interface StatementExtractionPrimitives {
   readonly summary?: StatementDeclaredSummaryPrimitives | null;
 }
 
+/**
+ * Lo que costó una lectura, medido y estimado por separado.
+ *
+ * Los TOKENS son un hecho: los reporta el proveedor. El COSTO es una
+ * derivación a partir de una tabla de precios que vive en el adaptador y que
+ * puede quedar desfasada de la lista del proveedor. Se guardan los dos para
+ * que un precio mal actualizado no borre el dato real: con los tokens siempre
+ * se puede recalcular el costo hacia atrás.
+ */
+export interface ExtractionUsagePrimitives {
+  readonly inputTokens: number;
+  readonly outputTokens: number;
+  /** Estimación en USD según la tabla de precios del adaptador. */
+  readonly costUsd: number;
+}
+
 /** Resultado de una de las comprobaciones que se le hacen a la lectura. */
 export interface ExtractionCheckPrimitives {
   /** Qué se comprobó. */
@@ -209,6 +225,8 @@ export interface StatementExtractionAttemptPrimitives {
    * permite mostrar *qué* se comprobó y qué no, en vez de un sí/no opaco.
    */
   readonly checks?: readonly ExtractionCheckPrimitives[];
+  /** Consumo del intento, cuando el proveedor lo reporta. */
+  readonly usage?: ExtractionUsagePrimitives | null;
   readonly extraction: StatementExtractionPrimitives;
 }
 
