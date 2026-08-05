@@ -235,8 +235,13 @@ export const statementDeclaredTotalsSchema = z.object({
     .nullish()
     .transform((value) => {
       if (value === null || value === undefined) return null;
-      const digits = String(value).replace(/\D/g, '');
-      return digits.length >= 4 ? digits.slice(-4) : null;
+      // Formato y enmascarado fuera; el resto tiene que ser todo dígitos. Si
+      // el extractor devuelve un identificador alfanumérico (el `acct_…` de
+      // una pasarela), quedarse con sus dígitos sueltos fabricaría una cola
+      // que después se compara y falla sin que nadie se haya equivocado.
+      const limpio = String(value).replace(/[\s._·•*#xX-]/g, '');
+      if (!/^\d{4,}$/.test(limpio)) return null;
+      return limpio.slice(-4);
     }),
 });
 
