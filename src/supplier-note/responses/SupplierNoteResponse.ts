@@ -1,0 +1,112 @@
+/**
+ * @fileoverview DTO de SupplierNote (nota a proveedor) y del mapeo aprendido de CFDI.
+ *
+ * Espejo de `Pittaj.Domain.Purchasing.SupplierNote`. Tres documentos en uno:
+ *
+ * - `RETURN` — devolución de mercancía: renglones a costo, **saca stock** y reduce lo que se debe.
+ * - `CREDIT` — nota de crédito o descuento posterior: monto manual, sin stock, reduce el saldo.
+ * - `DEBIT`  — nota de débito o cargo: monto manual, sin stock, aumenta el saldo.
+ *
+ * Efecto **operativo, no fiscal**: la verdad fiscal vive en el CFDI del proveedor, cuyo UUID se
+ * guarda aquí solo para conciliar.
+ *
+ * ── La nube NO mueve inventario ──
+ * Cuando una devolución se aplica, el escritorio ya emitió la salida de stock y esa viaja por su
+ * cuenta como `stock-movement`. Aplicarla otra vez al recibir la nota sacaría el doble.
+ *
+ * ── Importes verbatim ──
+ * El monto del documento llega calculado y así se guarda. La nube no lo recompone a partir de los
+ * renglones: para `CREDIT`/`DEBIT` ni siquiera hay renglones de dónde sacarlo.
+ *
+ * @module Contracts/SupplierNote
+ */
+
+/** Tipo de nota. */
+export type SupplierNoteKind = 'RETURN' | 'CREDIT' | 'DEBIT';
+
+/** Estado: borrador editable → aplicada (con efecto) o cancelada. */
+export type SupplierNoteStatus = 'DRAFT' | 'APPLIED' | 'CANCELLED';
+
+/** Renglón de una devolución (solo en notas `RETURN`). */
+export interface SupplierNoteLineResponse {
+    readonly id: string;
+    readonly productId: string;
+    /** Snapshot del nombre al capturar la nota. */
+    readonly productName: string;
+    /** Snapshot del código/SKU al capturar la nota. */
+    readonly productCode: string;
+
+    readonly quantity: number;
+    readonly unitCost: number;
+    readonly discountPercent: number;
+    readonly taxPercent: number;
+
+    readonly subtotalAmount: number;
+    readonly discountAmount: number;
+    readonly taxBaseAmount: number;
+    readonly taxAmount: number;
+    readonly totalAmount: number;
+}
+
+/** DTO de respuesta para sync de notas a proveedor. */
+export interface SupplierNoteResponse {
+    readonly id: string;
+    /** Folio interno (NOTA-#). */
+    readonly noteNumber: string;
+    readonly kind: SupplierNoteKind;
+    readonly status: SupplierNoteStatus;
+
+    readonly supplierId: string;
+    /** Snapshot del nombre del proveedor. */
+    readonly supplierName: string;
+    /** RFC snapshot; puede faltar si el proveedor se capturó sin él. */
+    readonly supplierTaxId: string | null;
+
+    /** Compra referenciada, si la nota nació de una. */
+    readonly purchaseId: string | null;
+    /** Snapshot del folio de esa compra. */
+    readonly purchaseNumber: string | null;
+
+    /** Bodega de la que sale la mercancía (solo importa en `RETURN`). */
+    readonly warehouseId: string;
+    /** UUID del CFDI del proveedor, para conciliar. */
+    readonly invoiceUuid: string | null;
+
+    readonly currency: string;
+    readonly reason: string | null;
+
+    /** Monto del documento. En `RETURN` sale de los renglones; en el resto se captura. */
+    readonly amount: number;
+    /** Impuesto; solo tiene sentido en `RETURN`. */
+    readonly taxAmount: number;
+
+    readonly appliedAt: string | null;
+    readonly cancellationReason: string | null;
+    readonly lines: readonly SupplierNoteLineResponse[];
+
+    readonly version: number;
+    readonly createdAt?: string;
+    readonly updatedAt?: string;
+}
+
+/**
+ * DTO del mapeo **proveedor-concepto → producto** que se aprende al importar CFDIs.
+ *
+ * La primera factura de un proveedor se concilia a mano; de la segunda en adelante los conceptos
+ * emparejan solos. Sincronizarlo importa porque ese aprendizaje es trabajo humano acumulado: sin
+ * él, una computadora nueva vuelve a preguntar producto por producto en cada factura.
+ */
+export interface SupplierProductLinkResponse {
+    readonly id: string;
+    /** RFC del emisor en mayúsculas — clave estable aunque el proveedor no exista aún en el catálogo. */
+    readonly supplierRfc: string;
+    /** Clave del concepto: `ID:<NoIdentificacion>` si el CFDI lo trae, o `DESC:<descripción>`. */
+    readonly conceptoKey: string;
+    readonly productId: string;
+    /** Última descripción vista (diagnóstico/UI). */
+    readonly description: string;
+
+    readonly version: number;
+    readonly createdAt?: string;
+    readonly updatedAt?: string;
+}
