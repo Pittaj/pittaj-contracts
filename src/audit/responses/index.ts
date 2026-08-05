@@ -10,3 +10,4 @@ export type {
     AuditLogsPageResponse,
     AccessLogsPageResponse,
 } from './AuditResponses.js';
+export * from './DeviceAuditLogResponse';
