@@ -65,6 +65,10 @@
       "types": "./src/onboarding/index.ts",
       "import": "./dist/onboarding/index.js"
     },
+    "./operator": {
+      "types": "./src/operator/index.ts",
+      "import": "./dist/operator/index.js"
+    },
     "./onboarding/schemas": {
       "types": "./src/onboarding/schemas/index.ts",
       "import": "./dist/onboarding/schemas/index.js"
