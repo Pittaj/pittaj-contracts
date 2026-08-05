@@ -176,8 +176,15 @@ export interface StatementExtractionPrimitives {
 export interface ExtractionUsagePrimitives {
   readonly inputTokens: number;
   readonly outputTokens: number;
-  /** Estimación en USD según la tabla de precios del adaptador. */
-  readonly costUsd: number;
+  /**
+   * Estimación en USD, o **null si no hay precio configurado** para ese modelo.
+   *
+   * Null es deliberado y no significa gratis: significa "no lo sé". Poner un
+   * cero, o un precio inventado, produce un dato que se ve creíble y no lo es
+   * — y el propósito de medir esto es dejar de estimar a ojo. Con los tokens
+   * guardados, el costo se recalcula cuando el precio se configure.
+   */
+  readonly costUsd: number | null;
 }
 
 /** Resultado de una de las comprobaciones que se le hacen a la lectura. */
