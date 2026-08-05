@@ -2,11 +2,11 @@
  * @fileoverview DTO de respuesta para Operator (usuario local de la instalación).
  *
  * Espejo del agregado desktop `Pittaj.Domain.Identity.Operator`: la persona que entra a
- * esta computadora con usuario y contraseña, incluso sin internet. Es distinto del
- * `Cashier` (Caja → Cajeros, PIN y permisos POS) y del `User` de Organización: el
- * operador es quien ABRE Pittaj, no quien cobra.
+ * esta computadora con usuario y contraseña, incluso sin internet, y que también cobra.
+ * Desde ADR-016 es la ÚNICA identidad —"cajero" es un rol, no una entidad— y es distinta
+ * del `User` de Organización, que es la cuenta de nube.
  *
- * ── Por qué la contraseña SÍ viaja (y el PIN del cajero no) ──
+ * ── Por qué la contraseña SÍ viaja (y el PIN de mostrador no) ──
  * Lo que viaja es el **verificador Argon2id** (sal + hash), nunca la contraseña. Es
  * exactamente lo que ya guarda la nube para las cuentas web en `auth_credentials`: de un
  * hash Argon2id no se recupera la contraseña.
@@ -17,8 +17,9 @@
  * un verificador que la nube ya guarda para las cuentas web. Decisión del dueño del
  * producto, 2026-08-04.
  *
- * Sigue sin viajar el PIN del `Cashier` (ver CashierResponse): esa es otra credencial y
- * otra decisión, hoy sin cambiar.
+ * El **PIN de mostrador** del operador sigue sin viajar (ADR-016): 4-6 dígitos se enumeran
+ * offline en minutos y el pull lo repartiría a todos los dispositivos. Por eso no aparece
+ * en este contrato — ni en ningún otro.
  *
  * @module Contracts/Operator
  */
