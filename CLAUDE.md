@@ -29,3 +29,15 @@ Este repo lo consumen backend y frontend por `file:`. Tras cambiarlo hay que **r
 consumidor para que vea lo nuevo; si algo "no compila con lo que acabas de exportar", suele ser eso.
 
 Los contratos siguen a la implementación **del escritorio**: desktop manda → contracts → web.
+
+## Compilar y probar es trabajo de Actions
+
+No compiles el proyecto entero ni corras la suite completa en local: **Actions es la autoridad**
+sobre si algo compila y pasa (ADR-016). Los fallos que aparecen en local suelen ser del entorno, no
+del código, y cuestan media hora de diagnóstico ajeno al problema.
+
+En local, solo lo rápido y acotado: `tsc --noEmit` del paquete tocado y las pruebas **unitarias y
+de dominio** del módulo tocado.
+
+Antes de acusar a tu cambio, reproduce el fallo contra la rama base. Si también falla ahí, es
+ambiental: repórtalo y sigue.
