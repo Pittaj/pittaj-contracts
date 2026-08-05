@@ -246,6 +246,30 @@ export const statementDeclaredTotalsSchema = z.object({
 });
 
 /** Lo que produce el puerto de extracción: saldos declarados + líneas. */
+/**
+ * Un renglón de la ecuación del resumen.
+ *
+ * El importe se exige POSITIVO y el sentido va aparte en `sign`. Es a propósito:
+ * si se aceptara el signo dentro del número, un banco que imprime
+ * `Salidas: $-80,875.35` y otro que imprime `−  $19,417.49` producirían la misma
+ * cifra con sentidos opuestos, y nadie podría saber cuál era cuál después.
+ */
+export const statementSummaryTermSchema = z.object({
+  label: z.string().trim().min(1).max(120),
+  amount: z.number().min(0).max(LIMITS.MAX_AMOUNT),
+  sign: z.union([z.literal(1), z.literal(-1)]),
+  kind: z.enum(BANKING_CONSTANTS.SUMMARY_TERM_KINDS),
+});
+
+/** El bloque de resumen del documento, como ecuación. */
+export const statementDeclaredSummarySchema = z.object({
+  openingBalance: z.number().min(-LIMITS.MAX_AMOUNT).max(LIMITS.MAX_AMOUNT),
+  closingBalance: z.number().min(-LIMITS.MAX_AMOUNT).max(LIMITS.MAX_AMOUNT),
+  nature: z.enum(BANKING_CONSTANTS.ACCOUNT_NATURES),
+  /** Un resumen puede traer muchos renglones; 30 ya es un documento raro. */
+  terms: z.array(statementSummaryTermSchema).max(30),
+});
+
 export const statementExtractionSchema = z
   .object({
     openingBalance: z.number(),
@@ -254,6 +278,7 @@ export const statementExtractionSchema = z
     periodEnd: isoDateSchema,
     lines: z.array(extractedStatementLineSchema).min(1).max(RECON.MAX_STATEMENT_LINES),
     declared: statementDeclaredTotalsSchema.nullish(),
+    summary: statementDeclaredSummarySchema.nullish(),
   })
   .refine((v) => v.periodStart <= v.periodEnd, {
     message: 'El periodo inicia después de terminar',
