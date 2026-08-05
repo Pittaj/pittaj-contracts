@@ -33,7 +33,7 @@ Los contratos siguen a la implementación **del escritorio**: desktop manda → 
 ## Compilar y probar es trabajo de Actions
 
 No compiles el proyecto entero ni corras la suite completa en local: **Actions es la autoridad**
-sobre si algo compila y pasa (ADR-016). Los fallos que aparecen en local suelen ser del entorno, no
+sobre si algo compila y pasa (ADR-017). Los fallos que aparecen en local suelen ser del entorno, no
 del código, y cuestan media hora de diagnóstico ajeno al problema.
 
 En local, solo lo rápido y acotado: `tsc --noEmit` del paquete tocado y las pruebas **unitarias y
