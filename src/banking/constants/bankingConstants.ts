@@ -122,6 +122,31 @@ export const BANKING_CONSTANTS = {
     MAX_COMMISSION_RATE: 0.2,
   },
 
+  // ── N3 · Aplicación de pagos a documentos ────────────────────────
+
+  /**
+   * Documentos a los que un egreso se puede aplicar.
+   *
+   * Son los dos sabores de `Purchase` (kind INVENTORY / EXPENSE) y se
+   * distinguen a propósito: la contabilidad futura no arma la misma póliza
+   * pagando mercancía que pagando la luz. Coinciden con los `SOURCE_TYPES`
+   * homónimos porque son el mismo documento visto desde el movimiento.
+   */
+  PAYABLE_DOCUMENT_TYPES: ['PURCHASE', 'EXPENSE'] as const,
+
+  PAYMENT_APPLICATION_LIMITS: {
+    /**
+     * Documentos que un solo movimiento puede pagar.
+     *
+     * Un pago a proveedor que cubre 30 facturas es un caso real; 200 es un
+     * error de captura o un intento de meter un lote entero como un pago.
+     */
+    MAX_APPLICATIONS: 30,
+
+    /** Longitud máxima del folio del documento que se guarda como snapshot. */
+    MAX_DOCUMENT_NUMBER_LENGTH: 50,
+  },
+
   /**
    * Epsilon para comparar dinero.
    *
@@ -148,6 +173,7 @@ export type StatementStatusValue = (typeof BANKING_CONSTANTS.STATEMENT_STATUSES)
 export type MatchStatusValue = (typeof BANKING_CONSTANTS.MATCH_STATUSES)[number];
 export type MatchOriginValue = (typeof BANKING_CONSTANTS.MATCH_ORIGINS)[number];
 export type ReconciliationRuleActionValue = (typeof BANKING_CONSTANTS.RULE_ACTIONS)[number];
+export type PayableDocumentTypeValue = (typeof BANKING_CONSTANTS.PAYABLE_DOCUMENT_TYPES)[number];
 
 /** Definición de una categoría de sistema (seed por tenant, estilo CONTPAQi). */
 export interface SystemCategoryDef {
