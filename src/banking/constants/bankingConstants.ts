@@ -122,6 +122,39 @@ export const BANKING_CONSTANTS = {
     MAX_COMMISSION_RATE: 0.2,
   },
 
+  /**
+   * Naturaleza del saldo de la cuenta.
+   *
+   * DEBTOR (deudora) = el dinero es tuyo: el abono sube el saldo.
+   * CREDITOR (acreedora) = es una deuda: el CARGO sube el saldo y el PAGO lo
+   * baja. Las tarjetas de crédito son acreedoras, y no distinguirlo invierte
+   * el estado de cuenta completo.
+   */
+  ACCOUNT_NATURES: ['DEBTOR', 'CREDITOR'] as const,
+
+  /**
+   * Clases de término del resumen que imprime un banco.
+   *
+   * NO se usan para cuadrar —para eso basta el signo— sino para casar los
+   * movimientos leídos contra el término que les corresponde. `OTHER` existe
+   * porque el noveno banco va a traer un renglón que nadie previó, y perder la
+   * ecuación entera por no saber cómo llamarlo sería absurdo.
+   */
+  SUMMARY_TERM_KINDS: [
+    'DEPOSITS',
+    'WITHDRAWALS',
+    'COMMISSIONS',
+    'COMMISSIONS_TAX',
+    'INTEREST_EARNED',
+    'INTEREST_CHARGED',
+    'TAX_WITHHELD',
+    'PAYMENTS',
+    'CHARGES',
+    'INSTALLMENTS',
+    'ADJUSTMENTS',
+    'OTHER',
+  ] as const,
+
   // ── N3 · Aplicación de pagos a documentos ────────────────────────
 
   /**
@@ -174,6 +207,8 @@ export type MatchStatusValue = (typeof BANKING_CONSTANTS.MATCH_STATUSES)[number]
 export type MatchOriginValue = (typeof BANKING_CONSTANTS.MATCH_ORIGINS)[number];
 export type ReconciliationRuleActionValue = (typeof BANKING_CONSTANTS.RULE_ACTIONS)[number];
 export type PayableDocumentTypeValue = (typeof BANKING_CONSTANTS.PAYABLE_DOCUMENT_TYPES)[number];
+export type AccountNatureValue = (typeof BANKING_CONSTANTS.ACCOUNT_NATURES)[number];
+export type SummaryTermKindValue = (typeof BANKING_CONSTANTS.SUMMARY_TERM_KINDS)[number];
 
 /** Definición de una categoría de sistema (seed por tenant, estilo CONTPAQi). */
 export interface SystemCategoryDef {

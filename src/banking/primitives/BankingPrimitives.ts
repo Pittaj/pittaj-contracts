@@ -4,10 +4,12 @@
  */
 
 import type {
+  AccountNatureValue,
   CounterpartyTypeValue,
   MatchOriginValue,
   PayableDocumentTypeValue,
   ReconciliationRuleActionValue,
+  SummaryTermKindValue,
   TransactionSourceTypeValue,
 } from '../constants/index.js';
 
@@ -86,6 +88,52 @@ export interface StatementDeclaredTotalsPrimitives {
 }
 
 /**
+ * Un renglón de la ecuación que el banco imprime en su resumen.
+ *
+ * Existe porque **no hay una ecuación única**: Banorte declara siete términos y
+ * deja las comisiones fuera de "retiros"; Banco Azteca declara dos niveles y las
+ * mete dentro; Mercado Pago declara cuatro; una tarjeta declara ocho y al revés.
+ * Imponerle a todos una forma de dos términos (`depósitos − retiros`) marca en
+ * rojo lecturas perfectas.
+ *
+ * Capturando la ecuación tal como está impresa, la comprobación deja de
+ * depender de conocer al banco.
+ */
+export interface StatementSummaryTermPrimitives {
+  /** La etiqueta tal como la imprime el documento. */
+  readonly label: string;
+  /** Importe SIEMPRE en positivo: el sentido lo lleva `sign`. */
+  readonly amount: number;
+  /**
+   * +1 suma al saldo, −1 resta.
+   *
+   * Lo normaliza el extractor, y es el dato más delicado de todo el resumen:
+   * el signo puede venir **dentro del número** (`-$80,875.35`) o **fuera, como
+   * operador de la tabla** (`−  $19,417.49`), y dos emisores con la MISMA tabla
+   * estandarizada usan convenciones opuestas. Equivocarlo no descuadra por el
+   * importe: descuadra por el doble, porque suma lo que debía restar.
+   */
+  readonly sign: 1 | -1;
+  /** Clasificación best-effort, para casar movimientos. Nunca para cuadrar. */
+  readonly kind: SummaryTermKindValue;
+}
+
+/**
+ * El bloque de resumen del documento, como ecuación.
+ *
+ * `saldoInicial + Σ(signo × importe) = saldoFinal` debe cerrar. Que cierre no
+ * dice que los movimientos estén bien leídos —dice que el RESUMEN se leyó
+ * bien—, y son dos cosas distintas que conviene no confundir.
+ */
+export interface StatementDeclaredSummaryPrimitives {
+  readonly openingBalance: number;
+  readonly closingBalance: number;
+  /** Deudora (el dinero es tuyo) o acreedora (es una deuda: TDC). */
+  readonly nature: AccountNatureValue;
+  readonly terms: readonly StatementSummaryTermPrimitives[];
+}
+
+/**
  * Lo que devuelve un extractor de estados de cuenta, sea cual sea el proveedor.
  *
  * Trae los saldos declarados **además** de las líneas porque son el verificador:
@@ -106,6 +154,14 @@ export interface StatementExtractionPrimitives {
   readonly lines: readonly ExtractedStatementLinePrimitives[];
   /** Cifras de control del resumen, cuando el documento las trae. */
   readonly declared?: StatementDeclaredTotalsPrimitives | null;
+  /**
+   * La ecuación del resumen tal como el documento la imprime.
+   *
+   * Es opcional porque hay documentos que no la traen —una tarjeta del lote
+   * solo publica fechas, línea de crédito y una gráfica—. Ausente significa
+   * "no comprobable", nunca "aprobado".
+   */
+  readonly summary?: StatementDeclaredSummaryPrimitives | null;
 }
 
 /** Resultado de una de las comprobaciones que se le hacen a la lectura. */
@@ -113,6 +169,10 @@ export interface ExtractionCheckPrimitives {
   /** Qué se comprobó. */
   readonly check:
     | 'NET_BALANCE'
+    /** La ecuación que el banco imprime cierra consigo misma. */
+    | 'SUMMARY_CLOSES'
+    /** Lo leído casa con los términos que el banco declara. */
+    | 'MOVEMENTS_MATCH_SUMMARY'
     | 'TOTAL_CREDITS'
     | 'TOTAL_DEBITS'
     | 'MOVEMENT_COUNT'
