@@ -341,6 +341,25 @@ export interface PayableDocumentPrimitives {
   /** Folio fiscal del CFDI del proveedor, si lo hay. */
   readonly cfdiUuid: string | null;
   readonly currency: string;
+  /** El total tal como lo trae el documento de Compras, sin tocar. */
+  readonly grossAmount: number;
+  /**
+   * Efecto **firmado** de las notas de proveedor aplicadas a este documento.
+   *
+   * Negativo en devolución y nota de crédito, positivo en nota de débito. Va
+   * aparte del total porque si se mezclaran, la pantalla mostraría una cifra
+   * que no cuadra con la factura del proveedor y nadie sabría por qué. Aquí se
+   * puede enseñar la resta.
+   */
+  readonly noteAdjustment: number;
+  /**
+   * Lo que el documento obliga HOY: `grossAmount + noteAdjustment`.
+   *
+   * Es el tope contra el que se comprueba el sobrepago. Puede quedar por
+   * debajo del total impreso en la factura, y esa es justamente la corrección:
+   * si el proveedor mandó una nota de crédito, pagar el total sería pagar de
+   * más.
+   */
   readonly totalAmount: number;
   /** Suma de lo aplicado desde tesorería (movimientos no anulados). */
   readonly appliedAmount: number;
