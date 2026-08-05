@@ -49,7 +49,13 @@ export interface SalesReturnResponse {
     readonly totalAmount: number;
     /** Moneda (ej. "MXN"). */
     readonly currency: string;
-    /** Operador/cajero que procesó la devolución. */
+    /** Operador que procesó la devolución. Desde ADR-016 el operador ES el cajero. */
+    readonly operatorId: string;
+    /**
+     * @deprecated Nombre viejo de `operatorId`. Se sigue emitiendo y leyendo durante el
+     * despliegue escalonado (ADR-012: nada rompe en un solo salto) y se retira después,
+     * cuando toda la flota esté en una versión que use `operatorId`.
+     */
     readonly cashierId: string;
     /** Nota de crédito emitida (id) cuando resolution = CREDIT_NOTE (null en CASH). */
     readonly creditNoteId: string | null;

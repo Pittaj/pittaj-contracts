@@ -50,7 +50,13 @@ export interface LayawayResponse {
     readonly balance: number;
     /** Moneda (ej. "MXN"). */
     readonly currency: string;
-    /** Operador/cajero que creó el apartado. */
+    /** Operador que creó el apartado. Desde ADR-016 el operador ES el cajero. */
+    readonly operatorId: string;
+    /**
+     * @deprecated Nombre viejo de `operatorId`. Se sigue emitiendo y leyendo durante el
+     * despliegue escalonado (ADR-012: nada rompe en un solo salto) y se retira después,
+     * cuando toda la flota esté en una versión que use `operatorId`.
+     */
     readonly cashierId: string;
     /** Vencimiento del apartado (ISO 8601, null = sin vencimiento). */
     readonly dueDate: string | null;
