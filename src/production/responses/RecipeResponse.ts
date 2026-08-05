@@ -9,8 +9,9 @@
  * Los nombres y códigos de componente son **snapshot**: se congelan como estaban al capturar la
  * receta. Si mañana se renombra un producto, la receta vieja sigue diciendo lo que decía.
  *
- * Las cantidades viajan como **string** (numeric de Postgres) para no perder decimales al pasar
- * por el punto flotante de JavaScript — misma convención que compras e inventario.
+ * Cantidades y dinero viajan como **number**, la convención de la casa para todos los
+ * documentos (compras, tickets, inventario). La nube los guarda en `numeric` y los convierte al
+ * serializar.
  *
  * @module Contracts/Production
  */
@@ -24,7 +25,7 @@ export interface RecipeLineResponse {
     /** Snapshot del código/SKU al capturar la receta. */
     readonly componentCode: string;
     /** Cantidad en unidad BASE del componente. */
-    readonly quantity: string;
+    readonly quantity: number;
 }
 
 /** DTO de respuesta para sync de recetas. */
@@ -34,7 +35,7 @@ export interface RecipeResponse {
     /** Snapshot del nombre del producto que se produce. */
     readonly productName: string;
     /** Unidades base que rinde la receta (el lote). Las líneas consumen esto. */
-    readonly outputQuantity: string;
+    readonly outputQuantity: number;
     readonly notes: string | null;
     readonly isActive: boolean;
     readonly lines: readonly RecipeLineResponse[];

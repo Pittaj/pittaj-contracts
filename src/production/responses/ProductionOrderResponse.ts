@@ -15,7 +15,7 @@
  * costo promedio vigente en el momento de terminar. **No se recalculan aquí**: el costo de un lote
  * depende de un promedio histórico que la nube no tiene, y recalcularlo daría otro número.
  *
- * Cantidades y dinero viajan como **string** (numeric de Postgres) para no perder decimales.
+ * Cantidades y dinero viajan como **number**, la convención de la casa para los documentos.
  *
  * @module Contracts/Production
  */
@@ -32,11 +32,11 @@ export interface ProductionOrderLineResponse {
     /** Snapshot del código/SKU al capturar la orden. */
     readonly componentCode: string;
     /** Lo que sugirió la receta. */
-    readonly plannedQuantity: string;
+    readonly plannedQuantity: number;
     /** Lo realmente consumido (el peso tras un secado varía). */
-    readonly consumedQuantity: string;
+    readonly consumedQuantity: number;
     /** Costo promedio vigente al TERMINAR la orden. Verbatim. */
-    readonly unitCost: string;
+    readonly unitCost: number;
 }
 
 /** DTO de respuesta para sync de órdenes de producción. */
@@ -53,13 +53,13 @@ export interface ProductionOrderResponse {
     readonly locationId: string | null;
     readonly status: ProductionOrderStatus;
 
-    readonly plannedQuantity: string;
+    readonly plannedQuantity: number;
     /** Lo realmente obtenido; puede diferir de lo planeado. */
-    readonly producedQuantity: string;
+    readonly producedQuantity: number;
     /** Suma de consumos × costo promedio. Verbatim del escritorio. */
-    readonly totalCost: string;
+    readonly totalCost: number;
     /** Costo unitario del producto obtenido: total ÷ producido. Verbatim. */
-    readonly unitCost: string;
+    readonly unitCost: number;
 
     readonly notes: string | null;
     readonly completedAt: string | null;
