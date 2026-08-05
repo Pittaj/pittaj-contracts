@@ -6,6 +6,7 @@
 import type {
   CounterpartyTypeValue,
   MatchOriginValue,
+  PayableDocumentTypeValue,
   ReconciliationRuleActionValue,
   TransactionSourceTypeValue,
 } from '../constants/index.js';
@@ -203,4 +204,61 @@ export interface ReconciliationActionPrimitives {
   readonly categoryId?: string | null;
   /** Tasa de comisión propuesta para TPV_SPLIT (fracción: 0.025 = 2.5%). */
   readonly commissionRate?: number | null;
+}
+
+// ── N3 · Aplicación de pagos a documentos ──────────────────────────
+
+/**
+ * Un tramo de un movimiento aplicado a un documento de negocio.
+ *
+ * Es la pieza que convierte "salieron $12,000 de la cuenta" en "esos $12,000
+ * pagaron estas tres facturas". Un pago puede repartirse entre varios
+ * documentos y un documento puede recibir varios pagos, así que la relación
+ * es N:M y el importe aplicado vive en el cruce, no en ninguno de los dos.
+ *
+ * El nombre y el folio son SNAPSHOT: el documento se sincroniza desde el
+ * desktop y puede cambiar de proveedor o de folio; lo que se aplicó se aplicó
+ * contra lo que decía en ese momento.
+ */
+export interface PaymentApplicationPrimitives {
+  readonly id: string;
+  /** PURCHASE (compra de inventario) o EXPENSE (gasto). */
+  readonly documentType: PayableDocumentTypeValue;
+  /** Id del documento en su propia tabla; uuid suelto, sin FK. */
+  readonly documentId: string;
+  /** Folio visible del documento al momento de aplicar (snapshot). */
+  readonly documentNumber: string;
+  /** Contraparte del documento al momento de aplicar (snapshot). */
+  readonly counterpartyName: string;
+  /** Importe de ESTE movimiento que se destina a ESE documento; > 0. */
+  readonly appliedAmount: number;
+}
+
+/**
+ * Un documento pagable con su saldo, tal como Bancos lo ve.
+ *
+ * El saldo NO vive en el documento: se deriva restándole al total lo ya
+ * aplicado desde tesorería. El documento (una compra) es un espejo del
+ * desktop y Bancos no lo escribe — si guardara ahí un "pagado" estaría
+ * inventándole un campo a un dueño que no es él, y el ciclo CxP formal
+ * (Etapa 3) llegaría a discutírselo.
+ */
+export interface PayableDocumentPrimitives {
+  readonly documentType: PayableDocumentTypeValue;
+  readonly documentId: string;
+  readonly documentNumber: string;
+  /** Fecha del documento (YYYY-MM-DD). */
+  readonly date: string;
+  readonly counterpartyId: string | null;
+  readonly counterpartyName: string;
+  /** RFC del proveedor cuando el documento lo trae. */
+  readonly counterpartyTaxId: string | null;
+  /** Folio fiscal del CFDI del proveedor, si lo hay. */
+  readonly cfdiUuid: string | null;
+  readonly currency: string;
+  readonly totalAmount: number;
+  /** Suma de lo aplicado desde tesorería (movimientos no anulados). */
+  readonly appliedAmount: number;
+  /** totalAmount − appliedAmount. Cero = saldado. */
+  readonly balanceAmount: number;
 }

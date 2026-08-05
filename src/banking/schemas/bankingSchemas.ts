@@ -373,3 +373,48 @@ export const getReconciliationRulesSchema = z.object({
   accountId: z.string().uuid().optional(),
   status: statusEnum.optional(),
 });
+
+// ============================================================
+// N3 · APLICACIÓN DE PAGOS A DOCUMENTOS
+// ============================================================
+
+const { PAYMENT_APPLICATION_LIMITS: APPLY } = BANKING_CONSTANTS;
+
+const payableDocumentTypeEnum = z.enum(BANKING_CONSTANTS.PAYABLE_DOCUMENT_TYPES);
+
+/** Un tramo del movimiento destinado a un documento. */
+const paymentApplicationSchema = z.object({
+  documentType: payableDocumentTypeEnum,
+  documentId: z.string().uuid(),
+  appliedAmount: z.number().positive().max(LIMITS.MAX_AMOUNT),
+});
+
+/**
+ * PUT /api/bank-transactions/:id/applications — Reparto del movimiento.
+ *
+ * Reemplaza el reparto completo, no lo acumula: mandar `[]` desaplica todo.
+ * Reemplazar en bloque es lo único que permite validar la suma de una sola
+ * vez; aplicar de a uno dejaría estados intermedios donde el reparto excede
+ * el movimiento y habría que decidir si eso es válido "por un momento".
+ *
+ * El folio y el nombre del proveedor NO viajan: los resuelve el servidor
+ * leyendo el documento. Si los mandara el cliente, el snapshot guardaría lo
+ * que la pantalla creía, no lo que el documento dice.
+ */
+export const applyPaymentSchema = z.object({
+  version: z.number().int().min(1),
+  applications: z.array(paymentApplicationSchema).max(APPLY.MAX_APPLICATIONS),
+});
+
+/** GET /api/payable-documents — Documentos por pagar con su saldo. */
+export const getPayableDocumentsSchema = z.object({
+  /** Filtra por proveedor (soft ref). */
+  counterpartyId: z.string().uuid().optional(),
+  /** Texto libre: folio, proveedor o folio fiscal. */
+  search: z.string().trim().max(100).optional(),
+  documentType: payableDocumentTypeEnum.optional(),
+  /** true (default) = solo con saldo > 0; false = incluye los saldados. */
+  onlyPending: z.coerce.boolean().optional(),
+  page: z.coerce.number().int().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(LIMITS.MAX_PAGE_SIZE).optional(),
+});

@@ -6,6 +6,7 @@
 
 import type {
   CounterpartyPrimitives,
+  PaymentApplicationPrimitives,
   TransactionSourcePrimitives,
 } from '../primitives/index.js';
 
@@ -25,6 +26,16 @@ export interface BankTransactionResponse {
   readonly source: TransactionSourcePrimitives;
   /** CFDIs que este pago cubre (andamiaje N3 → REP). */
   readonly cfdiUuids: readonly string[];
+  /**
+   * Documentos que este movimiento paga (N3). Vacío = pago sin aplicar.
+   *
+   * Un movimiento sin aplicaciones no es un error: el dinero salió y todavía
+   * no se decide contra qué documento va. Lo que sí sería un error es que la
+   * suma aplicada superara el importe del movimiento.
+   */
+  readonly applications: readonly PaymentApplicationPrimitives[];
+  /** Importe del movimiento que aún no se aplica a ningún documento. */
+  readonly unappliedAmount: number;
   readonly reference: string | null;
   readonly notes: string | null;
   /** Pierna de un traspaso, si aplica. */
