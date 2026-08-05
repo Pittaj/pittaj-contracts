@@ -65,6 +65,10 @@
       "types": "./src/onboarding/index.ts",
       "import": "./dist/onboarding/index.js"
     },
+    "./production": {
+      "types": "./src/production/index.ts",
+      "import": "./dist/production/index.js"
+    },
     "./operator": {
       "types": "./src/operator/index.ts",
       "import": "./dist/operator/index.js"
