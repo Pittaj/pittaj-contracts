@@ -33,6 +33,9 @@ export const createLayawaySchema = z.object({
     dueDate: z.string().datetime({ offset: true }).optional(),
     /** Anticipo inicial (0 = sin anticipo). No puede exceder el total. */
     initialDeposit: z.number().min(0).optional().default(0),
+    /** Con qué forma de pago se dio el anticipo. Opcional: si no viene, se asume efectivo. */
+    paymentMethodId: z.string().optional(),
+    paymentMethodName: z.string().max(100).optional(),
     /** Renglones apartados (al menos uno). */
     lines: z.array(createLayawayLineSchema).min(1, 'El apartado no tiene líneas'),
 });
