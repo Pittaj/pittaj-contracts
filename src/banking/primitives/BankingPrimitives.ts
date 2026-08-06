@@ -247,6 +247,30 @@ export interface StatementExtractionAttemptPrimitives {
 }
 
 /**
+ * Esta cuenta empezó a necesitar un lector más caro que el que la venía resolviendo.
+ *
+ * Es la señal que faltaba. Cuando un banco cambia el formato de su PDF, la cascada hace lo
+ * correcto —escalar al modelo que sí lo entiende— y devuelve una lectura buena, así que **nada
+ * falla**: solo se paga más, en silencio, todos los meses. Lo que duele no es el importe, es que
+ * un cambio de comportamiento del banco no se note hasta que alguien mire el recibo.
+ *
+ * Se compara contra el peldaño MÁS BARATO de las últimas importaciones de la cuenta, no contra la
+ * anterior: comparar con la última convertiría el cambio en el nuevo normal a la primera y dejaría
+ * de avisar justo en los seis meses siguientes, que es el caso que importa. Con una ventana móvil
+ * el aviso se apaga solo cuando el peldaño nuevo ya es lo habitual de esa cuenta.
+ */
+export interface ExtractorDriftPrimitives {
+  /** El extractor más barato que resolvió esta cuenta en la ventana. */
+  readonly previous: string;
+  /** El que la resolvió ahora. */
+  readonly current: string;
+  /** Cuántos peldaños subió. */
+  readonly steps: number;
+  /** Sobre cuántas importaciones previas se comparó. */
+  readonly samples: number;
+}
+
+/**
  * Un peldaño de la cascada: qué extractor se probó y por qué no bastó.
  *
  * La cascada empieza por el modelo más barato y escala cuando la lectura no pasa el filtro. Sin
