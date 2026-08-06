@@ -32,3 +32,11 @@ export interface DeviceAuditLogResponse {
     /** Cuándo ocurrió EN LA MÁQUINA, no cuándo llegó a la nube. */
     readonly occurredAt: string;
 }
+
+/** Página de la bitácora de instalaciones. */
+export interface DeviceAuditLogsPageResponse {
+    readonly items: DeviceAuditLogResponse[];
+    readonly total: number;
+    readonly page: number;
+    readonly pageSize: number;
+}
