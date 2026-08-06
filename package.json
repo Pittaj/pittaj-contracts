@@ -41,6 +41,10 @@
       "types": "./src/customer/index.ts",
       "import": "./dist/customer/index.js"
     },
+    "./customer-payment": {
+      "types": "./src/customer-payment/index.ts",
+      "import": "./dist/customer-payment/index.js"
+    },
     "./sync": {
       "types": "./src/sync/index.ts",
       "import": "./dist/sync/index.js"
@@ -189,7 +193,7 @@
       "types": "./src/layaway/index.ts",
       "import": "./dist/layaway/index.js"
     },
-"./tenant": {
+    "./tenant": {
       "types": "./src/tenant/index.ts",
       "import": "./dist/tenant/index.js"
     },
