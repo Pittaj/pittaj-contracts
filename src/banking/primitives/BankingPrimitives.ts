@@ -201,7 +201,16 @@ export interface ExtractionCheckPrimitives {
     | 'MOVEMENT_COUNT'
     | 'DATES_IN_PERIOD'
     | 'ACCOUNT_MATCH';
-  /** null = el documento no declaró el dato, así que no se pudo comprobar. */
+  /**
+   * `true` pasó, `false` falló, **`null` no se comprobó** — y no siempre por el mismo motivo:
+   *
+   * - el documento no publica el dato (el banco no imprime cuántos movimientos trae), o
+   * - la comprobación quedó **superada** por otra mejor (los totales sueltos de abonos y cargos,
+   *   cuando el documento declara su ecuación completa).
+   *
+   * La diferencia importa al pintarlo: decir "no declarado" del segundo caso contradice la
+   * explicación que va debajo, que dice justo lo contrario. `detail` lleva el motivo cuando lo hay.
+   */
   readonly passed: boolean | null;
   /** Lo que dio la lectura. */
   readonly computed?: number | string | null;
@@ -235,6 +244,29 @@ export interface StatementExtractionAttemptPrimitives {
   /** Consumo del intento, cuando el proveedor lo reporta. */
   readonly usage?: ExtractionUsagePrimitives | null;
   readonly extraction: StatementExtractionPrimitives;
+}
+
+/**
+ * Un peldaño de la cascada: qué extractor se probó y por qué no bastó.
+ *
+ * La cascada empieza por el modelo más barato y escala cuando la lectura no pasa el filtro. Sin
+ * este rastro, la pantalla solo puede decir "leído por sonnet" — y quien ve eso después de que una
+ * importación costara diez veces lo previsto no tiene forma de saber **qué falló abajo**, que es
+ * justo el dato que decide si el prompt necesita ayuda o si ese banco simplemente no es para el
+ * modelo barato.
+ */
+export interface StatementExtractionStepPrimitives {
+  /** Proveedor y modelo del peldaño. */
+  readonly extractor: string;
+  /** Si su lectura cuadró. `null` cuando el extractor ni siquiera pudo leer. */
+  readonly balanced: boolean | null;
+  readonly difference: number | null;
+  /** Nombres de las comprobaciones que falló. Vacío = ninguna. */
+  readonly failedChecks?: readonly string[];
+  /** Mensaje cuando el extractor no pudo leer el documento. */
+  readonly error?: string;
+  /** Lo que consumió este peldaño. */
+  readonly usage?: ExtractionUsagePrimitives | null;
 }
 
 /** Condición de una regla de conciliación sobre una línea del banco. */
