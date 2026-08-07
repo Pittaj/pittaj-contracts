@@ -17,6 +17,10 @@
       "types": "./src/shared/index.ts",
       "import": "./dist/shared/index.js"
     },
+    "./accounting": {
+      "types": "./src/accounting/index.ts",
+      "import": "./dist/accounting/index.js"
+    },
     "./auth": {
       "types": "./src/auth/index.ts",
       "import": "./dist/auth/index.js"
