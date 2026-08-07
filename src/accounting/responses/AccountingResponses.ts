@@ -450,6 +450,19 @@ export interface BalanceSheetResponse {
     readonly equity: FinancialStatementGroupResponse;
     /** Resultado del periodo, ya incluido en el subtotal de capital. */
     readonly profitForPeriod: number;
+    /**
+     * Resultado de ejercicios anteriores que **nadie traspasó todavía**, ya incluido en el
+     * subtotal de capital.
+     *
+     * Es utilidad vieja que sigue viva en las cuentas de resultados porque el asiento de cierre de
+     * ejercicio (C4) aún no existe. Va aparte porque **no es del periodo** y sumarla ahí inflaría
+     * el resultado del año; y se enseña porque, si no, las cuentas de capital no suman a su propio
+     * subtotal y el reporte parece roto.
+     *
+     * Vale `0` en cuanto el traspaso exista: entonces su importe estará asentado en `3xx` y
+     * aparecerá como una cuenta más.
+     */
+    readonly retainedFromPriorYears: number;
     readonly totalAssets: number;
     /** Pasivo más capital, con el resultado del ejercicio dentro. */
     readonly totalLiabilitiesAndEquity: number;
