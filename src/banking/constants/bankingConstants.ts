@@ -241,3 +241,13 @@ export const BANKING_SYSTEM_CATEGORIES: readonly SystemCategoryDef[] = [
 
 /** Nombre de la categoría de sistema usada por los traspasos. */
 export const TRANSFER_CATEGORY_NAME = 'Traspaso';
+
+/**
+ * Categoría de sistema donde caen los ajustes de centavos de la conciliación.
+ *
+ * Es "Otro" a propósito y no una categoría nueva: un ajuste de dos centavos no es un concepto de
+ * tesorería que alguien vaya a querer analizar por separado, y darle categoría propia lo ascendería
+ * a algo que no es. Lo que sí importa es que **exista como movimiento** con su nota, no que tenga
+ * su propio renglón en los reportes.
+ */
+export const ADJUSTMENT_CATEGORY_NAME = 'Otro';
