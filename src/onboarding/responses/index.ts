@@ -9,3 +9,4 @@ export * from './OnboardingFlowListResponse.js';
 export * from './OnboardingFlowDetailResponse.js';
 export * from './OnboardingMetricsResponse.js';
 export * from './OnboardingExportResponse.js';
+export * from './StartupGuideResponse.js';
