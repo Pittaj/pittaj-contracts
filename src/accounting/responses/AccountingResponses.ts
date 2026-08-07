@@ -283,3 +283,70 @@ export interface TrialBalanceResponse {
      */
     readonly balanced: boolean;
 }
+
+// ============================================================
+// LIBRO MAYOR / AUXILIAR DE CUENTA (C3)
+// ============================================================
+
+/**
+ * Una partida en el auxiliar de una cuenta, con el saldo corrido.
+ *
+ * **Trae con qué llegar al documento origen, no solo su id.** El `documentLabel` es el folio
+ * impreso (`CLS-000123`) y los `cfdiUuids` los comprobantes que amparan la operación: es el
+ * recorrido póliza → documento → CFDI que pide un contador cuando revisa un movimiento raro, y sin
+ * él el auxiliar es una lista de cifras sin dónde comprobarlas.
+ */
+export interface LedgerDetailRowResponse {
+    readonly entryId: string;
+    /** `YYYY-MM-DD`, la del periodo donde quedó el asiento. */
+    readonly entryDate: string;
+    /** La real del documento si entró tarde; `null` si coinciden. */
+    readonly originalDate: string | null;
+    readonly isLate: boolean;
+    readonly type: JournalEntryTypeValue;
+    readonly folio: number | null;
+    /** El concepto de la póliza. */
+    readonly concept: string;
+    /** La descripción de esta partida, que puede ser más específica que el concepto. */
+    readonly description: string;
+    readonly debit: number;
+    readonly credit: number;
+    /**
+     * Saldo acumulado **hasta esta partida inclusive**, con el signo en la dirección natural de
+     * la cuenta. Arranca del saldo inicial del rango, no de cero: un auxiliar que empieza en cero
+     * a mitad del ejercicio no dice cuánto había.
+     */
+    readonly running: number;
+    readonly sourceType: string;
+    readonly sourceDocId: string | null;
+    /** El folio impreso del documento origen. `null` si no lleva o ya no existe. */
+    readonly documentLabel: string | null;
+    /** UUIDs de los CFDI que amparan la operación. */
+    readonly cfdiUuids: readonly string[];
+}
+
+export interface LedgerDetailResponse {
+    readonly companyId: string;
+    readonly accountId: string;
+    readonly code: string;
+    readonly name: string;
+    readonly nature: string;
+    readonly from: string;
+    readonly to: string;
+    /** Saldo al día anterior al rango. Es de donde arranca el `running` de la primera fila. */
+    readonly initial: number;
+    /** De la más vieja a la más nueva: es el orden en que se lee un auxiliar. */
+    readonly rows: readonly LedgerDetailRowResponse[];
+    readonly debits: number;
+    readonly credits: number;
+    /** `initial` más los movimientos. Coincide con el `final` de esta cuenta en la balanza. */
+    readonly final: number;
+    /**
+     * Hay más partidas de las que caben en la respuesta.
+     *
+     * El auxiliar de una cuenta de bancos con un año de movimiento son miles de filas; se corta y
+     * **se dice que se cortó**, porque un saldo corrido que termina antes de tiempo parece un
+     * saldo final y no lo es.
+     */
+    readonly truncated: boolean;
+}
