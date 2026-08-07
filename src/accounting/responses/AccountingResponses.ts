@@ -216,3 +216,70 @@ export interface JournalEntryResponse {
     readonly version: number;
     readonly lines: readonly JournalLineResponse[];
 }
+
+// ============================================================
+// BALANZA DE COMPROBACIÓN (C3)
+// ============================================================
+
+/**
+ * Una cuenta en la balanza.
+ *
+ * **Los saldos van con signo en la dirección natural de la cuenta**: positivo significa «del lado
+ * que le toca» —deudor en una cuenta deudora, acreedor en una acreedora— y negativo, del contrario.
+ * Se hace así y no con dos columnas `saldoDeudor`/`saldoAcreedor` porque con dos columnas hay que
+ * decidir en el servidor de qué lado cae cada cifra, y esa decisión depende de la naturaleza: una
+ * cuenta de clientes con saldo acreedor —un cliente que pagó de más— es una anomalía que hay que
+ * poder VER, no una cifra que se cambia de columna en silencio.
+ *
+ * `debits` y `credits` son movimientos del periodo y **siempre son positivos**.
+ */
+export interface TrialBalanceRowResponse {
+    readonly accountId: string;
+    readonly code: string;
+    readonly name: string;
+    readonly nature: string;
+    readonly satGroupingCode: string | null;
+    /** 1 a 4. Sirve para sangrar el árbol sin recalcularlo. */
+    readonly level: number;
+    /** Puede recibir partidas. Las de mayor solo acumulan a sus hijas. */
+    readonly isPostable: boolean;
+    /** Saldo al día anterior al inicio del rango. */
+    readonly initial: number;
+    readonly debits: number;
+    readonly credits: number;
+    /** `initial` más los movimientos del rango, con el mismo criterio de signo. */
+    readonly final: number;
+    /**
+     * La cuenta tiene partidas **propias** en el rango, no solo de sus hijas.
+     *
+     * Distingue una cuenta de mayor que solo acumula de una hoja con movimiento real, que es lo
+     * que hay que mirar cuando una rama no cuadra.
+     */
+    readonly hasOwnMovements: boolean;
+}
+
+export interface TrialBalanceTotalsResponse {
+    /** Suma de cargos y de abonos del rango. **Tienen que ser iguales**: es la comprobación. */
+    readonly debits: number;
+    readonly credits: number;
+    /** Suma de los saldos finales que quedaron del lado deudor y del acreedor. */
+    readonly finalDebit: number;
+    readonly finalCredit: number;
+}
+
+export interface TrialBalanceResponse {
+    readonly companyId: string;
+    /** `YYYY-MM-DD`, ambos inclusive. */
+    readonly from: string;
+    readonly to: string;
+    /** De la cuenta de mayor a la última hoja, en orden de código. */
+    readonly rows: readonly TrialBalanceRowResponse[];
+    readonly totals: TrialBalanceTotalsResponse;
+    /**
+     * `true` cuando cargos y abonos coinciden al centavo.
+     *
+     * En un libro sano es **siempre** `true` —la póliza no puede nacer descuadrada— así que un
+     * `false` no es un aviso al usuario: es que algo escribió en la base sin pasar por el agregado.
+     */
+    readonly balanced: boolean;
+}
