@@ -350,3 +350,115 @@ export interface LedgerDetailResponse {
      */
     readonly truncated: boolean;
 }
+
+// ============================================================
+// ESTADOS FINANCIEROS
+// ============================================================
+
+/** Las familias del agrupador SAT, que es lo que decide en qué estado cae una cuenta. */
+export type AccountClassResponse =
+    | 'ACTIVO'
+    | 'PASIVO'
+    | 'CAPITAL'
+    | 'INGRESO'
+    | 'COSTO'
+    | 'GASTO'
+    | 'RESULTADO_FINANCIERO'
+    | 'ORDEN'
+    /**
+     * No se pudo saber. Solo aparece en `unclassified`.
+     *
+     * En un catálogo sano no sale nunca: una cuenta no puede postear sin agrupador SAT
+     * (`LedgerAccount.canPost`), así que toda cuenta con movimiento es clasificable. Existe para
+     * que un agrupador fuera de las familias `1`–`8` se **vea**, en vez de repartirse a ojo entre
+     * los estados —que descuadra uno y cuadra el otro, y ahí ya no se nota—.
+     */
+    | 'DESCONOCIDA';
+
+/** Un renglón de cualquiera de los dos estados. Siempre es una cuenta que puede postear. */
+export interface FinancialStatementLineResponse {
+    readonly accountId: string;
+    readonly code: string;
+    readonly name: string;
+    readonly satGroupingCode: string | null;
+    readonly accountClass: AccountClassResponse;
+    /**
+     * `DEUDORA` o `ACREEDORA`.
+     *
+     * Va en el renglón porque **es lo que decide si la cuenta suma o resta** dentro del estado, y
+     * la clase no basta: la familia `7` lleva dentro gastos financieros (deudora, restan) y
+     * productos financieros (acreedora, suman).
+     */
+    readonly nature: string;
+    /**
+     * Saldo **con signo en la dirección natural de la cuenta**, igual que en la balanza.
+     *
+     * En resultados eso significa que una devolución sobre ventas llega negativa y disminuye el
+     * ingreso, en vez de sumarse a él por venir en valor absoluto.
+     */
+    readonly amount: number;
+}
+
+/** Un bloque del estado (Ingresos, Costo de ventas…) con sus cuentas y su subtotal. */
+export interface FinancialStatementGroupResponse {
+    readonly accountClass: AccountClassResponse;
+    readonly label: string;
+    readonly lines: readonly FinancialStatementLineResponse[];
+    /** Suma de las cuentas del bloque, ya con el signo que le toca dentro del estado. */
+    readonly subtotal: number;
+}
+
+/**
+ * Estado de resultados de un rango.
+ *
+ * **No necesita el cierre de ejercicio.** La utilidad se deriva de las cuentas de resultados del
+ * periodo; el traspaso a capital es un asiento que se hace al cerrar el año y que aquí no hace
+ * falta para nada.
+ */
+export interface IncomeStatementResponse {
+    readonly companyId: string;
+    readonly from: string;
+    readonly to: string;
+    readonly groups: readonly FinancialStatementGroupResponse[];
+    /** Ingresos menos costos. Sin gastos todavía. */
+    readonly grossProfit: number;
+    /** Utilidad de operación: bruta menos gastos, antes del resultado financiero. */
+    readonly operatingProfit: number;
+    /** Lo que suma el bloque financiero: positivo si se ganó más de lo que se pagó. */
+    readonly financialResult: number;
+    /** Utilidad **antes de impuestos**: la app no calcula ISR ni PTU. */
+    readonly netProfit: number;
+    /** Cuentas con movimiento que no se pudieron clasificar. Vacío en un catálogo sano. */
+    readonly unclassified: readonly FinancialStatementLineResponse[];
+}
+
+/**
+ * Balance general a una fecha.
+ *
+ * El **resultado del ejercicio** entra como un renglón calculado dentro del capital: es lo que
+ * permite que cuadre a mitad de año, cuando el traspaso todavía no se ha hecho. No se guarda ni
+ * se asienta: se deriva igual que todo lo demás.
+ */
+export interface BalanceSheetResponse {
+    readonly companyId: string;
+    /** Fecha de corte. El saldo es acumulado desde el principio, no de un rango. */
+    readonly asOf: string;
+    /** Desde dónde se acumuló el resultado del ejercicio (inicio del ejercicio en curso). */
+    readonly fiscalYearStart: string;
+    readonly assets: FinancialStatementGroupResponse;
+    readonly liabilities: FinancialStatementGroupResponse;
+    readonly equity: FinancialStatementGroupResponse;
+    /** Resultado del periodo, ya incluido en el subtotal de capital. */
+    readonly profitForPeriod: number;
+    readonly totalAssets: number;
+    /** Pasivo más capital, con el resultado del ejercicio dentro. */
+    readonly totalLiabilitiesAndEquity: number;
+    /**
+     * `true` cuando activo iguala pasivo más capital al centavo.
+     *
+     * En un libro sano es **siempre** `true`. Un `false` no es un aviso al usuario: o hay cuentas
+     * sin clasificar (van en `unclassified`) o algo escribió en la base sin pasar por el agregado.
+     */
+    readonly balanced: boolean;
+    readonly unclassified: readonly FinancialStatementLineResponse[];
+}
