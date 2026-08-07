@@ -58,7 +58,24 @@ export const BANKING_CONSTANTS = {
   TRANSACTION_STATUSES: ['PENDING', 'CLEARED', 'VOID'] as const,
 
   /** Tipo de documento origen de un movimiento. */
-  SOURCE_TYPES: ['CASH_CLOSURE', 'PURCHASE', 'EXPENSE', 'TICKET_BATCH', 'TRANSFER', 'MANUAL'] as const,
+  /**
+   * De qué documento nace el movimiento.
+   *
+   * `REVERSAL` no es un documento de negocio como los demás: es el **movimiento que se corrige**.
+   * Un movimiento ya conciliado es inmutable —el ledger es append-only— así que la única forma de
+   * enmendarlo es un contramovimiento, y el original es literalmente su origen. Guardarlo aquí, en
+   * las mismas columnas consultables que el resto, es lo que permite preguntar "¿esto ya se
+   * corrigió?" sin una tabla nueva.
+   */
+  SOURCE_TYPES: [
+    'CASH_CLOSURE',
+    'PURCHASE',
+    'EXPENSE',
+    'TICKET_BATCH',
+    'TRANSFER',
+    'REVERSAL',
+    'MANUAL',
+  ] as const,
 
   /** Tipo de contraparte de un movimiento. */
   COUNTERPARTY_TYPES: ['SUPPLIER', 'CUSTOMER', 'EMPLOYEE', 'OTHER'] as const,

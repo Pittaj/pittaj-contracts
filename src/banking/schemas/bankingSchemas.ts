@@ -112,6 +112,19 @@ export const assignCategoryLedgerAccountSchema = z.object({
   ledgerAccountCode: z.string().trim().max(20).nullable(),
 });
 
+/**
+ * POST /api/bank-transactions/:id/reverse — contramovimiento de un movimiento conciliado.
+ *
+ * No existe un endpoint para reabrir la conciliación, y esa ausencia es la decisión: una
+ * conciliación cerrada es el soporte de un saldo que ya se declaró. Se corrige hacia adelante.
+ */
+export const reverseTransactionSchema = z.object({
+  /** Fecha del contramovimiento. Tiene que ir después del periodo que concilió el original. */
+  date: isoDateSchema,
+  /** Por qué se corrige. Obligatorio: sin él, dentro de un año nadie sabrá qué es ese movimiento. */
+  reason: z.string().trim().min(3).max(300),
+});
+
 /** GET /api/bank-accounts/ledger-options — cuentas contables que Tesorería puede elegir. */
 export const getLedgerAccountOptionsSchema = z.object({
   /** Acota a la empresa dueña de esa sucursal. Sin él, todas las del tenant. */
