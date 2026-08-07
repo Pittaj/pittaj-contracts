@@ -68,6 +68,14 @@ export const addLineSchema = z.object({
   unitPrice: z.number().min(0).max(LIMITS.MAX_UNIT_PRICE),
   discountPercent: z.number().min(0).max(100).optional(),
   taxPercent: z.number().min(0).max(100).optional(),
+  /**
+   * `true` si el precio unitario ya trae el impuesto dentro (precio de etiqueta).
+   *
+   * Cambia la FÓRMULA, no un adorno: con `true` el impuesto se saca por residuo del total en vez
+   * de sumarse sobre la base. Sin este campo la línea nacía siempre como IVA excluido y al editar
+   * la cantidad se le subía el 16 % — ver `SalesOrderLine`.
+   */
+  taxIncluded: z.boolean().optional(),
   currency: z.string().length(3).optional(),
   notes: z.string().max(200).nullable().optional(),
   version: z.number().int().min(0),
