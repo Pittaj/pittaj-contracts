@@ -101,6 +101,23 @@ export const updateBankAccountSchema = z.object({
   creditCard: creditCardConfigSchema.nullish(),
 });
 
+/**
+ * PUT /api/transaction-categories/:id/ledger-account — asignar (o quitar) su cuenta contable.
+ *
+ * Sin `version`: lo único mutable de una categoría es este código, y dos personas asignándoselo a
+ * la vez quieren lo mismo. Un conflicto OCC aquí sería fricción sin dato que proteger.
+ */
+export const assignCategoryLedgerAccountSchema = z.object({
+  /** Código del catálogo (`701-01`). `null` o cadena vacía quita la asignación. */
+  ledgerAccountCode: z.string().trim().max(20).nullable(),
+});
+
+/** GET /api/bank-accounts/ledger-options — cuentas contables que Tesorería puede elegir. */
+export const getLedgerAccountOptionsSchema = z.object({
+  /** Acota a la empresa dueña de esa sucursal. Sin él, todas las del tenant. */
+  locationId: z.string().uuid().optional(),
+});
+
 /** POST /api/bank-accounts/:id/archive — Archivar (INACTIVE) / reactivar. */
 export const archiveBankAccountSchema = z.object({
   version: z.number().int().min(1),
