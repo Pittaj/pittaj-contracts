@@ -454,3 +454,28 @@ export interface PayableDocumentPrimitives {
   /** totalAmount − appliedAmount. Cero = saldado. */
   readonly balanceAmount: number;
 }
+
+/**
+ * El ciclo vigente de una tarjeta de crédito.
+ *
+ * `CreditCard.cutoffDay` y `paymentDay` se capturaban desde N1 y no los leía nadie. Son la única
+ * razón por la que alguien mete una tarjeta en un sistema de tesorería: no para ver su saldo —eso
+ * ya lo ve en la app del banco— sino para que le avisen antes de que venza el pago.
+ *
+ * **No dice si está vencida**, a propósito. No se puede saber: que el saldo no sea cero no
+ * significa que no se haya pagado, porque hay compras del periodo nuevo, y Bancos no recibe el
+ * aviso del banco. Un "VENCIDA" inventado se descubre una vez y después nadie vuelve a mirar el
+ * aviso, incluido el día que sí lo esté.
+ */
+export interface CreditCardCyclePrimitives {
+  /** Fecha ISO del último corte que ya ocurrió. */
+  readonly lastCutoff: string;
+  /** Fecha ISO del próximo corte. */
+  readonly nextCutoff: string;
+  /** Fecha ISO en que vence el pago del último corte. */
+  readonly paymentDue: string;
+  /** Días al vencimiento. Negativo = la fecha ya pasó (que no es lo mismo que impagada). */
+  readonly daysUntilDue: number;
+  /** true si conviene enseñarlo en el listado: vence pronto o la fecha ya pasó. */
+  readonly needsAttention: boolean;
+}

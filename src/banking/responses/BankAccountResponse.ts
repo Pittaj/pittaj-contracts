@@ -4,7 +4,7 @@
  * @version 1.0.0
  */
 
-import type { CreditCardConfigPrimitives } from '../primitives/index.js';
+import type { CreditCardCyclePrimitives, CreditCardConfigPrimitives } from '../primitives/index.js';
 
 export interface BankAccountResponse {
   readonly id: string;
@@ -23,6 +23,15 @@ export interface BankAccountResponse {
   readonly ledgerAccountCode: string | null;
   /** Configuración TDC; solo kind=CREDIT_CARD. */
   readonly creditCard: CreditCardConfigPrimitives | null;
+  /**
+   * Cuándo corta y cuándo vence el pago de la tarjeta. `null` si no es TDC o no está configurada.
+   *
+   * Se calcula en el servidor y no en la pantalla para que la regla —el pago cae el mes siguiente
+   * cuando el día de pago es menor que el de corte, los cortes se recortan a los días del mes—
+   * exista una sola vez. `daysUntilDue` se mide contra la fecha del servidor: puede diferir en un
+   * día del calendario del usuario, y sobre un aviso de cinco días eso no cambia ninguna decisión.
+   */
+  readonly creditCardCycle: CreditCardCyclePrimitives | null;
   /** Cuenta creada por el sistema (TRANSIT): oculta y no editable. */
   readonly isSystem: boolean;
   readonly status: string;
