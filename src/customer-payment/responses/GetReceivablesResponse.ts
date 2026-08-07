@@ -38,4 +38,12 @@ export interface GetReceivablesResponse {
     readonly limit: number;
     /** Suma de saldos por tramo, sobre TODO el filtro — no solo la página. */
     readonly totals: Readonly<Record<ReceivableBucket, number>> & { readonly ALL: number };
+    /**
+     * Cuántas ventas hay en cada tramo, sobre TODO el filtro.
+     *
+     * Va junto al importe porque «$4,380 en más de 90 días» dice algo muy distinto según sean
+     * cuatro ventas o cuarenta: una es un cliente al que hay que llamar, la otra es un problema
+     * de cobranza. `ALL` es el total de ventas con saldo, el mismo número que `total`.
+     */
+    readonly counts: Readonly<Record<ReceivableBucket, number>> & { readonly ALL: number };
 }
