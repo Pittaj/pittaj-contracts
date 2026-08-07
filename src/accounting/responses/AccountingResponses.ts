@@ -115,3 +115,81 @@ export interface PostingRunResponse {
     readonly skipped?: number;
     readonly exceptions: readonly PostingExceptionSummary[];
 }
+
+// ============================================================
+// EJERCICIOS Y PERIODOS
+// ============================================================
+
+/** Un mes contable. Se cierra y se puede reabrir; cerrado, no admite pólizas. */
+export interface FiscalPeriodResponse {
+    readonly id: string;
+    /** 1–12. */
+    readonly month: number;
+    readonly startDate: string;
+    readonly endDate: string;
+    readonly status: 'OPEN' | 'CLOSED';
+    readonly closedAt: string | null;
+}
+
+export interface FiscalYearResponse {
+    readonly id: string;
+    readonly year: number;
+    readonly status: 'OPEN' | 'CLOSED';
+    readonly closedAt: string | null;
+    readonly closingEntryId: string | null;
+    readonly periods: readonly FiscalPeriodResponse[];
+}
+
+// ============================================================
+// PÓLIZAS
+// ============================================================
+
+/** Tipo de póliza. El folio corre por tipo y por mes. */
+export const JOURNAL_ENTRY_TYPES = ['INGRESO', 'EGRESO', 'DIARIO'] as const;
+export type JournalEntryTypeValue = (typeof JOURNAL_ENTRY_TYPES)[number];
+
+export interface JournalLineResponse {
+    readonly ordinal: number;
+    readonly ledgerAccountId: string;
+    readonly description: string;
+    readonly debit: number;
+    readonly credit: number;
+    /** Sucursal como dimensión del asiento. */
+    readonly locationId: string | null;
+}
+
+/** Referencia al CFDI que ampara la operación. Es la trazabilidad que pide el SAT. */
+export interface CfdiRefResponse {
+    readonly uuid: string;
+    readonly kind?: string;
+}
+
+export interface JournalEntryResponse {
+    readonly id: string;
+    readonly companyId: string;
+    readonly fiscalPeriodId: string;
+    readonly type: JournalEntryTypeValue;
+    /** `YYYY-MM-DD`. La del periodo donde quedó el asiento. */
+    readonly entryDate: string;
+    /** La del documento, si entró tarde. `null` si coinciden. */
+    readonly originalDate: string | null;
+    /**
+     * El documento entró después de que su mes cerrara.
+     *
+     * No es un error: se asienta en el primer periodo abierto y **conserva su fecha real**,
+     * que es lo que permite explicarle a un contador por qué una compra de marzo aparece en
+     * la póliza de abril.
+     */
+    readonly isLate: boolean;
+    readonly folio: number | null;
+    readonly concept: string;
+    readonly status: string;
+    readonly sourceType: string;
+    readonly sourceDocId: string | null;
+    /** Si es la reversa de otra póliza, cuál. */
+    readonly reversalOfId: string | null;
+    readonly cfdiRefs: readonly CfdiRefResponse[];
+    readonly createdBy: string;
+    readonly version: number;
+    readonly lines: readonly JournalLineResponse[];
+}
