@@ -271,6 +271,38 @@ export interface ExtractorDriftPrimitives {
 }
 
 /**
+ * Una cuenta del catálogo contable, vista desde Tesorería.
+ *
+ * Bancos no conoce el agregado `LedgerAccount` de Contabilidad ni quiere conocerlo: para asignarle
+ * cuenta a un banco o a una categoría solo hacen falta el código, el nombre y si puede recibir
+ * partidas hoy. Todo lo demás —naturaleza, agrupador SAT, jerarquía— es asunto del otro libro.
+ */
+export interface LedgerAccountOptionPrimitives {
+  /** El código con el que se guarda el vínculo (`102-01`). Es la llave, no el id. */
+  readonly code: string;
+  readonly name: string;
+}
+
+/**
+ * El catálogo posteable de una empresa, para elegir cuenta desde Tesorería.
+ *
+ * Va por **empresa** y no por tenant porque el libro contable es por RFC: un tenant con dos
+ * empresas tiene dos catálogos independientes, y el mismo `102-01` en cada uno es una cuenta
+ * distinta. Una cuenta bancaria se atribuye a su empresa por la sucursal.
+ */
+export interface CompanyChartPrimitives {
+  readonly companyId: string;
+  readonly companyName: string;
+  /**
+   * Solo las que pueden recibir partidas HOY: activas, hoja y con agrupador SAT.
+   *
+   * Ofrecer una acumulativa o una archivada sería ofrecer un error diferido — se guardaría sin
+   * queja y reventaría meses después, de madrugada, posteando el corte.
+   */
+  readonly postable: readonly LedgerAccountOptionPrimitives[];
+}
+
+/**
  * Un peldaño de la cascada: qué extractor se probó y por qué no bastó.
  *
  * La cascada empieza por el modelo más barato y escala cuando la lectura no pasa el filtro. Sin
