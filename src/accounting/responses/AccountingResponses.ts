@@ -35,6 +35,15 @@ export interface AccountingExceptionResponse {
     readonly status: AccountingExceptionStatusValue;
     /** Fecha del documento (`YYYY-MM-DD`), no la del fallo. */
     readonly documentDate: string | null;
+    /**
+     * El folio impreso del documento (`CLS-000123`, `COM-0045`), para poder ir a
+     * buscarlo. `sourceDocId` es un UUID y no se busca en ninguna pantalla.
+     *
+     * `null` cuando el documento no lleva folio por diseño —un movimiento de
+     * inventario o de caja es un apunte, no un documento—, cuando lo tiene vacío,
+     * o cuando ya no existe (que es justo el motivo `SOURCE_NOT_FOUND`).
+     */
+    readonly documentLabel: string | null;
     readonly createdAt: string;
     readonly updatedAt: string;
 }
@@ -129,6 +138,20 @@ export interface FiscalPeriodResponse {
     readonly endDate: string;
     readonly status: 'OPEN' | 'CLOSED';
     readonly closedAt: string | null;
+    /**
+     * Quién cerró el mes (su correo). `null` en los meses abiertos: al reabrir se
+     * borra, porque un nombre junto a un mes abierto se lee como si aún lo
+     * estuviera. El rastro completo de cierres y reaperturas vive en la bitácora.
+     */
+    readonly closedBy: string | null;
+    /**
+     * Pólizas posteadas del mes. Es lo que distingue un mes que nadie ha trabajado
+     * de uno cerrado a conciencia — y esa es la pregunta antes de cerrarlo.
+     *
+     * Los borradores no cuentan; una póliza reversada y su reversa cuentan dos,
+     * igual que se ven al abrir el mes.
+     */
+    readonly entryCount: number;
 }
 
 export interface FiscalYearResponse {
