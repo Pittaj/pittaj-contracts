@@ -4,4 +4,4 @@
  */
 
 export * from './audit.schema.js';
-export * from './syncDeviceAudit.schema';
+export * from './syncDeviceAudit.schema.js';
