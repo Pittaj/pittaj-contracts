@@ -251,7 +251,21 @@ export interface SystemCategoryDef {
 export const BANKING_SYSTEM_CATEGORIES: readonly SystemCategoryDef[] = [
   { code: 'DEPOSITO_VENTA', name: 'Depósito de venta', flow: 'IN' },
   { code: 'LIQUIDACION_TPV', name: 'Liquidación TPV', flow: 'IN' },
-  { code: 'COBRO_CLIENTE', name: 'Cobro a cliente', flow: 'IN' },
+  /**
+   * La categoría de la cuenta puente `103-04 Transferencias en tránsito`.
+   *
+   * **`BOTH` y «Transferencia» desde el 2026-08-09, con el reembolso por transferencia.** Antes
+   * era `IN` y se llamaba «Cobro a cliente», y era correcto: la puente solo recibía cargos —cobro
+   * de crédito, corte de caja, abono de apartado— porque no existía ninguna forma de que saliera
+   * dinero por ella. Ahora una devolución la abona, y cerrarla exige un movimiento `OUT` que la
+   * cargue; con `flow: 'IN'`, `CategoryFlow.admits()` lo rechazaba y el saldo se quedaba vivo
+   * para siempre (BUG-040).
+   *
+   * El nombre acompaña al flujo por la misma razón que `TRASPASO` no se llama «Traspaso
+   * recibido»: una cuenta, una categoría, las dos direcciones. Quien ve un «SPEI ENVIADO» no
+   * puede elegir algo que se llame «cobro».
+   */
+  { code: 'COBRO_CLIENTE', name: 'Transferencia', flow: 'BOTH' },
   { code: 'PAGO_PROVEEDOR', name: 'Pago a proveedor', flow: 'OUT' },
   { code: 'GASTO', name: 'Gasto', flow: 'OUT' },
   { code: 'COMISION_BANCARIA', name: 'Comisión bancaria', flow: 'OUT' },

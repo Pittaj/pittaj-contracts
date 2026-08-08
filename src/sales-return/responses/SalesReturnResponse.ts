@@ -43,7 +43,7 @@ export interface SalesReturnResponse {
     readonly originTicketId: string | null;
     /** Motivo de la devolución (texto libre). */
     readonly reason: string;
-    /** Resolución del importe: CASH | CREDIT_NOTE. */
+    /** Resolución del importe: CASH | CREDIT_NOTE | TRANSFER. */
     readonly resolution: ReturnResolutionPrimitive;
     /** Importe total de la devolución (suma de los renglones). */
     readonly totalAmount: number;
@@ -59,6 +59,20 @@ export interface SalesReturnResponse {
     readonly cashierId: string;
     /** Nota de crédito emitida (id) cuando resolution = CREDIT_NOTE (null en CASH). */
     readonly creditNoteId: string | null;
+
+    /**
+     * Forma de pago con la que se envió el reembolso. **Solo la llevan las devoluciones
+     * `TRANSFER`**; null en las otras dos y en todo lo devuelto antes de que existiera.
+     *
+     * Es lo que permite que la contabilidad resuelva la cuenta puente correcta
+     * (`forPaymentMethod` mira el método concreto antes que el tipo) en vez de dar por supuesto
+     * que todo reembolso salió del cajón — que es lo que hacía el lector hasta ahora.
+     */
+    readonly refundMethodId: string | null;
+    /** Tipo del método (CASH | CARD | TRANSFER | …), snapshot al devolver. */
+    readonly refundMethodType: string | null;
+    /** Nombre visible del método, para leer la devolución sin resolver el catálogo. */
+    readonly refundMethodName: string | null;
 
     /** Renglones (tabla hija sales_return_lines). */
     readonly lines: SalesReturnLineResponse[];

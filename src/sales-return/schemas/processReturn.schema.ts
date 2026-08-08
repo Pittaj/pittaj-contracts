@@ -44,10 +44,27 @@ export const processReturnSchema = z
     .object({
         /** Ticket origen (opcional; null/omitido = devolución sin ticket ligado). */
         originTicketId: z.string().optional(),
-        /** Resolución del importe: CASH | CREDIT_NOTE. */
+        /** Resolución del importe: CASH | CREDIT_NOTE | TRANSFER. */
         resolution: z.enum(RETURN_RESOLUTIONS),
-        /** Sesión de caja (obligatoria si resolution = CASH). */
+        /**
+         * Sesión de caja. Obligatoria en CASH (de ahí sale el efectivo) y en TRANSFER: aunque la
+         * transferencia no mueva el cajón, la devolución sigue siendo un acto del turno y de la
+         * sesión salen el operador y la sucursal que la póliza necesita.
+         */
         sessionId: z.string().optional(),
+        /**
+         * Forma de pago con la que se envió el reembolso. **Obligatoria en TRANSFER y prohibida en
+         * las otras dos.**
+         *
+         * Se guarda el método concreto y no solo el tipo porque la contabilidad resuelve la cuenta
+         * por método antes que por tipo: dos cuentas bancarias son las dos TRANSFER y el tenant
+         * puede querer mapearlas por separado. Y se prohíbe en CASH porque si se permitiera, un
+         * mapeo por método podría mandar un reembolso «en efectivo» a una cuenta que no es la caja
+         * — y entonces CASH dejaría de significar «salió del cajón».
+         */
+        refundMethodId: z.string().optional(),
+        refundMethodType: z.string().max(20).optional(),
+        refundMethodName: z.string().max(100).optional(),
         /** Cliente para la nota de crédito (opcional). */
         customerId: z.string().optional(),
         /** Motivo de la devolución (texto libre). */
@@ -63,12 +80,41 @@ export const processReturnSchema = z
         /** Renglones devueltos (al menos uno). */
         lines: z.array(processReturnLineSchema).min(1, 'La devolución no tiene líneas'),
     })
+    /**
+     * Las reglas cruzadas van en el schema **y no en el handler**: es la clase de invariante que
+     * se olvida en el segundo llamador, y aquí ya hay dos (la pantalla web y el push del
+     * escritorio).
+     */
     .superRefine((val, ctx) => {
-        if (val.resolution === 'CASH' && (!val.sessionId || val.sessionId.length === 0)) {
+        const sinSesion = !val.sessionId || val.sessionId.length === 0;
+        if (val.resolution === 'CASH' && sinSesion) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 path: ['sessionId'],
                 message: 'El reembolso en efectivo requiere una sesión de caja',
+            });
+        }
+        if (val.resolution === 'TRANSFER') {
+            if (sinSesion) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ['sessionId'],
+                    message: 'La devolución requiere una sesión de caja abierta',
+                });
+            }
+            if (!val.refundMethodId || val.refundMethodId.length === 0) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ['refundMethodId'],
+                    message:
+                        'El reembolso por transferencia necesita la cuenta o forma de pago con la que se envía',
+                });
+            }
+        } else if (val.refundMethodId && val.refundMethodId.length > 0) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['refundMethodId'],
+                message: `Una devolución resuelta como ${val.resolution} no lleva forma de pago de reembolso`,
             });
         }
     });
