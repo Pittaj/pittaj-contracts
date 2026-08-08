@@ -538,3 +538,81 @@ export interface VatReportResponse {
     /** Huecos sin cuenta resoluble. Con esto, alguna cifra está incompleta y hay que decirlo. */
     readonly missing: readonly string[];
 }
+
+// ============================================================
+// DIOT (C4)
+// ============================================================
+
+/**
+ * Tipo de tercero del catálogo del SAT.
+ *
+ * `04` proveedor nacional · `05` proveedor extranjero · `15` proveedor global (las operaciones
+ * con quien no dio RFC, que se declaran en un solo renglón).
+ */
+export type DiotThirdPartyType = '04' | '05' | '15';
+
+/** Un proveedor con lo que se le pagó en el mes. */
+export interface DiotRowResponse {
+    readonly supplierName: string;
+    /** RFC. `null` cuando el proveedor no lo tiene capturado. */
+    readonly taxId: string | null;
+    readonly thirdPartyType: DiotThirdPartyType;
+    /**
+     * Tipo de operación del SAT: `03` servicios · `06` arrendamiento · `85` otros.
+     *
+     * **Siempre sale `85`, y hay que revisarlo.** El dato para distinguir un arrendamiento de un
+     * servicio no existe en la compra —`kind` solo dice si es inventario o gasto—, y adivinarlo
+     * pondría una clasificación fiscal falsa que nadie verificaría.
+     */
+    readonly operationType: '85';
+    /** Valor de los actos **pagados en el mes** que llevaron IVA. */
+    readonly paidBase: number;
+    /** IVA acreditable pagado en el mes a ese proveedor. */
+    readonly creditableVat: number;
+    /**
+     * Valor de los actos pagados **sin IVA**.
+     *
+     * La DIOT distingue **tasa 0% de exento** y el dato no: la compra guarda un solo importe de
+     * impuesto. Va junto y se marca para que el contador lo parta.
+     */
+    readonly paidBaseWithoutVat: number;
+    /** IVA retenido a ese proveedor en las operaciones pagadas. */
+    readonly withheldVat: number;
+}
+
+/**
+ * La DIOT del mes: a quién se le pagó y cuánto IVA se acreditó por ello.
+ *
+ * **Se declara por lo PAGADO, no por lo facturado**, igual que el IVA acreditable: una factura a
+ * crédito entra en la DIOT del mes en que se paga.
+ */
+export interface DiotReportResponse {
+    readonly companyId: string;
+    readonly year: number;
+    readonly month: number;
+    readonly from: string;
+    readonly to: string;
+    readonly rows: readonly DiotRowResponse[];
+    readonly totals: {
+        readonly paidBase: number;
+        readonly creditableVat: number;
+        readonly paidBaseWithoutVat: number;
+        readonly withheldVat: number;
+    };
+    /**
+     * Cuadre contra el libro: el IVA acreditable de la DIOT tiene que ser **el mismo** que el del
+     * reporte de IVA del mismo mes.
+     *
+     * Los dos salen de sitios distintos —la DIOT de las compras y sus pagos, el libro de la cuenta
+     * `118-01`— así que una diferencia significa que algo no está contabilizado, y descubrirlo al
+     * presentar la declaración sale caro.
+     */
+    readonly reconciliation: {
+        /** Lo que dice el libro (movimiento del mes en IVA acreditable pagado). */
+        readonly ledgerCreditableVat: number;
+        /** Lo que suma la DIOT. */
+        readonly diotCreditableVat: number;
+        readonly difference: number;
+        readonly matches: boolean;
+    };
+}
