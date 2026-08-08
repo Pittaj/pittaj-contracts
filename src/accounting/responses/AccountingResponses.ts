@@ -475,3 +475,144 @@ export interface BalanceSheetResponse {
     readonly balanced: boolean;
     readonly unclassified: readonly FinancialStatementLineResponse[];
 }
+
+// ============================================================
+// IVA (C4)
+// ============================================================
+
+/** Una de las cuentas que alimentan la declaración, con lo que aportó. */
+export interface VatReportLineResponse {
+    /** El hueco del motor: `VAT_TRANSFERRED_COLLECTED`, `VAT_CREDITABLE_PAID`… */
+    readonly slot: string;
+    readonly label: string;
+    /** `null` cuando el hueco no tiene cuenta: se dice, no se calla. */
+    readonly accountId: string | null;
+    readonly code: string | null;
+    readonly name: string | null;
+    /**
+     * Movimiento **del periodo** en la dirección natural de la cuenta, salvo en las dos de
+     * pendiente, donde es el **saldo acumulado** al corte — que es lo que de verdad está
+     * pendiente, no lo que se movió este mes.
+     */
+    readonly amount: number;
+}
+
+/**
+ * Los números con los que se prepara la declaración mensual de IVA.
+ *
+ * **Prepara, no declara.** Pittaj no presenta nada ante el SAT: esto es para que el contador
+ * llegue con las cifras cuadradas y con de dónde salió cada una.
+ *
+ * **Se mira el MOVIMIENTO del mes, no el saldo.** Lo que se declara es lo que se cobró y se pagó
+ * en el periodo; el saldo de la cuenta arrastra meses anteriores mientras nadie asiente el pago
+ * del impuesto, y leerlo daría una cifra que crece sola.
+ */
+export interface VatReportResponse {
+    readonly companyId: string;
+    readonly year: number;
+    readonly month: number;
+    readonly from: string;
+    readonly to: string;
+
+    /** IVA que se cobró en el periodo. Es lo que se causa por flujo. */
+    readonly transferredCollected: number;
+    /** IVA que se pagó en el periodo y por tanto se acredita. */
+    readonly creditablePaid: number;
+    /**
+     * IVA retenido a proveedores en el periodo.
+     *
+     * **Va aparte y NO se resta de la diferencia**: es una obligación distinta —dinero de un
+     * tercero que el negocio entera— y mezclarla con el IVA propio da un número que no
+     * corresponde a ningún renglón de la declaración.
+     */
+    readonly withheld: number;
+    /** Cobrado menos pagado. **Positivo es a cargo**; negativo, saldo a favor. */
+    readonly balance: number;
+
+    /** Saldo al corte de lo que se cobrará: IVA de ventas a crédito aún sin cobrar. */
+    readonly transferredPending: number;
+    /** Saldo al corte de lo que se acreditará: IVA de compras a crédito aún sin pagar. */
+    readonly creditablePending: number;
+
+    readonly lines: readonly VatReportLineResponse[];
+    /** Huecos sin cuenta resoluble. Con esto, alguna cifra está incompleta y hay que decirlo. */
+    readonly missing: readonly string[];
+}
+
+// ============================================================
+// DIOT (C4)
+// ============================================================
+
+/**
+ * Tipo de tercero del catálogo del SAT.
+ *
+ * `04` proveedor nacional · `05` proveedor extranjero · `15` proveedor global (las operaciones
+ * con quien no dio RFC, que se declaran en un solo renglón).
+ */
+export type DiotThirdPartyType = '04' | '05' | '15';
+
+/** Un proveedor con lo que se le pagó en el mes. */
+export interface DiotRowResponse {
+    readonly supplierName: string;
+    /** RFC. `null` cuando el proveedor no lo tiene capturado. */
+    readonly taxId: string | null;
+    readonly thirdPartyType: DiotThirdPartyType;
+    /**
+     * Tipo de operación del SAT: `03` servicios · `06` arrendamiento · `85` otros.
+     *
+     * **Siempre sale `85`, y hay que revisarlo.** El dato para distinguir un arrendamiento de un
+     * servicio no existe en la compra —`kind` solo dice si es inventario o gasto—, y adivinarlo
+     * pondría una clasificación fiscal falsa que nadie verificaría.
+     */
+    readonly operationType: '85';
+    /** Valor de los actos **pagados en el mes** que llevaron IVA. */
+    readonly paidBase: number;
+    /** IVA acreditable pagado en el mes a ese proveedor. */
+    readonly creditableVat: number;
+    /**
+     * Valor de los actos pagados **sin IVA**.
+     *
+     * La DIOT distingue **tasa 0% de exento** y el dato no: la compra guarda un solo importe de
+     * impuesto. Va junto y se marca para que el contador lo parta.
+     */
+    readonly paidBaseWithoutVat: number;
+    /** IVA retenido a ese proveedor en las operaciones pagadas. */
+    readonly withheldVat: number;
+}
+
+/**
+ * La DIOT del mes: a quién se le pagó y cuánto IVA se acreditó por ello.
+ *
+ * **Se declara por lo PAGADO, no por lo facturado**, igual que el IVA acreditable: una factura a
+ * crédito entra en la DIOT del mes en que se paga.
+ */
+export interface DiotReportResponse {
+    readonly companyId: string;
+    readonly year: number;
+    readonly month: number;
+    readonly from: string;
+    readonly to: string;
+    readonly rows: readonly DiotRowResponse[];
+    readonly totals: {
+        readonly paidBase: number;
+        readonly creditableVat: number;
+        readonly paidBaseWithoutVat: number;
+        readonly withheldVat: number;
+    };
+    /**
+     * Cuadre contra el libro: el IVA acreditable de la DIOT tiene que ser **el mismo** que el del
+     * reporte de IVA del mismo mes.
+     *
+     * Los dos salen de sitios distintos —la DIOT de las compras y sus pagos, el libro de la cuenta
+     * `118-01`— así que una diferencia significa que algo no está contabilizado, y descubrirlo al
+     * presentar la declaración sale caro.
+     */
+    readonly reconciliation: {
+        /** Lo que dice el libro (movimiento del mes en IVA acreditable pagado). */
+        readonly ledgerCreditableVat: number;
+        /** Lo que suma la DIOT. */
+        readonly diotCreditableVat: number;
+        readonly difference: number;
+        readonly matches: boolean;
+    };
+}

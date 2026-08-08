@@ -229,9 +229,16 @@ export type SummaryTermKindValue = (typeof BANKING_CONSTANTS.SUMMARY_TERM_KINDS)
 
 /** Definición de una categoría de sistema (seed por tenant, estilo CONTPAQi). */
 export interface SystemCategoryDef {
-  /** Código estable interno (no se persiste; identifica el seed). */
+  /**
+   * Código estable de la categoría. **Se persiste** desde la migración `0029`.
+   *
+   * Antes no, y era deuda: quien necesitaba reconocer una categoría concreta la buscaba **por el
+   * nombre visible**, que es texto de interfaz. Mientras no hubo forma de renombrar una categoría
+   * nadie se hizo daño; el día que la hubiera, un tenant que le cambiara el nombre a «Otro» dejaba
+   * sin funcionar el ajuste de centavos de la conciliación, con un error que no habla de nombres.
+   */
   readonly code: string;
-  /** Nombre visible, único por tenant — clave de idempotencia junto a isSystem. */
+  /** Nombre visible, único por tenant. Es la etiqueta, no la identidad. */
   readonly name: string;
   /** Flujo que admite: IN / OUT / BOTH. */
   readonly flow: CategoryFlowValue;
@@ -256,8 +263,12 @@ export const BANKING_SYSTEM_CATEGORIES: readonly SystemCategoryDef[] = [
   { code: 'OTRO', name: 'Otro', flow: 'BOTH' },
 ] as const;
 
-/** Nombre de la categoría de sistema usada por los traspasos. */
-export const TRANSFER_CATEGORY_NAME = 'Traspaso';
+/**
+ * Código de la categoría de sistema usada por los traspasos.
+ *
+ * Por **código** y no por nombre: ver `SystemCategoryDef.code`.
+ */
+export const TRANSFER_CATEGORY_CODE = 'TRASPASO';
 
 /**
  * Categoría de sistema donde caen los ajustes de centavos de la conciliación.
@@ -267,4 +278,4 @@ export const TRANSFER_CATEGORY_NAME = 'Traspaso';
  * a algo que no es. Lo que sí importa es que **exista como movimiento** con su nota, no que tenga
  * su propio renglón en los reportes.
  */
-export const ADJUSTMENT_CATEGORY_NAME = 'Otro';
+export const ADJUSTMENT_CATEGORY_CODE = 'OTRO';
