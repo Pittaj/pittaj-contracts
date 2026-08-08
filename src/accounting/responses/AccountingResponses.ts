@@ -475,3 +475,66 @@ export interface BalanceSheetResponse {
     readonly balanced: boolean;
     readonly unclassified: readonly FinancialStatementLineResponse[];
 }
+
+// ============================================================
+// IVA (C4)
+// ============================================================
+
+/** Una de las cuentas que alimentan la declaración, con lo que aportó. */
+export interface VatReportLineResponse {
+    /** El hueco del motor: `VAT_TRANSFERRED_COLLECTED`, `VAT_CREDITABLE_PAID`… */
+    readonly slot: string;
+    readonly label: string;
+    /** `null` cuando el hueco no tiene cuenta: se dice, no se calla. */
+    readonly accountId: string | null;
+    readonly code: string | null;
+    readonly name: string | null;
+    /**
+     * Movimiento **del periodo** en la dirección natural de la cuenta, salvo en las dos de
+     * pendiente, donde es el **saldo acumulado** al corte — que es lo que de verdad está
+     * pendiente, no lo que se movió este mes.
+     */
+    readonly amount: number;
+}
+
+/**
+ * Los números con los que se prepara la declaración mensual de IVA.
+ *
+ * **Prepara, no declara.** Pittaj no presenta nada ante el SAT: esto es para que el contador
+ * llegue con las cifras cuadradas y con de dónde salió cada una.
+ *
+ * **Se mira el MOVIMIENTO del mes, no el saldo.** Lo que se declara es lo que se cobró y se pagó
+ * en el periodo; el saldo de la cuenta arrastra meses anteriores mientras nadie asiente el pago
+ * del impuesto, y leerlo daría una cifra que crece sola.
+ */
+export interface VatReportResponse {
+    readonly companyId: string;
+    readonly year: number;
+    readonly month: number;
+    readonly from: string;
+    readonly to: string;
+
+    /** IVA que se cobró en el periodo. Es lo que se causa por flujo. */
+    readonly transferredCollected: number;
+    /** IVA que se pagó en el periodo y por tanto se acredita. */
+    readonly creditablePaid: number;
+    /**
+     * IVA retenido a proveedores en el periodo.
+     *
+     * **Va aparte y NO se resta de la diferencia**: es una obligación distinta —dinero de un
+     * tercero que el negocio entera— y mezclarla con el IVA propio da un número que no
+     * corresponde a ningún renglón de la declaración.
+     */
+    readonly withheld: number;
+    /** Cobrado menos pagado. **Positivo es a cargo**; negativo, saldo a favor. */
+    readonly balance: number;
+
+    /** Saldo al corte de lo que se cobrará: IVA de ventas a crédito aún sin cobrar. */
+    readonly transferredPending: number;
+    /** Saldo al corte de lo que se acreditará: IVA de compras a crédito aún sin pagar. */
+    readonly creditablePending: number;
+
+    readonly lines: readonly VatReportLineResponse[];
+    /** Huecos sin cuenta resoluble. Con esto, alguna cifra está incompleta y hay que decirlo. */
+    readonly missing: readonly string[];
+}
