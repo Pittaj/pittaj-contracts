@@ -42,6 +42,9 @@ export const POSTING_SWEEPS = [
     { key: 'layaway-payments', label: 'Abonos de apartado' },
     { key: 'production-orders', label: 'Órdenes de producción' },
     { key: 'customer-payments', label: 'Cobros de ventas a crédito' },
+    // El espejo del cobro: acredita el IVA de una compra a crédito cuando se paga. No registra
+    // el pago —eso lo hace el movimiento bancario—, solo reclasifica el impuesto.
+    { key: 'purchase-payments', label: 'Pagos a proveedores (IVA acreditable)' },
 ] as const;
 
 export type PostingSweepKey = (typeof POSTING_SWEEPS)[number]['key'];
