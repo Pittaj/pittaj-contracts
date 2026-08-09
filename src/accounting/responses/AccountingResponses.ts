@@ -123,6 +123,16 @@ export interface PostingRunResponse {
     readonly failed: number;
     readonly skipped?: number;
     readonly exceptions: readonly PostingExceptionSummary[];
+    /**
+     * Cuentas de la plantilla que el motor tuvo que crear durante el barrido.
+     *
+     * El motor crea la cuenta que la plantilla define para un concepto **solo cuando un
+     * documento la necesita de verdad** — sembrar de más le cambiaría a la empresa el XML de
+     * catálogo del Anexo 24 por una cuenta que quizá no use nunca. Pero eso **no puede pasar en
+     * silencio**: su catálogo cambió, y quien lo mira tiene que poder ir a remapear el concepto
+     * si esperaba que cayera en una cuenta suya.
+     */
+    readonly provisionedAccounts?: readonly { readonly code: string; readonly name: string }[];
 }
 
 // ============================================================
