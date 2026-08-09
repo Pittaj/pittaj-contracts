@@ -11,3 +11,4 @@ export * from './RemoveOrderLineResponse.js';
 export * from './ReturnSalesOrderResponse.js';
 export * from './SalesOrderResponse.js';
 export * from './UpdateOrderLineResponse.js';
+export * from './SyncSalesOrderResponses.js';
