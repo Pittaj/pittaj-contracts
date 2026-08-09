@@ -626,3 +626,110 @@ export interface DiotReportResponse {
         readonly matches: boolean;
     };
 }
+
+/**
+ * Un activo fijo tal como lo ve la pantalla.
+ *
+ * **`accumulatedDepreciation` y `bookValue` son derivados, no columnas.** Salen
+ * del MOI, la tasa y la fecha de servicio, igual que todo saldo en esta app: un
+ * contador guardado en dos sitios se desincroniza, y el día que alguien cancele
+ * una póliza de depreciación la columna mentiría sin que nada proteste.
+ */
+export interface FixedAssetResponse {
+    readonly id: string;
+    readonly companyId: string;
+    readonly name: string;
+    readonly description: string | null;
+    readonly assetType: string;
+    /** Cómo se llama el tipo en la pantalla, ya traducido. */
+    readonly assetTypeLabel: string;
+    /** Monto original de la inversión: precio + fletes + instalación, sin IVA. */
+    readonly moi: number;
+    /** Tasa anual en tanto por uno. `0.30` = 30 %. */
+    readonly annualRate: number;
+    /**
+     * Qué artículo de la LISR da esa tasa. Va a la pantalla a propósito: una tasa
+     * sin procedencia es un número que nadie se atreve a cambiar ni a defender.
+     */
+    readonly rateBasis: string;
+    /**
+     * `true` cuando la tasa la fija la **actividad del negocio** y no el bien
+     * (LISR art. 35). El valor por defecto es el residual del 10 %, correcto para
+     * una tienda y **equivocado para un restaurante**, que son 20 %. La pantalla
+     * tiene que decirlo: nadie corrige un número que no sabe que está mal.
+     */
+    readonly rateDependsOnActivity: boolean;
+    readonly acquisitionDate: string;
+    readonly inServiceDate: string;
+    /** `YYYY-MM` del primer mes que deprecia. `null` si el activo no deprecia. */
+    readonly firstDepreciationPeriod: string | null;
+    readonly purchaseCfdiUuid: string | null;
+    readonly locationId: string | null;
+    readonly status: string;
+    /** Lo depreciado hasta hoy. Derivado. */
+    readonly accumulatedDepreciation: number;
+    /** MOI menos lo depreciado. Es contra esto que se mide una baja. */
+    readonly bookValue: number;
+    /** Cuántos meses de depreciación quedan. `null` si no deprecia. */
+    readonly remainingMonths: number | null;
+    /** Las cinco cuentas contra las que postea, para que se puedan mirar. */
+    readonly accounts: {
+        readonly asset: string;
+        readonly accumulated: string | null;
+        readonly expense: string | null;
+        readonly disposalLoss: string;
+        readonly disposalGain: string;
+    };
+    readonly disposal: {
+        readonly kind: string;
+        readonly date: string;
+        readonly proceeds: number;
+        /** Contra el valor en libros, no contra el MOI. Negativo = pérdida. */
+        readonly result: number;
+    } | null;
+    /**
+     * ⚠️ Avisos que no bloquean pero conviene ver: un automóvil por encima del
+     * tope deducible del art. 36, o una tasa que depende de la actividad.
+     */
+    readonly warnings: readonly string[];
+}
+
+/** Un renglón de la tabla de depreciación de un activo. */
+export interface DepreciationScheduleRowResponse {
+    readonly period: string;
+    readonly amount: number;
+    readonly accumulated: number;
+    readonly bookValue: number;
+    /** `true` si ese mes ya está asentado en el libro. */
+    readonly posted: boolean;
+}
+
+export interface FixedAssetDetailResponse extends FixedAssetResponse {
+    readonly schedule: readonly DepreciationScheduleRowResponse[];
+}
+
+export interface FixedAssetListResponse {
+    readonly items: readonly FixedAssetResponse[];
+    readonly total: number;
+    readonly page: number;
+    readonly limit: number;
+    /** Los totales de la lista, que es lo que va al balance. */
+    readonly totals: {
+        readonly moi: number;
+        readonly accumulatedDepreciation: number;
+        readonly bookValue: number;
+    };
+}
+
+/** Lo que devuelve el barrido mensual de depreciación. */
+export interface DepreciationRunResponse {
+    readonly companyId: string;
+    readonly period: string;
+    readonly posted: number;
+    readonly skipped: number;
+    readonly failed: number;
+    readonly totalDepreciated: number;
+    readonly exceptions: readonly { readonly assetId: string; readonly reason: string }[];
+    /** Cuentas de plantilla creadas al vuelo para poder postear. */
+    readonly provisionedAccounts: readonly { readonly code: string; readonly name: string }[];
+}
