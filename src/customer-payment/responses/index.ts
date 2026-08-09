@@ -1,4 +1,5 @@
 export * from './CustomerPaymentResponse.js';
 export * from './GetCustomerPaymentsResponse.js';
 export * from './GetReceivablesResponse.js';
+export * from './GetDebtorsResponse.js';
 export * from './SyncCustomerPaymentResponses.js';
