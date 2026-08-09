@@ -334,10 +334,10 @@ export const BANKING_SYSTEM_CATEGORIES: readonly SystemCategoryDef[] = [
    * etiquetar (¿hay acta?, ¿está en nómina?). Si no lo sabe, `OTRO` — y el movimiento queda
    * visible en «Sin contabilizar» en vez de convertirse en un asiento equivocado.
    */
-  { code: 'APORTACION_FUTUROS_AUMENTOS', name: 'Aportación para futuros aumentos', flow: 'IN', ledgerAccountCode: null },
+  { code: 'APORTACION_FUTUROS_AUMENTOS', name: 'Aportación para futuros aumentos', flow: 'IN', ledgerAccountCode: '301-02' },
   { code: 'PRESTAMO_DE_SOCIO', name: 'Préstamo del socio al negocio', flow: 'IN', ledgerAccountCode: '205-02' },
   { code: 'AUMENTO_CAPITAL_SOCIAL', name: 'Aumento de capital social', flow: 'IN', ledgerAccountCode: '301-01' },
-  { code: 'PRESTAMO_A_SOCIO', name: 'Préstamo al socio', flow: 'OUT', ledgerAccountCode: null },
+  { code: 'PRESTAMO_A_SOCIO', name: 'Préstamo al socio', flow: 'OUT', ledgerAccountCode: '113-03' },
   { code: 'REPARTO_UTILIDADES', name: 'Reparto de utilidades', flow: 'OUT', ledgerAccountCode: '304-01' },
   { code: 'SUELDO_SOCIO', name: 'Sueldo del socio', flow: 'OUT', ledgerAccountCode: '601-01' },
 
