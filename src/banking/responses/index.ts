@@ -5,3 +5,4 @@ export * from './BankTransferResponse.js';
 export * from './BankStatementResponse.js';
 export * from './ReconciliationRuleResponse.js';
 export * from './PayableDocumentResponse.js';
+export * from './BankReportResponses.js';

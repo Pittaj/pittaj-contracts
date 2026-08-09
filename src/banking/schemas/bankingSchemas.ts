@@ -473,3 +473,27 @@ export const getPayableDocumentsSchema = z.object({
   page: z.coerce.number().int().min(1).optional(),
   limit: z.coerce.number().int().min(1).max(LIMITS.MAX_PAGE_SIZE).optional(),
 });
+
+/**
+ * `GET /api/bank-reports/balances` — saldos y disponible.
+ *
+ * `asOf` acota el corte del saldo en libros. Por omisión, hoy.
+ */
+export const getAccountBalancesReportSchema = z.object({
+  asOf: isoDateSchema.optional(),
+  locationId: z.string().uuid().optional(),
+});
+
+/** `GET /api/bank-reports/by-category` — movimientos agrupados por concepto. */
+export const getCategoryTotalsReportSchema = z.object({
+  from: isoDateSchema,
+  to: isoDateSchema,
+  accountId: z.string().uuid().optional(),
+});
+
+/** `GET /api/bank-reports/commissions` — comisiones y tasa real de la terminal. */
+export const getCommissionsReportSchema = z.object({
+  from: isoDateSchema,
+  to: isoDateSchema,
+  accountId: z.string().uuid().optional(),
+});
