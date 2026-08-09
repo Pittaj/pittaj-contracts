@@ -242,6 +242,26 @@ export interface SystemCategoryDef {
   readonly name: string;
   /** Flujo que admite: IN / OUT / BOTH. */
   readonly flow: CategoryFlowValue;
+  /**
+   * Cuenta contable con la que **nace** la categoría (`LedgerAccountCode`, código y no id: dos
+   * empresas del mismo tenant tienen dos catálogos y el código es lo único que significa lo mismo
+   * en los dos). `null` = se siembra sin cuenta, a propósito.
+   *
+   * **Está aquí y no en un documento porque un mapeo que hay que aplicar a mano no se aplica.**
+   * Antes de esto, la tabla que Contabilidad mantiene era una lista de tareas: veinte llamadas a
+   * `PUT /:id/ledger-account` por tenant, y la condición de disparo era «que alguien se acuerde».
+   * Esa condición ya falló tres veces en una semana —la siembra del catálogo que se salía entera,
+   * este seeder que solo inserta si no hay ninguna categoría, y este mapeo—. Con el código aquí,
+   * el mapeo nace con la categoría y el documento pasa de lista de tareas a documentación.
+   *
+   * **El criterio contable de cada uno es de Contabilidad**, y está razonado cuenta por cuenta en
+   * `arquitectura/categorias-bancarias-a-cuentas.md`. Aquí solo vive el dato.
+   *
+   * Sigue siendo un **valor por omisión**, no una atadura: el dueño lo cambia desde
+   * `/bancos/categorias` y nada lo vuelve a pisar — el seeder solo corre cuando el tenant no tiene
+   * ninguna categoría de sistema.
+   */
+  readonly ledgerAccountCode: string | null;
 }
 
 /**
@@ -249,8 +269,8 @@ export interface SystemCategoryDef {
  * Se siembran por tenant: en onboarding y lazy en la primera lectura del catálogo.
  */
 export const BANKING_SYSTEM_CATEGORIES: readonly SystemCategoryDef[] = [
-  { code: 'DEPOSITO_VENTA', name: 'Depósito de venta', flow: 'IN' },
-  { code: 'LIQUIDACION_TPV', name: 'Liquidación TPV', flow: 'IN' },
+  { code: 'DEPOSITO_VENTA', name: 'Depósito de venta', flow: 'IN', ledgerAccountCode: '103-01' },
+  { code: 'LIQUIDACION_TPV', name: 'Liquidación TPV', flow: 'IN', ledgerAccountCode: '103-02' },
   /**
    * La categoría de la cuenta puente `103-04 Transferencias en tránsito`.
    *
@@ -265,10 +285,10 @@ export const BANKING_SYSTEM_CATEGORIES: readonly SystemCategoryDef[] = [
    * recibido»: una cuenta, una categoría, las dos direcciones. Quien ve un «SPEI ENVIADO» no
    * puede elegir algo que se llame «cobro».
    */
-  { code: 'COBRO_CLIENTE', name: 'Transferencia', flow: 'BOTH' },
-  { code: 'PAGO_PROVEEDOR', name: 'Pago a proveedor', flow: 'OUT' },
-  { code: 'GASTO', name: 'Gasto', flow: 'OUT' },
-  { code: 'COMISION_BANCARIA', name: 'Comisión bancaria', flow: 'OUT' },
+  { code: 'COBRO_CLIENTE', name: 'Transferencia', flow: 'BOTH', ledgerAccountCode: '103-04' },
+  { code: 'PAGO_PROVEEDOR', name: 'Pago a proveedor', flow: 'OUT', ledgerAccountCode: '201-01' },
+  { code: 'GASTO', name: 'Gasto', flow: 'OUT', ledgerAccountCode: '601-09' },
+  { code: 'COMISION_BANCARIA', name: 'Comisión bancaria', flow: 'OUT', ledgerAccountCode: '701-01' },
 
   /**
    * El IVA de una comisión bancaria. **No es un impuesto que se pague al SAT: es acreditable.**
@@ -278,7 +298,7 @@ export const BANKING_SYSTEM_CATEGORIES: readonly SystemCategoryDef[] = [
    * saldo a tu favor. Mientras esa categoría no tuvo cuenta el error no se veía; al partirla en
    * cuatro pasivos concretos habría que elegir uno, y los cuatro serían falsos.
    */
-  { code: 'IVA_ACREDITABLE', name: 'IVA acreditable', flow: 'OUT' },
+  { code: 'IVA_ACREDITABLE', name: 'IVA acreditable', flow: 'OUT', ledgerAccountCode: '118-01' },
 
   /**
    * ── Los impuestos, en cuatro ──
@@ -291,13 +311,13 @@ export const BANKING_SYSTEM_CATEGORIES: readonly SystemCategoryDef[] = [
    * **categorización** —por movimiento, quien mira el estado de cuenta y sabe qué pagó—. Aquí el
    * usuario sí lo sabe: la línea del banco dice qué impuesto es.
    */
-  { code: 'IMPUESTO_IVA', name: 'Pago de IVA', flow: 'OUT' },
-  { code: 'IMPUESTO_ISR', name: 'Pago de ISR', flow: 'OUT' },
-  { code: 'RETENCION_IVA_ENTERADA', name: 'Entero de retenciones de IVA', flow: 'OUT' },
-  { code: 'RETENCION_ISR_ENTERADA', name: 'Entero de retenciones de ISR', flow: 'OUT' },
+  { code: 'IMPUESTO_IVA', name: 'Pago de IVA', flow: 'OUT', ledgerAccountCode: '208-01' },
+  { code: 'IMPUESTO_ISR', name: 'Pago de ISR', flow: 'OUT', ledgerAccountCode: '213-01' },
+  { code: 'RETENCION_IVA_ENTERADA', name: 'Entero de retenciones de IVA', flow: 'OUT', ledgerAccountCode: '216-01' },
+  { code: 'RETENCION_ISR_ENTERADA', name: 'Entero de retenciones de ISR', flow: 'OUT', ledgerAccountCode: '216-02' },
 
-  { code: 'NOMINA', name: 'Nómina', flow: 'OUT' },
-  { code: 'TRASPASO', name: 'Traspaso', flow: 'BOTH' },
+  { code: 'NOMINA', name: 'Nómina', flow: 'OUT', ledgerAccountCode: '601-01' },
+  { code: 'TRASPASO', name: 'Traspaso', flow: 'BOTH', ledgerAccountCode: '103-03' },
 
   /**
    * ── El dinero del socio, en seis ──
@@ -314,19 +334,19 @@ export const BANKING_SYSTEM_CATEGORIES: readonly SystemCategoryDef[] = [
    * etiquetar (¿hay acta?, ¿está en nómina?). Si no lo sabe, `OTRO` — y el movimiento queda
    * visible en «Sin contabilizar» en vez de convertirse en un asiento equivocado.
    */
-  { code: 'APORTACION_FUTUROS_AUMENTOS', name: 'Aportación para futuros aumentos', flow: 'IN' },
-  { code: 'PRESTAMO_DE_SOCIO', name: 'Préstamo del socio al negocio', flow: 'IN' },
-  { code: 'AUMENTO_CAPITAL_SOCIAL', name: 'Aumento de capital social', flow: 'IN' },
-  { code: 'PRESTAMO_A_SOCIO', name: 'Préstamo al socio', flow: 'OUT' },
-  { code: 'REPARTO_UTILIDADES', name: 'Reparto de utilidades', flow: 'OUT' },
-  { code: 'SUELDO_SOCIO', name: 'Sueldo del socio', flow: 'OUT' },
+  { code: 'APORTACION_FUTUROS_AUMENTOS', name: 'Aportación para futuros aumentos', flow: 'IN', ledgerAccountCode: null },
+  { code: 'PRESTAMO_DE_SOCIO', name: 'Préstamo del socio al negocio', flow: 'IN', ledgerAccountCode: '205-02' },
+  { code: 'AUMENTO_CAPITAL_SOCIAL', name: 'Aumento de capital social', flow: 'IN', ledgerAccountCode: '301-01' },
+  { code: 'PRESTAMO_A_SOCIO', name: 'Préstamo al socio', flow: 'OUT', ledgerAccountCode: null },
+  { code: 'REPARTO_UTILIDADES', name: 'Reparto de utilidades', flow: 'OUT', ledgerAccountCode: '304-01' },
+  { code: 'SUELDO_SOCIO', name: 'Sueldo del socio', flow: 'OUT', ledgerAccountCode: '601-01' },
 
   /**
    * El cajón de «no sé qué es esto», y **se queda sin cuenta a propósito**. Darle una convertiría
    * un «no sé» en un asiento, que es lo contrario de para lo que existe: aquí el movimiento cae en
    * «Sin contabilizar», que es una lista que se mira.
    */
-  { code: 'OTRO', name: 'Otro', flow: 'BOTH' },
+  { code: 'OTRO', name: 'Otro', flow: 'BOTH', ledgerAccountCode: null },
 ] as const;
 
 /**
