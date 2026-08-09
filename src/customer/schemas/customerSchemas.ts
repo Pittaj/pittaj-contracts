@@ -20,7 +20,9 @@ const customerCreditConfigSchema = z.object({
     creditEnabled: z.boolean().default(false),
     creditLimit: z.number().min(LIMITS.MIN_CREDIT_LIMIT).max(LIMITS.MAX_CREDIT_LIMIT).default(0),
     creditDays: z.number().int().min(LIMITS.MIN_CREDIT_DAYS).max(LIMITS.MAX_CREDIT_DAYS).default(0),
-    creditUsed: z.number().min(0).default(0),
+    // Sin `creditUsed`: la deuda no se declara al editar un cliente (BUG-030). Aceptarlo aquí era
+    // además un agujero — el handler reemplaza el VO entero y el campo traía `.default(0)`, así que
+    // un PUT legítimo que tocara las condiciones de crédito ponía la deuda a cero en silencio.
 });
 
 /** Dirección del cliente */
