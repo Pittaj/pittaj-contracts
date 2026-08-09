@@ -106,19 +106,9 @@ export const blockCustomerSchema = z.object({
     reason: z.string().max(LIMITS.MAX_NOTES_LENGTH).optional(),
 });
 
-/** POST /api/customers/:id/charge-credit — Cargo a crédito */
-export const chargeCreditSchema = z.object({
-    amount: z.number().positive(),
-    referenceId: z.string().uuid(),
-    version: z.number().int().min(1),
-});
-
-/** POST /api/customers/:id/credit-payment — Pago a crédito */
-export const applyCreditPaymentSchema = z.object({
-    amount: z.number().positive(),
-    referenceId: z.string().uuid(),
-    version: z.number().int().min(1),
-});
+// Aquí estaban `chargeCreditSchema` y `applyCreditPaymentSchema`, de las dos rutas que movían a
+// mano el contador de deuda del cliente. Se van con él (BUG-030): cobrar se hace registrando un
+// cobro (`POST /api/customer-payments`) y deshacerlo, cancelándolo.
 
 // ============================================================
 // QUERIES
@@ -129,7 +119,9 @@ export const getCustomersSchema = z.object({
     search: z.string().max(100).optional(),
     status: customerStatusEnum.optional(),
     type: customerTypeEnum.optional(),
-    hasOutstandingDebt: z.coerce.boolean().optional(),
+    // Sin `hasOutstandingDebt`: filtraba por el contador muerto, así que devolvía **cero clientes**
+    // por más que se fiara (BUG-030). Ninguna pantalla lo ofrecía. Vuelve en la fase 2 sobre
+    // cuentas por cobrar, que es donde la deuda se sabe.
     page: z.coerce.number().int().min(1).optional(),
     pageSize: z.coerce.number().int().min(1).max(LIMITS.MAX_PAGE_SIZE).optional(),
 });
@@ -141,7 +133,6 @@ export const getCustomersCursorSchema = z.object({
     search: z.string().max(100).optional(),
     status: customerStatusEnum.optional(),
     type: customerTypeEnum.optional(),
-    hasOutstandingDebt: z.coerce.boolean().optional(),
 });
 
 /** GET /api/customers/search-pos — Búsqueda rápida para POS */
