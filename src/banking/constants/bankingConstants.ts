@@ -269,7 +269,7 @@ export interface SystemCategoryDef {
  * Se siembran por tenant: en onboarding y lazy en la primera lectura del catálogo.
  */
 export const BANKING_SYSTEM_CATEGORIES: readonly SystemCategoryDef[] = [
-  { code: 'DEPOSITO_VENTA', name: 'Depósito de venta', flow: 'IN', ledgerAccountCode: '103-01' },
+  { code: 'DEPOSITO_VENTA', name: 'Depósito de efectivo', flow: 'IN', ledgerAccountCode: '103-01' },
   { code: 'LIQUIDACION_TPV', name: 'Liquidación TPV', flow: 'IN', ledgerAccountCode: '103-02' },
   /**
    * La categoría de la cuenta puente `103-04 Transferencias en tránsito`.
