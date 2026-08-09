@@ -269,11 +269,63 @@ export const BANKING_SYSTEM_CATEGORIES: readonly SystemCategoryDef[] = [
   { code: 'PAGO_PROVEEDOR', name: 'Pago a proveedor', flow: 'OUT' },
   { code: 'GASTO', name: 'Gasto', flow: 'OUT' },
   { code: 'COMISION_BANCARIA', name: 'Comisión bancaria', flow: 'OUT' },
-  { code: 'IMPUESTOS', name: 'Impuestos', flow: 'OUT' },
+
+  /**
+   * El IVA de una comisión bancaria. **No es un impuesto que se pague al SAT: es acreditable.**
+   *
+   * Lo usa el split del TPV, que parte el depósito en venta bruta, comisión e IVA de la comisión.
+   * Vivía en `IMPUESTOS` y ahí estaba mal: `IMPUESTOS` es lo que le DEBES al SAT, y esto es un
+   * saldo a tu favor. Mientras esa categoría no tuvo cuenta el error no se veía; al partirla en
+   * cuatro pasivos concretos habría que elegir uno, y los cuatro serían falsos.
+   */
+  { code: 'IVA_ACREDITABLE', name: 'IVA acreditable', flow: 'OUT' },
+
+  /**
+   * ── Los impuestos, en cuatro ──
+   *
+   * Era una sola categoría, `IMPUESTOS`, y se quedó sin cuenta a propósito porque IVA, ISR y las
+   * dos retenciones son **cuatro pasivos distintos**: con una sola cuenta, tres quedan con saldo
+   * falso y cuadrar la declaración contra el libro es imposible.
+   *
+   * Partirlas mueve la decisión de la **configuración** —una vez, quien montó el sistema— a la
+   * **categorización** —por movimiento, quien mira el estado de cuenta y sabe qué pagó—. Aquí el
+   * usuario sí lo sabe: la línea del banco dice qué impuesto es.
+   */
+  { code: 'IMPUESTO_IVA', name: 'Pago de IVA', flow: 'OUT' },
+  { code: 'IMPUESTO_ISR', name: 'Pago de ISR', flow: 'OUT' },
+  { code: 'RETENCION_IVA_ENTERADA', name: 'Entero de retenciones de IVA', flow: 'OUT' },
+  { code: 'RETENCION_ISR_ENTERADA', name: 'Entero de retenciones de ISR', flow: 'OUT' },
+
   { code: 'NOMINA', name: 'Nómina', flow: 'OUT' },
   { code: 'TRASPASO', name: 'Traspaso', flow: 'BOTH' },
-  { code: 'APORTACION_SOCIO', name: 'Aportación de socio', flow: 'IN' },
-  { code: 'RETIRO_SOCIO', name: 'Retiro de socio', flow: 'OUT' },
+
+  /**
+   * ── El dinero del socio, en seis ──
+   *
+   * `APORTACION_SOCIO` y `RETIRO_SOCIO` no se podían mapear porque **cambian de naturaleza entre
+   * movimientos**: en marzo el socio saca dinero y es un préstamo, en diciembre saca dinero y es
+   * un reparto con acta. Un mapeo guarda **una** respuesta para siempre, así que la mitad se
+   * contabilizaría mal en silencio.
+   *
+   * Es el que más caro sale de equivocar: mandar un retiro a gastos **deduce algo que no es
+   * deducible**.
+   *
+   * Aquí el usuario puede no saber cuál es, y por eso el texto de la pantalla pregunta en vez de
+   * etiquetar (¿hay acta?, ¿está en nómina?). Si no lo sabe, `OTRO` — y el movimiento queda
+   * visible en «Sin contabilizar» en vez de convertirse en un asiento equivocado.
+   */
+  { code: 'APORTACION_FUTUROS_AUMENTOS', name: 'Aportación para futuros aumentos', flow: 'IN' },
+  { code: 'PRESTAMO_DE_SOCIO', name: 'Préstamo del socio al negocio', flow: 'IN' },
+  { code: 'AUMENTO_CAPITAL_SOCIAL', name: 'Aumento de capital social', flow: 'IN' },
+  { code: 'PRESTAMO_A_SOCIO', name: 'Préstamo al socio', flow: 'OUT' },
+  { code: 'REPARTO_UTILIDADES', name: 'Reparto de utilidades', flow: 'OUT' },
+  { code: 'SUELDO_SOCIO', name: 'Sueldo del socio', flow: 'OUT' },
+
+  /**
+   * El cajón de «no sé qué es esto», y **se queda sin cuenta a propósito**. Darle una convertiría
+   * un «no sé» en un asiento, que es lo contrario de para lo que existe: aquí el movimiento cae en
+   * «Sin contabilizar», que es una lista que se mira.
+   */
   { code: 'OTRO', name: 'Otro', flow: 'BOTH' },
 ] as const;
 
