@@ -18,7 +18,11 @@ const { LIMITS, TYPES, STATUSES } = CUSTOMER_CONSTANTS;
 /** Configuración de crédito del cliente */
 const customerCreditConfigSchema = z.object({
     creditEnabled: z.boolean().default(false),
-    creditLimit: z.number().min(LIMITS.MIN_CREDIT_LIMIT).max(LIMITS.MAX_CREDIT_LIMIT).default(0),
+    // `null` = SIN TOPE. El `0` ya solo significa «no le fíes ni un peso», que es lo que cualquiera
+    // lee al verlo. Por omisión `null` sería «sin tope» a quien no manda nada, así que el defecto
+    // es `0`: quien no lo declara no está autorizando crédito ilimitado sin darse cuenta.
+    creditLimit: z.number().min(LIMITS.MIN_CREDIT_LIMIT).max(LIMITS.MAX_CREDIT_LIMIT)
+        .nullable().default(0),
     creditDays: z.number().int().min(LIMITS.MIN_CREDIT_DAYS).max(LIMITS.MAX_CREDIT_DAYS).default(0),
     // Sin `creditUsed`: la deuda no se declara al editar un cliente (BUG-030). Aceptarlo aquí era
     // además un agujero — el handler reemplaza el VO entero y el campo traía `.default(0)`, así que
