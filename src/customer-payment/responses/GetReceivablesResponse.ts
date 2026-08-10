@@ -7,10 +7,20 @@
  * corte**, no contra hoy.
  */
 
-/** Una venta a crédito con saldo. */
+/**
+ * Qué clase de documento se debe. El saldo se calcula distinto en cada uno y las dos formas son
+ * correctas: el ticket registra CON QUÉ se pagó —de ahí sale lo fiado— y el pedido registra CUÁNTO
+ * se ha abonado.
+ */
+export const RECEIVABLE_DOCUMENT_TYPES = ['TICKET', 'SALES_ORDER'] as const;
+export type ReceivableDocumentType = (typeof RECEIVABLE_DOCUMENT_TYPES)[number];
+
+/** Un documento con saldo. */
 export interface ReceivableResponse {
-    readonly ticketId: string;
-    readonly ticketNumber: string;
+    readonly documentId: string;
+    readonly documentType: ReceivableDocumentType;
+    /** Folio del documento (`TKT-…` o `ORD-…`). */
+    readonly documentNumber: string;
     readonly customerId: string;
     readonly customerName: string | null;
     readonly locationId: string | null;
