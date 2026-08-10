@@ -32,7 +32,18 @@ export interface SalesOrderResponse {
   readonly taxAmount: number;
   readonly totalAmount: number;
   readonly totalPaid: number;
-  readonly balanceDue: number;
+
+  /**
+   * Lo que falta por cobrar **según los abonos registrados en el propio pedido**.
+   *
+   * ⚠️ **No es necesariamente lo que el cliente debe por este pedido.** Cobranza puede aplicarle
+   * cobros, y esos no viven aquí: viven en las aplicaciones del cobro. La deuda real es este número
+   * menos esas aplicaciones, y **quien la sabe es cuentas por cobrar** (`GET /receivables`).
+   *
+   * Se llamaba `balanceDue`, y ese nombre miente en cuanto un cobro toca el pedido — la misma forma
+   * de BUG-030: un número que parece un saldo y no lo es.
+   */
+  readonly pendingOnOrder: number;
   readonly currency: string;
   readonly itemCount: number;
   readonly deliveryAddress: DeliveryAddressPrimitives | null;

@@ -147,7 +147,7 @@ const salesOrderStatusEnum = z.enum([
   'SHIPPED', 'DELIVERED', 'COMPLETED', 'CANCELLED', 'RETURNED',
 ]);
 const salesOrderSortFieldEnum = z.enum([
-  'createdAt', 'totalAmount', 'orderNumber', 'status', 'estimatedDeliveryDate', 'balanceDue',
+  'createdAt', 'totalAmount', 'orderNumber', 'status', 'estimatedDeliveryDate', 'pendingOnOrder',
 ]);
 const sortDirectionEnum = z.enum(['asc', 'desc']);
 
