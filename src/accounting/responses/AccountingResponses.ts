@@ -556,9 +556,14 @@ export interface VatReportResponse {
      * deducible. Encadenados: ese IVA no se acredita.
      *
      * **Está aquí y no en una pantalla aparte** porque el sitio donde importa es
-     * justo antes de declarar. `creditablePaid` **incluye** este importe: lo que
-     * se enseña es cuánto habría que quitarle a mano — el sistema todavía no lo
-     * mueve de cuenta (BUG-045).
+     * justo antes de declarar.
+     *
+     * ⚠️ **No es un importe a restar.** Desde el candado de BUG-045 el motor manda
+     * ese IVA a la cuenta de no deducibles, así que `creditablePaid` **ya no lo
+     * incluye**. La lista sirve para otras dos cosas: las compras posteadas
+     * **antes** del candado sí lo tienen en `118-01`, y **la base de estas
+     * compras tampoco es deducible** — eso se resuelve en la conciliación
+     * contable-fiscal de la anual, y esto es su insumo.
      */
     readonly nonCreditableVat: {
         /** Cuántas compras del periodo tropiezan. `0` = la lista está limpia. */
