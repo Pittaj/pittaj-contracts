@@ -30,11 +30,19 @@ export type CustomerPaymentStatusPrimitive = (typeof CUSTOMER_PAYMENT_STATUSES)[
  */
 export interface CustomerPaymentApplicationPrimitives {
     readonly id: string;
-    /** Venta a crédito que se abona (`posTickets.id`). */
-    readonly ticketId: string;
-    /** Folio de la venta, copiado para leer el cobro sin volver al ticket. */
-    readonly ticketNumber: string | null;
-    /** Cuánto de este cobro se aplicó a esa venta. Siempre > 0. */
+    /**
+     * Qué clase de documento se abonó.
+     *
+     * **No siempre es un ticket:** un pedido entregado y sin pagar también es deuda y también se
+     * cobra. Una columna que se llamara `ticketId` y a veces guardara un pedido mentiría sobre a
+     * qué se abonó, y esa mentira acaba en un reporte de antigüedad.
+     */
+    readonly documentType: 'TICKET' | 'SALES_ORDER';
+    /** Documento que se abona (`posTickets.id` o `salesOrders.id`). */
+    readonly documentId: string;
+    /** Folio del documento, copiado para leer el cobro sin volver a él. */
+    readonly documentNumber: string | null;
+    /** Cuánto de este cobro se aplicó a ese documento. Siempre > 0. */
     readonly amount: number;
     /** Cuánto de ese importe es IVA. Congelado al cobrar. */
     readonly taxAmount: number;

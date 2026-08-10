@@ -13,11 +13,17 @@
 
 import { z } from 'zod';
 
-/** Una parte del cobro aplicada a una venta concreta. */
+/** Una parte del cobro aplicada a un documento concreto. */
 export const customerPaymentApplicationSchema = z.object({
-    /** Venta a crédito que se abona. */
-    ticketId: z.string().uuid('El ticket debe ser un UUID'),
-    /** Cuánto de este cobro se aplica a esa venta (> 0, no puede exceder su saldo). */
+    /**
+     * Documento que se abona: un ticket fiado o un pedido entregado y sin pagar.
+     *
+     * **No se pide el tipo**: el servidor sabe qué es cada id y lo resuelve. Pedirlo abriría la
+     * puerta a que llegara mal —un ticket declarado como pedido— y el saldo se calcularía con la
+     * fórmula equivocada.
+     */
+    documentId: z.string().uuid('El documento debe ser un UUID'),
+    /** Cuánto de este cobro se aplica a ese documento (> 0, no puede exceder su saldo). */
     amount: z.number().positive('El importe aplicado debe ser mayor que 0'),
 });
 
