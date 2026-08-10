@@ -547,6 +547,38 @@ export interface VatReportResponse {
     readonly lines: readonly VatReportLineResponse[];
     /** Huecos sin cuenta resoluble. Con esto, alguna cifra está incompleta y hay que decirlo. */
     readonly missing: readonly string[];
+
+    /**
+     * ⚠️ IVA que se acreditó y **la ley no permite acreditar**, por la forma de pago.
+     *
+     * LISR art. 27 fr. III deja el efectivo fuera de los medios que hacen deducible
+     * un pago de más de $2 000, y LIVA art. 5 fr. I ata lo acreditable a lo
+     * deducible. Encadenados: ese IVA no se acredita.
+     *
+     * **Está aquí y no en una pantalla aparte** porque el sitio donde importa es
+     * justo antes de declarar. `creditablePaid` **incluye** este importe: lo que
+     * se enseña es cuánto habría que quitarle a mano — el sistema todavía no lo
+     * mueve de cuenta (BUG-045).
+     */
+    readonly nonCreditableVat: {
+        /** Cuántas compras del periodo tropiezan. `0` = la lista está limpia. */
+        readonly count: number;
+        /** El IVA acreditado de más, sumado. */
+        readonly amount: number;
+        readonly rows: readonly NonCreditableVatRowResponse[];
+    };
+}
+
+/** Una compra cuyo IVA se acreditó contra lo que dice la ley. */
+export interface NonCreditableVatRowResponse {
+    readonly purchaseId: string;
+    readonly purchaseNumber: string;
+    readonly date: string;
+    readonly supplierName: string;
+    readonly total: number;
+    readonly vatAmount: number;
+    /** Por qué, en una línea y con el artículo. */
+    readonly detail: string;
 }
 
 // ============================================================
