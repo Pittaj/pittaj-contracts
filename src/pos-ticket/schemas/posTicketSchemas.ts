@@ -82,6 +82,14 @@ export const addPaymentSchema = z.object({
   amountPaid: z.number().min(0.01),
   currency: z.string().length(3).optional(),
   reference: z.string().max(200).nullable().optional(),
+  /**
+   * Quién autorizó fiar POR ENCIMA de la línea de crédito del cliente (BUG-030).
+   *
+   * Solo tiene sentido con `paymentMethodType: 'CREDIT'`; en cualquier otro el mandato lo rechaza.
+   * No se valida aquí como regla cruzada a propósito: quien decide es el guardia del handler, que
+   * es el único que conoce el saldo. El schema solo acepta el dato.
+   */
+  authorizedBy: z.string().max(50).nullable().optional(),
   version: z.number().int().min(0),
 });
 
