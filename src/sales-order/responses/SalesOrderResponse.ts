@@ -49,6 +49,16 @@ export interface SalesOrderResponse {
   readonly completedAt: Date | null;
   readonly cancelledAt: Date | null;
   readonly returnedAt: Date | null;
+
+  /**
+   * Desde cuándo este pedido es DEUDA. `null` = todavía no lo es.
+   *
+   * Lo sella el pedido cuando ocurre el hecho que manda según el ajuste del tenant (al confirmar o
+   * al entregar). **Cuentas por cobrar lee este sello, no el ajuste** — ver
+   * `SALES_ORDER_RECEIVABLE_POLICY_KEY` para el porqué.
+   */
+  readonly receivableFrom: Date | null;
+
   readonly tenantId: string;
   readonly createdAt: Date;
   readonly createdBy: string | null;

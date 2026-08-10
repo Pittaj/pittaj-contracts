@@ -31,3 +31,5 @@ export const SALES_ORDER_CONSTANTS = {
     PRICE_DECIMAL_PLACES: 2,
   },
 } as const;
+
+export * from './receivablePolicy.js';
