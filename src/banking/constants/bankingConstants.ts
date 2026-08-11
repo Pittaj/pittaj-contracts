@@ -208,6 +208,46 @@ export const BANKING_CONSTANTS = {
    * qué cuenta como cuadrado. Si cada capa lo declarara por su cuenta,
    * podrían discrepar en silencio sobre si una conciliación puede cerrarse.
    */
+  /**
+   * Las comprobaciones de una lectura, y cuáles hablan de **cómo se leyó**.
+   *
+   * Viven en el contrato y no en cada capa por lo mismo que `MONEY_EPSILON`: el backend decide con
+   * ellas si vale la pena pagar un peldaño más caro, y la web decide con ellas qué le dice al
+   * usuario. **Ya discreparon una vez** — se añadieron `SUMMARY_CLOSES` y `MOVEMENTS_MATCH_SUMMARY`
+   * al backend y la copia de la web se quedó con cinco, así que un fallo del neto de movimientos se
+   * anunciaba como «el documento parece de otra cuenta» con la tarjeta de la cuenta diciendo
+   * «coincide» justo debajo. Dos listas, dos verdades.
+   */
+  EXTRACTION_CHECKS: [
+    'NET_BALANCE',
+    'SUMMARY_CLOSES',
+    'MOVEMENTS_MATCH_SUMMARY',
+    'TOTAL_CREDITS',
+    'TOTAL_DEBITS',
+    'MOVEMENT_COUNT',
+    'DATES_IN_PERIOD',
+    'ACCOUNT_MATCH',
+  ] as const,
+
+  /**
+   * Las que un modelo mejor puede arreglar: si los totales no cuadran o falta un movimiento, volver
+   * a leer con más capacidad tiene sentido.
+   *
+   * `ACCOUNT_MATCH` queda fuera **a propósito** y es la única: que el documento sea de otra cuenta
+   * no lo arregla ningún modelo, y reintentarlo solo multiplica el costo. Es también la razón de que
+   * esta lista exista — «el sistema leyó mal» y «subiste otro estado de cuenta» son problemas
+   * distintos, con soluciones distintas y con mensajes distintos.
+   */
+  EXTRACTION_QUALITY_CHECKS: [
+    'NET_BALANCE',
+    'SUMMARY_CLOSES',
+    'MOVEMENTS_MATCH_SUMMARY',
+    'TOTAL_CREDITS',
+    'TOTAL_DEBITS',
+    'MOVEMENT_COUNT',
+    'DATES_IN_PERIOD',
+  ] as const,
+
   MONEY_EPSILON: 0.005,
 } as const;
 
@@ -224,6 +264,8 @@ export type MatchStatusValue = (typeof BANKING_CONSTANTS.MATCH_STATUSES)[number]
 export type MatchOriginValue = (typeof BANKING_CONSTANTS.MATCH_ORIGINS)[number];
 export type ReconciliationRuleActionValue = (typeof BANKING_CONSTANTS.RULE_ACTIONS)[number];
 export type PayableDocumentTypeValue = (typeof BANKING_CONSTANTS.PAYABLE_DOCUMENT_TYPES)[number];
+export type ExtractionCheckName = (typeof BANKING_CONSTANTS.EXTRACTION_CHECKS)[number];
+
 export type AccountNatureValue = (typeof BANKING_CONSTANTS.ACCOUNT_NATURES)[number];
 export type SummaryTermKindValue = (typeof BANKING_CONSTANTS.SUMMARY_TERM_KINDS)[number];
 
