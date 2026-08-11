@@ -81,6 +81,28 @@ export interface ReceivedCfdiResponse {
      */
     readonly cancelledAtSat: string | null;
 
+    /**
+     * Cuándo se le preguntó al SAT por última vez si sigue vigente. ISO 8601.
+     *
+     * Null = nunca. Sirve para no volver a preguntar por todo el buzón cada día.
+     */
+    readonly lastStatusCheckAt: string | null;
+
+    /** Lo que contestó el SAT: `Vigente`, `Cancelado`, `No Encontrado`. */
+    readonly satEstado: string | null;
+
+    /**
+     * Validación 69-B del emisor (EFOS: empresas que facturan operaciones simuladas).
+     *
+     * `100` = no está en la lista. **Vale tanto como la cancelación y casi nadie lo
+     * mira:** un comprobante de un emisor en la lista definitiva **no ampara deducción
+     * ni IVA acreditable**, aunque esté perfectamente timbrado y vigente.
+     *
+     * Se transporta el código tal cual en vez de un booleano porque el SAT ha añadido
+     * códigos, y un booleano obligaría a decidir hoy qué hacer con los que no existían.
+     */
+    readonly issuerEfosStatus: string | null;
+
     readonly version: number;
     readonly createdAt?: string;
     readonly updatedAt?: string;
