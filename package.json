@@ -137,6 +137,10 @@
       "types": "./src/purchase/index.ts",
       "import": "./dist/purchase/index.js"
     },
+    "./received-cfdi": {
+      "types": "./src/received-cfdi/index.ts",
+      "import": "./dist/received-cfdi/index.js"
+    },
     "./supplier": {
       "types": "./src/supplier/index.ts",
       "import": "./dist/supplier/index.js"

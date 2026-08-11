@@ -10,8 +10,18 @@
  * @module Contracts/Purchase
  */
 
-/** Naturaleza del documento: INVENTORY (postea existencias) o EXPENSE (gasto). */
-export type PurchaseKind = 'INVENTORY' | 'EXPENSE';
+import type { PurchaseKindValue } from '../schemas/getPurchases.schema.js';
+
+/**
+ * Naturaleza del documento: INVENTORY (postea existencias), EXPENSE (gasto) o
+ * FIXED_ASSET (se capitaliza y se deprecia).
+ *
+ * ⚠️ **Deriva de `PURCHASE_KINDS`, no se redefine.** Estaba escrito a mano como
+ * `'INVENTORY' | 'EXPENSE'` y se quedó atrás cuando entró `FIXED_ASSET`: dos
+ * definiciones del mismo enum y solo una actualizada. El sync de una compra de
+ * activo fijo lo habría rechazado quien tipara contra este alias.
+ */
+export type PurchaseKind = PurchaseKindValue;
 
 /** Estado de la compra. BORRADOR → RECIBIDA | CANCELADA. */
 export type PurchaseStatus = 'DRAFT' | 'RECEIVED' | 'CANCELLED';
