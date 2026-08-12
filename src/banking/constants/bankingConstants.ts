@@ -252,6 +252,31 @@ export const BANKING_CONSTANTS = {
     'SECOND_OPINION',
   ] as const,
 
+  /**
+   * Las que atan los movimientos leídos a una cifra **impresa por el banco**.
+   *
+   * Son las únicas que pueden desmentir una lectura. Las que quedan fuera no es que sobren, es que
+   * miran otra cosa: `NET_BALANCE` solo comprueba que la suma llegue del saldo inicial al final —y
+   * es ciega a dos errores que se compensan, que es el caso que nos dio un verde falso sobre 18
+   * movimientos invertidos—; `SUMMARY_CLOSES` compara al banco consigo mismo sin tocar nuestras
+   * líneas; `DATES_IN_PERIOD` y `ACCOUNT_MATCH` hablan del documento, no de los montos.
+   * `SECOND_OPINION` tampoco está: es lo que se decide con esta lista, y meterla sería preguntarle
+   * a la respuesta.
+   *
+   * Existe para decidir **cuándo se paga una segunda lectura**, y por eso se declara por nombre en
+   * vez de con un cociente. Un «menos de la mitad evaluadas» parece equivalente y no lo es: se
+   * mueve solo cada vez que se añade una comprobación que casi nunca está disponible —añadir
+   * `RUNNING_BALANCE`, que solo 1 de 8 documentos publica, subió el gasto sin que nadie lo
+   * decidiera—. Un umbral que deriva con el catálogo no es un umbral.
+   */
+  CORROBORATING_CHECKS: [
+    'RUNNING_BALANCE',
+    'MOVEMENTS_MATCH_SUMMARY',
+    'TOTAL_CREDITS',
+    'TOTAL_DEBITS',
+    'MOVEMENT_COUNT',
+  ] as const,
+
   MONEY_EPSILON: 0.005,
 } as const;
 

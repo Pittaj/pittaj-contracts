@@ -63,6 +63,8 @@ export interface ExtractionVerdict {
   readonly failed: readonly string[];
   /** Nombres de las que **no se pudieron** comprobar: el documento no publica el dato. */
   readonly notEvaluated: readonly string[];
+  /** Nombres de las que sí se pudieron evaluar, hayan pasado o no. */
+  readonly evaluatedChecks: readonly string[];
   /** Cuántas se pudieron evaluar. */
   readonly evaluated: number;
   /**
@@ -111,9 +113,15 @@ export function classifyExtraction(
   const todas = checks ?? [];
   const failed = todas.filter((c) => c.passed === false).map((c) => c.check);
   const notEvaluated = todas.filter((c) => c.passed === null).map((c) => c.check);
-  const evaluated = todas.filter((c) => c.passed !== null).length;
+  const evaluatedChecks = todas.filter((c) => c.passed !== null).map((c) => c.check);
 
-  const base = { failed, notEvaluated, evaluated, canImport: true } as const;
+  const base = {
+    failed,
+    notEvaluated,
+    evaluatedChecks,
+    evaluated: evaluatedChecks.length,
+    canImport: true,
+  } as const;
 
   if (failed.length === 0) return { ...base, kind: 'CLEAN' };
 
@@ -135,14 +143,24 @@ export function classifyExtraction(
 }
 
 /**
- * `true` si hubo poca evidencia con la que juzgar.
+ * `true` si **ninguna cifra impresa por el banco pudo contrastar los movimientos leídos**.
  *
  * Un documento que no publica su resumen ni su conteo puede pasar «las 2 comprobaciones» y verse
  * igual de sano que uno que pasó ocho. **No es lo mismo**, y decir solo el cociente lo esconde.
  * Éste es el verde débil que quedaba vivo después de arreglar los otros.
+ *
+ * La pregunta no es *cuántas* se pudieron hacer sino *cuáles*: pasar `NET_BALANCE` y
+ * `DATES_IN_PERIOD` es pasar dos comprobaciones que no miran los montos contra nada del papel. Si
+ * ninguna de `CORROBORATING_CHECKS` estuvo disponible, lo único que se sabe es que la suma llega
+ * del saldo inicial al final — y eso ya dio un verde falso una vez.
+ *
+ * Es también lo que decide pagar una segunda lectura, así que el criterio tiene que ser estable:
+ * ver `CORROBORATING_CHECKS`.
  */
 export function hasWeakEvidence(verdict: ExtractionVerdict): boolean {
-  return verdict.kind === 'CLEAN' && verdict.notEvaluated.length >= verdict.evaluated;
+  if (verdict.kind !== 'CLEAN') return false;
+  const corroboran = new Set<string>(BANKING_CONSTANTS.CORROBORATING_CHECKS);
+  return !verdict.evaluatedChecks.some((c) => corroboran.has(c));
 }
 
 /** Un término del resumen que el detalle de movimientos no lista. */
