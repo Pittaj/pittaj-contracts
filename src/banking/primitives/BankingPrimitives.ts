@@ -1,3 +1,4 @@
+import type { ExtractionCheckName } from '../constants/bankingConstants.js';
 /**
  * @fileoverview Primitivas serializables compartidas del módulo Banking.
  * Se usan en schemas, responses y en el dominio del backend.
@@ -56,6 +57,14 @@ export interface ExtractedStatementLinePrimitives {
   readonly reference?: string | null;
   /** Monto con signo: + abono, − cargo. */
   readonly amount: number;
+  /**
+   * Saldo corrido **impreso por el documento** tras este movimiento, si lo imprime.
+   *
+   * Convierte una ecuación sobre la suma en una por renglón, y permite señalar CUÁL falla.
+   * `null`/ausente = el documento no publica la columna. **Nunca se calcula**: un saldo derivado
+   * de los propios montos no verifica nada, solo los repite.
+   */
+  readonly balance?: number | null;
 }
 
 /**
@@ -189,18 +198,15 @@ export interface ExtractionUsagePrimitives {
 
 /** Resultado de una de las comprobaciones que se le hacen a la lectura. */
 export interface ExtractionCheckPrimitives {
-  /** Qué se comprobó. */
-  readonly check:
-    | 'NET_BALANCE'
-    /** La ecuación que el banco imprime cierra consigo misma. */
-    | 'SUMMARY_CLOSES'
-    /** Lo leído casa con los términos que el banco declara. */
-    | 'MOVEMENTS_MATCH_SUMMARY'
-    | 'TOTAL_CREDITS'
-    | 'TOTAL_DEBITS'
-    | 'MOVEMENT_COUNT'
-    | 'DATES_IN_PERIOD'
-    | 'ACCOUNT_MATCH';
+  /**
+   * Qué se comprobó.
+   *
+   * Sale de `BANKING_CONSTANTS.EXTRACTION_CHECKS` y **no de una unión escrita a mano**: eran dos
+   * listas, y añadir una comprobación obligaba a acordarse de las dos. Ya nos pasó con la lista de
+   * calidad —la web se quedó con cinco de siete y la pantalla se contradecía sola—, así que aquí el
+   * tipo se deriva del dato en vez de repetirlo.
+   */
+  readonly check: ExtractionCheckName;
   /**
    * `true` pasó, `false` falló, **`null` no se comprobó** — y no siempre por el mismo motivo:
    *

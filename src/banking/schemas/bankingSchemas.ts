@@ -238,6 +238,22 @@ export const extractedStatementLineSchema = z.object({
     .number()
     .refine((v) => v !== 0, 'El monto no puede ser cero')
     .refine((v) => Math.abs(v) <= LIMITS.MAX_AMOUNT, 'Monto fuera de rango'),
+  /**
+   * Saldo corrido **impreso por el documento** tras este movimiento, cuando lo imprime.
+   *
+   * Es el verificador más fuerte que existe y lo estábamos tirando: convierte una ecuación sobre
+   * la suma en **una por renglón**. Un monto mal leído, un renglón fusionado, uno omitido o un
+   * signo invertido dejan de esconderse detrás de una suma que casualmente cuadra — y además se
+   * puede **señalar cuál**, que es la diferencia entre «corrige las líneas» y «la línea 23 no
+   * cuadra con el saldo que imprime el banco».
+   *
+   * `null` = el documento no publica esta columna. En el muestreo de ocho estados solo la traía
+   * uno (Mercado Pago), así que no es la red universal: es la más fuerte cuando está.
+   *
+   * **Nunca se rellena por cálculo.** Un saldo derivado de los propios montos no verifica nada,
+   * solo los repite; si no viene del papel, va `null`.
+   */
+  balance: z.number().nullish(),
 });
 
 /**
