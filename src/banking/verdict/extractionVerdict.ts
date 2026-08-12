@@ -44,6 +44,16 @@ export type ExtractionVerdictKind =
   | 'WRONG_ACCOUNT'
   /** La lectura es buena; **el documento no cuadra consigo mismo**. Tampoco se arregla editando. */
   | 'DOCUMENT_INCONSISTENT'
+  /**
+   * La lectura es buena; **el documento cobra algo que no lista**.
+   *
+   * Distinto de `DOCUMENT_INCONSISTENT`: ahí el banco se contradice y no hay nada que hacer; aquí
+   * el propio resumen **explica** la diferencia con un término concreto, así que hay una acción —
+   * agregar ese renglón— y la pantalla la ofrece.
+   *
+   * Caso real: Rappi declara `Monto de intereses + $200.88` y no lo incluye en el desglose.
+   */
+  | 'DOCUMENT_INCOMPLETE'
   /** Hay algo que revisar en la lectura. */
   | 'NEEDS_REVIEW';
 
@@ -82,8 +92,22 @@ const DOCUMENT_CHECK = 'SUMMARY_CLOSES';
 
 const QUALITY = new Set<string>(BANKING_CONSTANTS.EXTRACTION_QUALITY_CHECKS);
 
+export interface ClassifyOptions {
+  /**
+   * `true` si un término del resumen explica la diferencia entera (ver `findMissingSummaryTerm`).
+   *
+   * Se pasa desde fuera y no se deduce aquí porque hace falta la aritmética de los saldos, que
+   * esta función no tiene — y meterla obligaría a arrastrar la extracción completa hasta el
+   * clasificador para una sola rama.
+   */
+  readonly missingTermExplainsGap?: boolean;
+}
+
 /** Clasifica una lectura. Pura: mismas comprobaciones, mismo veredicto. */
-export function classifyExtraction(checks: readonly CheckLike[] | undefined): ExtractionVerdict {
+export function classifyExtraction(
+  checks: readonly CheckLike[] | undefined,
+  options: ClassifyOptions = {},
+): ExtractionVerdict {
   const todas = checks ?? [];
   const failed = todas.filter((c) => c.passed === false).map((c) => c.check);
   const notEvaluated = todas.filter((c) => c.passed === null).map((c) => c.check);
@@ -101,6 +125,11 @@ export function classifyExtraction(checks: readonly CheckLike[] | undefined): Ex
   // la ecuación del propio banco no cierra, los demás descuadres son consecuencia de eso, no causa.
   // Es el caso Azteca: fallaban tres comprobaciones y la lectura era impecable.
   if (failed.includes(DOCUMENT_CHECK)) return { ...base, kind: 'DOCUMENT_INCONSISTENT' };
+
+  // El resumen del banco explica el hueco con un término suyo: la lectura no está mal, al documento
+  // le falta un renglón. Sin esto, la pantalla se contradecía sola — el encabezado en rojo
+  // («revisa la lectura») y la barra de cuadre en ámbar ofreciendo agregar los $200.88 de Rappi.
+  if (options.missingTermExplainsGap) return { ...base, kind: 'DOCUMENT_INCOMPLETE' };
 
   return { ...base, kind: 'NEEDS_REVIEW' };
 }

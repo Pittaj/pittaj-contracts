@@ -227,6 +227,7 @@ export const BANKING_CONSTANTS = {
     'TOTAL_DEBITS',
     'MOVEMENT_COUNT',
     'DATES_IN_PERIOD',
+    'SECOND_OPINION',
     'ACCOUNT_MATCH',
   ] as const,
 
@@ -248,6 +249,7 @@ export const BANKING_CONSTANTS = {
     'TOTAL_DEBITS',
     'MOVEMENT_COUNT',
     'DATES_IN_PERIOD',
+    'SECOND_OPINION',
   ] as const,
 
   MONEY_EPSILON: 0.005,
