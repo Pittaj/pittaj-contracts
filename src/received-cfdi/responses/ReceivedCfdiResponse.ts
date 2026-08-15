@@ -66,6 +66,23 @@ export interface ReceivedCfdiResponse {
 
     readonly linkedDocumentId: string | null;
     readonly linkedDocumentKind: ReceivedCfdiLinkKindValue | null;
+
+    /**
+     * Cómo se llama el documento en el que acabó — **estampado al vincular**, no resuelto al leer.
+     *
+     * Sin esto, `linkedDocumentId` es un uuid opaco: la web sabe que el comprobante se capturó y no
+     * puede decir en qué. Resolverlo con un join obligaría a que quien lee el buzón tenga permiso
+     * sobre Compras, y **el buzón lo leen tres apps** — una de ellas, Fiscal, existe precisamente
+     * para dárselo al contador externo *sin* darle Compras.
+     *
+     * Se guarda el hecho tal como fue en el momento del acto, que es lo correcto para un rastro
+     * fiscal: si mañana la compra se renumera o se borra, el comprobante sigue diciendo en qué se
+     * convirtió.
+     */
+    readonly linkedDocumentNumber: string | null;
+    readonly linkedDocumentDate: string | null;
+    /** Total del documento resultante. Un descuadre contra el del comprobante es captura mal hecha. */
+    readonly linkedDocumentTotal: number | null;
     /** ISO 8601. */
     readonly linkedAt: string | null;
     readonly ignoredReason: string | null;
