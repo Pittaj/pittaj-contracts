@@ -116,14 +116,39 @@ export interface PendingRepItemResponse {
     readonly stampedPartialities: number;
 }
 
-/** 🆕 `GET /api/sales-cfdi/pending-reps` (sin implementar). */
+/**
+ * 🆕 `GET /api/sales-cfdi/pending-reps` (sin implementar).
+ *
+ * 📌 **De aquí sale también el globo del menú.** Decisión del dueño (2026-08-15): el sidebar de
+ * Fiscal marca **solo lo vencido**, no todo lo pendiente — un número que está siempre encendido se
+ * vuelve paisaje en dos semanas y deja de avisar justo cuando hace falta. La pantalla del menú pide
+ * `?limit=1` y lee `overdueCount`; si es cero, no pinta nada.
+ */
 export interface ListPendingRepsResponse {
     readonly items: readonly PendingRepItemResponse[];
     readonly total: number;
     readonly page: number;
     readonly limit: number;
-    /** Cuántos ya se pasaron del día 5. Es el número que justifica la pantalla. */
+    /** Cuántos ya se pasaron del día 5. Es el número que justifica la pantalla y el del menú. */
     readonly overdueCount: number;
     /** Suma de lo cobrado sin amparar, del filtro completo. */
     readonly amountPendingTotal: number;
+}
+
+/**
+ * 🆕 `POST /api/sales-cfdi/retry-failed` (sin implementar).
+ *
+ * `status: 'count-changed'` es la respuesta al candado de `expectedCount`: **no se timbró nada** y
+ * `foundCount` dice lo que hay ahora. La pantalla vuelve a pedir confirmación con el número nuevo.
+ */
+export interface RetryFailedCfdiResponse {
+    readonly status: 'done' | 'count-changed';
+    readonly foundCount: number;
+    readonly stamped: number;
+    readonly stillFailed: number;
+    /** Qué salió mal en cada uno que volvió a fallar, para no repetir el mismo intento a ciegas. */
+    readonly failures: readonly {
+        readonly sourceId: string;
+        readonly error: string;
+    }[];
 }

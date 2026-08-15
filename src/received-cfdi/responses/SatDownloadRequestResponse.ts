@@ -50,8 +50,15 @@ export interface ListSatDownloadRequestsResponse {
     readonly limit: number;
     readonly counts: {
         readonly inFlight: number;
+        /**
+         * 🔴 **Sale del resumen diario, no de contar `items`.** Lo que acabó bien no sube a la nube
+         * (ver `pushSatDownloadRequestsSchema`), así que contar renglones daría cero descargas
+         * siempre — y un buzón lleno se leería como una máquina que nunca bajó nada.
+         */
         readonly downloaded: number;
         readonly rejected: number;
         readonly exhaustedPeriods: number;
     };
+    /** Comprobantes que trajeron las descargas del periodo consultado. También del resumen. */
+    readonly cfdiCount: number;
 }

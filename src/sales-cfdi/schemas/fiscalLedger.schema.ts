@@ -107,3 +107,26 @@ export const listPendingRepsSchema = z.object({
 });
 
 export type ListPendingRepsInput = z.infer<typeof listPendingRepsSchema>;
+
+/**
+ * 🆕 `POST /api/sales-cfdi/retry-failed` — **sin implementar**.
+ *
+ * Reintenta de golpe los timbrados que fallaron dentro de un periodo. Decisión del dueño
+ * (2026-08-15): se construye **con confirmación que diga cuántos y por cuánto**, porque lo que
+ * ahorra es real —el mes pasado fueron seis— y lo que arriesga también: cada reintento que sale
+ * bien es un CFDI **timbrado de verdad ante el SAT**, con su folio consumido, y deshacerlo es
+ * cancelar uno por uno.
+ *
+ * 🔴 **`expectedCount` es el candado y no un dato informativo.** Es cuántos le enseñó la pantalla
+ * a la persona que aceptó. Si el servidor encuentra otro número —porque otra caja timbró mientras
+ * el diálogo estaba abierto—, **no reintenta nada** y contesta el conteo real para que la pantalla
+ * vuelva a preguntar. Sin esto, «acepto reintentar 6» puede acabar timbrando 40.
+ */
+export const retryFailedCfdiSchema = z.object({
+    from: z.string().datetime(),
+    to: z.string().datetime(),
+    sourceType: z.enum(FISCAL_SOURCE_TYPES).optional(),
+    expectedCount: z.number().int().positive(),
+});
+
+export type RetryFailedCfdiInput = z.infer<typeof retryFailedCfdiSchema>;

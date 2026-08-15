@@ -90,12 +90,59 @@ export const listSatDownloadRequestsSchema = z.object({
 export type ListSatDownloadRequestsInput = z.infer<typeof listSatDownloadRequestsSchema>;
 
 /**
+ * Estados que **no** viajan a la nube: los que acabaron bien y no dejan nada que investigar.
+ *
+ * Ver `pushSatDownloadRequestsSchema` para el porqué. Se exporta para que el escritorio filtre
+ * con la misma lista y no con una condición escrita a mano que se desincronice.
+ */
+export const SAT_REQUEST_STATUSES_NO_VIAJAN = ['DESCARGADA'] as const;
+
+/** Lo que sí viaja: lo que está en curso o acabó mal. */
+export const SAT_REQUEST_STATUSES_QUE_VIAJAN = [
+    'PENDIENTE',
+    'SOLICITADA',
+    'LISTA',
+    'RECHAZADA',
+    'AGOTADA',
+] as const;
+export type SatRequestStatusQueViajaValue = (typeof SAT_REQUEST_STATUSES_QUE_VIAJAN)[number];
+
+/**
+ * Resumen de un día de barrido en un equipo.
+ *
+ * Es lo que sustituye a las filas que no viajan: una por día y equipo en vez de las ~2 diarias que
+ * dicen «descargada, 14 comprobantes». Con esto la nube puede pintar «128 descargadas · 1,904
+ * comprobantes» sin cargar 700 filas al año por máquina.
+ */
+export const satDownloadDaySummarySchema = z.object({
+    /** `YYYY-MM-DD` del día barrido, en la zona del equipo. */
+    day: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    /** Solicitudes que terminaron bien ese día. */
+    downloaded: z.number().int().min(0),
+    /** Comprobantes que entraron al buzón por ellas. */
+    cfdiCount: z.number().int().min(0),
+});
+
+export type SatDownloadDaySummaryInput = z.infer<typeof satDownloadDaySummarySchema>;
+
+/**
  * 🆕 Empuje del historial, del escritorio a la nube — **sin implementar**.
  *
  * Mismo patrón que `satDownloadStatus`: el equipo manda lo suyo y la nube lo guarda tal cual.
+ *
+ * 🔴 **No sube todo, y es decisión del dueño (2026-08-15).** Un barrido diario son ~700 filas al
+ * año **por equipo**, y casi todas dicen «descargada, 14 comprobantes»: engordan el sync para algo
+ * que solo se mira cuando algo falla. Así que viaja **lo que está en curso o acabó mal**
+ * (`SAT_REQUEST_STATUSES_QUE_VIAJAN`) más un **resumen por día**; el detalle de lo que salió bien
+ * se queda en la máquina, donde además se consulta sin nube.
+ *
+ * Consecuencia que la pantalla tiene que respetar: **la lista de filas no es el historial
+ * completo**, así que sus contadores de «descargadas» y de comprobantes salen del resumen y no de
+ * contar renglones. Contarlos daría siempre cero descargas y un buzón que parecería vacío.
  */
 export const pushSatDownloadRequestsSchema = z.object({
     deviceId: z.string().uuid(),
+    summaries: z.array(satDownloadDaySummarySchema).max(400).default([]),
     requests: z
         .array(
             z.object({
@@ -104,7 +151,8 @@ export const pushSatDownloadRequestsSchema = z.object({
                 payload: z.enum(SAT_DOWNLOAD_PAYLOADS),
                 periodStart: z.string().datetime(),
                 periodEnd: z.string().datetime(),
-                status: z.enum(SAT_DOWNLOAD_REQUEST_STATUSES),
+                /** `DESCARGADA` no se acepta: esa va en el resumen del día. */
+                status: z.enum(SAT_REQUEST_STATUSES_QUE_VIAJAN),
                 /** Folio que dio el SAT. `null` mientras está `PENDIENTE`. */
                 satRequestId: z.string().max(64).nullable(),
                 packageIds: z.array(z.string().max(64)).default([]),
