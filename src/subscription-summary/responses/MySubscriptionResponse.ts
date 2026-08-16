@@ -51,6 +51,41 @@ export interface SubscriptionBilling {
     readonly preliminary: boolean;
 }
 
+/** Modelos de cobro de una licencia. */
+export const BILLING_MODELS = ['PERPETUAL', 'SUBSCRIPTION'] as const;
+export type BillingModel = (typeof BILLING_MODELS)[number];
+
+/**
+ * La licencia contratada: qué se compró, no qué puede hacer el usuario.
+ *
+ * El código nunca pregunta «¿qué plan tiene?» sino «¿tiene esta capacidad?»; este
+ * bloque existe para lo único que sí necesita saber el nombre del plan, que es
+ * enseñárselo al dueño y decidir qué tarjeta pintar.
+ */
+export interface SubscriptionLicense {
+    /** Código del plan: 'escritorio' | 'conectado' | 'completo'. */
+    readonly planCode: string;
+    readonly planName: string;
+    /** PERPETUAL se compró una vez; SUBSCRIPTION se renta. */
+    readonly billingModel: BillingModel;
+    /** Cajas que cubre el nivel: 1 en la perpetua, 3 en las de renta. */
+    readonly includedDevices: number;
+    /**
+     * Hasta cuándo recibe funciones nuevas la licencia perpetua (ISO 8601).
+     * null en las de renta: ahí el mantenimiento va dentro de la mensualidad.
+     */
+    readonly maintenanceUntil: string | null;
+    /**
+     * false solo cuando una perpetua tiene el mantenimiento caducado.
+     *
+     * **No corta nada.** Deja de recibir funciones nuevas y lo obligatorio por ley
+     * entra siempre: un punto de venta que no puede timbrar está muerto.
+     */
+    readonly maintenanceActive: boolean;
+    /** Qué apps abre el nivel: 'sync' | 'web' | 'bancos' | 'contabilidad' | 'fiscal'. */
+    readonly capabilities: readonly string[];
+}
+
 /** Respuesta de GET /api/subscriptions/me. */
 export interface MySubscriptionResponse {
     readonly status: MySubscriptionStatus;
@@ -62,4 +97,6 @@ export interface MySubscriptionResponse {
     readonly currentPeriodEnd: string | null;
     readonly usage: SubscriptionUsage;
     readonly billing: SubscriptionBilling;
+    /** null en cuentas viejas sin fila de suscripción. */
+    readonly license: SubscriptionLicense | null;
 }

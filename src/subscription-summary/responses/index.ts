@@ -5,8 +5,11 @@
 
 export {
     MY_SUBSCRIPTION_STATUSES,
+    BILLING_MODELS,
     type MySubscriptionStatus,
+    type BillingModel,
     type SubscriptionUsage,
     type SubscriptionBilling,
+    type SubscriptionLicense,
     type MySubscriptionResponse,
 } from './MySubscriptionResponse.js';
