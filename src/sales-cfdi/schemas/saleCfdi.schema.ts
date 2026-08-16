@@ -70,10 +70,18 @@ export const DEFAULT_CANCELLATION_MOTIVE: CancellationMotiveValue = '02';
  * 🔴 **Sin el `99` (Por definir).** El REP existe precisamente para decir *con qué* se pagó, así
  * que el SAT no lo admite ahí — aunque sí lo admita en la factura PPD que lo origina. Un `99`
  * aquí es un timbrado rechazado por el PAC, ya con el abono cobrado.
+ *
+ * ⚠️ **Son NUEVE y no las veintitantas del catálogo `c_FormaPago`**, y eso no es un recorte de este
+ * archivo: es lo que `StampPaymentCfdiHandler` acepta hoy (`VALID_PAYMENT_FORMS`). Lo que no está
+ * aquí lo rechaza el handler con *«la forma de pago del abono debe ser una clave real del SAT»* —
+ * así que una pantalla que ofrezca más estaría ofreciendo botones que fallan.
+ *
+ * Son las que un negocio de mostrador usa de verdad; las de extinción de obligaciones —
+ * compensación, novación, condonación— piden criterio contable y no se cobran en caja. Ampliarla
+ * es decisión de producto **y** un cambio en el handler, en ese orden.
  */
 export const REP_PAYMENT_FORMS = [
-    '01', '02', '03', '04', '05', '06', '08', '12', '13', '14', '15',
-    '17', '23', '24', '25', '26', '27', '28', '29', '30', '31',
+    '01', '02', '03', '04', '05', '06', '28', '29', '31',
 ] as const;
 export type RepPaymentFormValue = (typeof REP_PAYMENT_FORMS)[number];
 
@@ -168,9 +176,14 @@ export type CancelSaleCfdiInput = z.infer<typeof cancelSaleCfdiSchema>;
 /**
  * `POST /api/sales-cfdi/:ticketId/rep` — complemento de pago de un abono.
  *
- * 🔴 **Hoy este endpoint no valida nada**: hace `Number(body.amount)` y `String(body.paymentForm)`.
- * Un importe vacío llega como `NaN` y una forma de pago inventada solo la rechaza el PAC, tarde.
- * Esto es lo que el handler ya daba por cierto, escrito donde se puede comprobar.
+ * **La ruta no valida; el handler sí.** El controlador hace `Number(body.amount)` y
+ * `String(body.paymentForm)` a pelo, así que un cuerpo vacío llega como `NaN` — pero
+ * `StampPaymentCfdiHandler` lo para después con `invalid-amount` / `invalid-payment-form` y un
+ * mensaje escrito para una persona.
+ *
+ * Lo que este esquema añade, entonces, no es la regla: es **dónde se entera quien la incumple**.
+ * Validar en el borde convierte un viaje al servidor y un `blocked` en un campo en rojo antes de
+ * mandar. Las reglas son las mismas del handler, a propósito.
  */
 export const stampRepSchema = z.object({
     /** Lo abonado. En pesos, mayor que cero: un REP de $0 no existe. */
