@@ -2,7 +2,8 @@
  * @fileoverview El historial de solicitudes al SAT, tal como lo leerá una pantalla.
  * @module Contracts/ReceivedCfdi
  *
- * 🆕 **Sin implementar todavía** — ni el endpoint ni el sync que lo llena.
+ * El endpoint existe; **el empuje desde el escritorio no**, y ése es el paso que falta para que
+ * la pantalla tenga algo que enseñar.
  */
 
 import type {
@@ -37,7 +38,7 @@ export interface SatDownloadRequestResponse {
 }
 
 /**
- * `GET /api/sat-download-requests`.
+ * `GET /api/received-cfdis/sat-download-requests`.
  *
  * `exhaustedPeriods` va aparte porque **es la única cifra irreversible de esta pantalla**: cada una
  * es un periodo que ya no se puede volver a pedir. Enterrada entre los contadores de estado se

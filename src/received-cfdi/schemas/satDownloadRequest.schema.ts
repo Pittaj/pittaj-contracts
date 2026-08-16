@@ -69,7 +69,11 @@ export type SatDownloadPayloadValue = (typeof SAT_DOWNLOAD_PAYLOADS)[number];
 export const MAX_SOLICITUDES_POR_PERIODO = 2;
 
 /**
- * 🆕 `GET /api/sat-download-requests` — **sin implementar**.
+ * `GET /api/received-cfdis/sat-download-requests`.
+ *
+ * Cuelga del buzón y no de la raíz por lo mismo que la marca de agua: es el mismo hecho contado
+ * desde el otro lado —quién trae los comprobantes y qué le pasó al intentarlo—, y separarlo
+ * obligaría a mantener dos módulos que solo se entienden juntos.
  *
  * `deviceId` filtra por equipo porque el historial solo tiene sentido junto a la marca de agua:
  * se llega aquí desde la ficha de una computadora concreta.
@@ -126,7 +130,7 @@ export const satDownloadDaySummarySchema = z.object({
 export type SatDownloadDaySummaryInput = z.infer<typeof satDownloadDaySummarySchema>;
 
 /**
- * 🆕 Empuje del historial, del escritorio a la nube — **sin implementar**.
+ * `POST /api/received-cfdis/sat-download-requests/sync/push` — el escritorio manda lo suyo.
  *
  * Mismo patrón que `satDownloadStatus`: el equipo manda lo suyo y la nube lo guarda tal cual.
  *
