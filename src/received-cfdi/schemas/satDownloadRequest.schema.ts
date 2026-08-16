@@ -1,5 +1,5 @@
 /**
- * @fileoverview El historial de solicitudes al SAT · **nada de esto está implementado todavía**.
+ * @fileoverview El historial de solicitudes al SAT.
  * @module Contracts/ReceivedCfdi/Schemas
  * @version 1.0.0
  *
@@ -10,8 +10,8 @@
  * pregunta, que es la que hace alguien cuando ve el aviso: *«¿y por qué no bajó?»*.
  *
  * La respuesta vive en el escritorio, en `SatDownloadRequest`: qué periodo se pidió, qué contestó
- * el SAT, cuántos comprobantes trajo y **cuál se agotó para siempre**. Hoy esa entidad no tiene
- * pantalla en ninguna parte — ni en la web, que no la conoce, ni en el propio escritorio.
+ * el SAT, cuántos comprobantes trajo y **cuál se agotó para siempre**. La nube ya tiene tabla,
+ * endpoint y pantalla; lo que falta es que el escritorio **empuje** — ése es el último paso.
  *
  * ── Espejo del escritorio, que es quien manda ──
  *

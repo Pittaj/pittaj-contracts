@@ -59,11 +59,10 @@ export const getFiscalLedgerSchema = z
 export type GetFiscalLedgerInput = z.infer<typeof getFiscalLedgerSchema>;
 
 /**
- * 🆕 `GET /api/sales-cfdi/emitted` — **sin implementar todavía**.
+ * `GET /api/sales-cfdi/emitted` — el panel del emisor.
  *
- * El panel del emisor: qué facturé, qué cancelé y qué se quedó en el intento. Es la pantalla que
- * hoy no existe en ningún lado — lo emitido solo se ve **ticket por ticket**, así que nadie puede
- * mirar un mes entero.
+ * El panel del emisor: qué facturé, qué cancelé y qué se quedó en el intento. Antes de esto lo
+ * emitido solo se veía **ticket por ticket**, así que nadie podía mirar un mes entero.
  *
  * A diferencia del libro fiscal, aquí **sí** entran `PENDING` y `FAILED`, y ésa es la mitad del
  * valor: un timbrado que falló y nadie reintentó es una venta cobrada y no facturada, y el único
@@ -86,7 +85,7 @@ export const listEmittedCfdiSchema = z.object({
 export type ListEmittedCfdiInput = z.infer<typeof listEmittedCfdiSchema>;
 
 /**
- * 🆕 `GET /api/sales-cfdi/pending-reps` — **sin implementar todavía**.
+ * `GET /api/sales-cfdi/pending-reps`.
  *
  * Las ventas a crédito (PPD) con abonos cobrados y sin complemento timbrado. Es una **obligación
  * con fecha**: el SAT exige el REP a más tardar el día 5 del mes siguiente al pago, y hoy esa
@@ -109,7 +108,7 @@ export const listPendingRepsSchema = z.object({
 export type ListPendingRepsInput = z.infer<typeof listPendingRepsSchema>;
 
 /**
- * 🆕 `POST /api/sales-cfdi/retry-failed` — **sin implementar**.
+ * `POST /api/sales-cfdi/retry-failed`.
  *
  * Reintenta de golpe los timbrados que fallaron dentro de un periodo. Decisión del dueño
  * (2026-08-15): se construye **con confirmación que diga cuántos y por cuánto**, porque lo que
