@@ -33,4 +33,14 @@ export interface CustomerPaymentResponse {
     readonly cancelledAt: string | null;
     readonly cancelledReason: string | null;
     readonly applications: readonly CustomerPaymentApplicationResponse[];
+    /**
+     * Versión del registro para el control de concurrencia.
+     *
+     * **Obligatorio, no opcional**: este DTO también viaja en el pull de
+     * sincronización, y el escritorio lo lee con `GetProperty("version")`, que
+     * lanza `KeyNotFoundException` si falta. El síntoma es «The given key was not
+     * present in the dictionary» y el efecto es que el catálogo entero deja de
+     * bajar — sin mencionar ni el campo ni la entidad.
+     */
+    readonly version: number;
 }
