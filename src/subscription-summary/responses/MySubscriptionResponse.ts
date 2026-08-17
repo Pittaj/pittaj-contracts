@@ -112,6 +112,16 @@ export interface AvailablePlan {
      * puede subir, y que un nivel esté a medias es información, no un secreto.
      */
     readonly available: boolean;
+    /**
+     * true = está disponible **solo** porque a esta cuenta se le abrió el acceso
+     * anticipado; para el resto sigue sin venderse.
+     *
+     * Tiene que llegar hasta lo que el cliente ve. Si un nivel a medias le aparece
+     * como uno normal, cuando choque con lo que falta no va a pensar «estoy
+     * probando algo temprano», va a pensar «me vendieron algo roto» — y serán las
+     * devoluciones de la gente que menos conviene perder.
+     */
+    readonly beta: boolean;
 }
 
 /** Respuesta de GET /api/subscriptions/me. */
