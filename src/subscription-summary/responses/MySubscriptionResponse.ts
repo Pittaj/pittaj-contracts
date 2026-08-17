@@ -86,6 +86,34 @@ export interface SubscriptionLicense {
     readonly capabilities: readonly string[];
 }
 
+/**
+ * Un nivel del catálogo, como se pinta en la pantalla de suscripción.
+ *
+ * Sale de la tabla `plans`, no de una lista en el cliente: añadir un nivel tiene
+ * que seguir siendo meter una fila.
+ */
+export interface AvailablePlan {
+    readonly code: string;
+    readonly name: string;
+    readonly description: string | null;
+    /** MXN, IVA incluido. Mensual salvo que `billingModel` sea PERPETUAL. */
+    readonly price: number;
+    readonly billingModel: BillingModel;
+    readonly includedDevices: number;
+    /** Timbres que se reponen cada mes. 0 en la perpetua. */
+    readonly monthlyStamps: number;
+    /** Timbres de bienvenida, una sola vez en la vida de la licencia. */
+    readonly oneTimeStamps: number;
+    readonly capabilities: readonly string[];
+    /**
+     * false = existe pero **todavía no se vende**.
+     *
+     * Se devuelve igual, en vez de esconderlo: el dueño tiene que poder ver a qué
+     * puede subir, y que un nivel esté a medias es información, no un secreto.
+     */
+    readonly available: boolean;
+}
+
 /** Respuesta de GET /api/subscriptions/me. */
 export interface MySubscriptionResponse {
     readonly status: MySubscriptionStatus;

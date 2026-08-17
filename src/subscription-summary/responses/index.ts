@@ -11,5 +11,6 @@ export {
     type SubscriptionUsage,
     type SubscriptionBilling,
     type SubscriptionLicense,
+    type AvailablePlan,
     type MySubscriptionResponse,
 } from './MySubscriptionResponse.js';
