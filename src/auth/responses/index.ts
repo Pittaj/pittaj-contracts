@@ -1,6 +1,5 @@
 export * from './ChangePasswordResponse.js';
 export * from './ConfirmPasswordResetResult.js';
-export * from './CreateAdminUserResponse.js';
 export * from './GetSaltResult.js';
 export * from './LoginResponse.js';
 export * from './LogoutResult.js';

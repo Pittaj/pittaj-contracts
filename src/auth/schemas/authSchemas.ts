@@ -65,14 +65,6 @@ export const verifyCredentialsSchema = z.object({
     permission: z.string().max(120).optional(),
 });
 
-/** Schema para creación de usuario admin (sin registro público). */
-export const createAdminUserSchema = z.object({
-    email: z.string().email('Email inválido'),
-    firstName: z.string().min(1, 'Nombre es requerido').max(100),
-    lastName: z.string().min(1, 'Apellido es requerido').max(100),
-    role: z.string().min(1, 'Rol es requerido'),
-    permissions: z.array(z.string()).default([]),
-});
 
 /** Schema para revocar una sesión específica. */
 export const revokeSessionSchema = z.object({
