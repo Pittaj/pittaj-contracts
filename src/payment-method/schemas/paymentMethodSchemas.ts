@@ -74,12 +74,7 @@ export const updatePaymentMethodSchema = z.object({
     settlementAccountId: z.string().uuid().nullish(),
 });
 
-/** DELETE /api/payment-methods/:id (query params) */
-export const deletePaymentMethodSchema = z.object({
-    version: z.coerce.number().int().min(1),
-});
-
-/** POST /api/payment-methods/:id/activate | deactivate — Version en body */
+/** POST /api/payment-methods/:id/activate | deactivate | archive | unarchive — Version en body */
 export const versionBodySchema = z.object({
     version: z.number().int().min(1),
 });
@@ -92,6 +87,11 @@ export const versionBodySchema = z.object({
 export const getPaymentMethodsSchema = z.object({
     q: z.string().max(100).optional(),
     type: paymentMethodTypeEnum.optional(),
+    /**
+     * Sin `status`, la lista **oculta los archivados**: archivar es decir «ya no existe
+     * en mi negocio», y volver a enseñarlos sería no haber archivado nada. Para verlos
+     * hay que pedirlos: `?status=ARCHIVED`.
+     */
     status: paymentMethodStatusEnum.optional(),
     page: z.coerce.number().int().min(1).optional(),
     limit: z.coerce.number().int().min(1).max(LIMITS.MAX_PAGE_SIZE).optional(),

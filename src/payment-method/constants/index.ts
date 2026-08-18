@@ -33,5 +33,10 @@ export const PAYMENT_METHOD_CONSTANTS = {
 
   TYPES: ['CASH', 'CARD', 'TRANSFER', 'CREDIT', 'WALLET', 'OTHER'] as const,
 
-  STATUSES: ['ACTIVE', 'INACTIVE'] as const,
+  /**
+   * ARCHIVED (2026-08-18) = «ya no existe en este negocio»: fuera de las listas por
+   * defecto y fuera del TPV. `INACTIVE` es solo «apagado temporalmente». La fila NUNCA
+   * se borra: tickets, cortes y abonos apuntan al método.
+   */
+  STATUSES: ['ACTIVE', 'INACTIVE', 'ARCHIVED'] as const,
 } as const;
