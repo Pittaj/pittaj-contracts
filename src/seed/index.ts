@@ -12,6 +12,21 @@
  * de ids dejó de ser necesario en cuanto quedó UN solo sembrador: los dispositivos ya no
  * siembran, hacen pull. Los ids fijos históricos quedan abajo como LEGADO (lo que las
  * instalaciones pre-F3 ya sincronizaron) — jamás re-sembrarlos.
+ *
+ * ⚠️ ANTES DE AÑADIR O CAMBIAR UN NOMBRE AQUÍ: la siembra inserta por SQL, sin pasar por los
+ * objetos de valor, así que puede dejar en la base algo que el dominio **rechaza al releer** — y
+ * como la lectura reconstruye el agregado, una fila mala tumba la consulta completa, no solo su
+ * renglón. Pasó el 2026-08-18: `GET /api/roles` contestaba 400 para TODOS los roles porque una
+ * descripción sembrada llevaba dos puntos.
+ *
+ * Los símbolos son la trampa: `PaymentMethodName` y `CategoryName` **rechazan `%`**, así que un
+ * «Pago con 5% de comisión» dejaría sin listar los métodos de pago de todo tenant nuevo (y el que
+ * ya existe seguiría bien, así que no se nota probando en local).
+ *
+ * Hay pruebas de costura por módulo (`test/domain/semillaSeLee.test.ts` en tax, payment-method,
+ * measure-unit, category y price-list) que pasan estas semillas por su VO. **Y el escritorio
+ * también valida al aplicar el pull**, con sus propios VOs: un nombre que la nube acepte y el
+ * escritorio no, se descarta en silencio en cada caja.
  */
 
 /** Impuestos MX base. `isDefault` = el que recibe un producto sin impuesto explícito. */
