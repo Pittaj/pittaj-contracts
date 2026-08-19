@@ -222,6 +222,22 @@ export const CreateLocationSchema = z.object({
    * @default false
    */
   isDefault: z.boolean().optional().default(false),
+
+  /**
+   * Nombre de la bodega que nace con la sucursal.
+   *
+   * Solo se usa si `capabilities.hasInventory`. El formulario propone `Bodega <sucursal>` y deja
+   * editarlo; si no viene, el servidor deriva ese mismo nombre.
+   *
+   * Va en la misma petición y no en un endpoint aparte **porque es la misma decisión**: quien da
+   * de alta una tienda no está pensando en su almacén, y partirlo en dos pasos convierte diez
+   * segundos en un trámite. Antes del 2026-08-19 no se creaba nada y la sucursal nueva acababa
+   * descontando del inventario de otra tienda.
+   */
+  warehouseName: z.string().trim().min(1).max(50).nullish(),
+
+  /** Nombre de la caja que nace con la sucursal. Solo si `capabilities.hasPointOfSale`. */
+  registerName: z.string().trim().min(1).max(50).nullish(),
 });
 
 /**
