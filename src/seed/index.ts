@@ -75,6 +75,36 @@ export const SEED_MEASURE_UNITS = [
     { name: 'Metro', abbreviation: 'm' },
 ] as const;
 
+/**
+ * Cliente genérico de mostrador.
+ *
+ * ── Por qué se siembra un «cliente» que no es una persona ──
+ *
+ * Porque **es una categoría de venta, no un cliente**, y sin ese renglón el reporte de clientes
+ * miente por omisión: no hay forma de contestar «¿cuánto vendí sin facturar a nadie?». Es la
+ * convención del mercado —Alegra, Sicar, Eleventa, Aronium y Aspel lo traen— y ése es el motivo.
+ *
+ * ── Lo que NO hace ──
+ *
+ * La **factura global no lo usa**: su receptor es una constante del dominio
+ * (`RECEPTOR_PUBLICO_EN_GENERAL`, en sales-cfdi), porque esos valores los fija el SAT y no son
+ * del negocio. Este cliente sirve para asignar la venta de mostrador y para que aparezca en los
+ * reportes, no para timbrar.
+ *
+ * Los datos fiscales son los que el SAT exige para público en general: RFC genérico, régimen 616
+ * «Sin obligaciones fiscales» y uso S01 «Sin efectos fiscales».
+ *
+ * ⚠️ Nace **sin crédito**. Un cliente genérico al que se le fía es una cuenta por cobrar que no
+ * se le puede cobrar a nadie.
+ */
+export const SEED_DEFAULT_CUSTOMER = {
+    name: 'Público en general',
+    code: 'PUBLICO',
+    taxId: 'XAXX010101000',
+    fiscalRegime: '616',
+    cfdiUse: 'S01',
+} as const;
+
 /** Categoría inicial: que el primer producto no obligue a crear una antes. */
 export const SEED_DEFAULT_CATEGORY = { name: 'General', code: 'GENERAL' } as const;
 
