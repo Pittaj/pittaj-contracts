@@ -146,6 +146,17 @@ export interface MySubscriptionResponse {
      * viejo sin ninguna pista de lo que va a pasar.
      */
     readonly pendingPlanChange: PendingPlanChange | null;
+    /**
+     * Desde cuándo la cuenta está en el programa beta (ISO), o `null` si no lo está.
+     *
+     * Cambia lo que la pantalla DEBE decir: a un invitado no se le habla de prueba vencida ni de
+     * cobros, porque no va a pagar mientras dure. Sin este dato, el aviso de vencimiento le llega
+     * igual y es la primera fricción que se encuentra — falsa, además.
+     *
+     * NO tiene nada que ver con el canal de actualizaciones: un tester corre el mismo `stable`
+     * que cualquiera.
+     */
+    readonly betaSince: string | null;
 }
 
 /** Una bajada de nivel programada para el inicio del siguiente periodo. */
