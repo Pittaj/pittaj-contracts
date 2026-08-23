@@ -137,4 +137,21 @@ export interface MySubscriptionResponse {
     readonly billing: SubscriptionBilling;
     /** null en cuentas viejas sin fila de suscripción. */
     readonly license: SubscriptionLicense | null;
+    /**
+     * Bajada de nivel ya pedida que todavía NO ha entrado. `null` si no hay ninguna.
+     *
+     * Tiene que viajar aunque la interfaz pudiera vivir sin ello: quien pide una bajada y no
+     * ve rastro de ella vuelve a pedirla, o escribe a soporte creyendo que falló. Y como el
+     * cambio no toca `license` hasta el día 1, sin este campo la pantalla enseñaría el nivel
+     * viejo sin ninguna pista de lo que va a pasar.
+     */
+    readonly pendingPlanChange: PendingPlanChange | null;
+}
+
+/** Una bajada de nivel programada para el inicio del siguiente periodo. */
+export interface PendingPlanChange {
+    readonly planCode: string;
+    readonly planName: string;
+    /** Cuándo entra (ISO 8601). Es el día 1 del mes siguiente al de la petición. */
+    readonly effectiveFrom: string;
 }

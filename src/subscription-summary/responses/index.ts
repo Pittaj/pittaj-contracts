@@ -13,4 +13,5 @@ export {
     type SubscriptionLicense,
     type AvailablePlan,
     type MySubscriptionResponse,
+    type PendingPlanChange,
 } from './MySubscriptionResponse.js';
