@@ -5,5 +5,5 @@
 
 export type { LocationResponse, LocationAddress, LocationCapabilities } from './LocationResponse.js';
 export type { CreateLocationResponse } from './CreateLocationResponse.js';
-export type { SyncPushLocationResponse, SyncPushItemResult } from './SyncPushLocationResponse.js';
+export type { SyncPushLocationResponse } from './SyncPushLocationResponse.js';
 export type { SyncPullLocationResponse } from './SyncPullLocationResponse.js';

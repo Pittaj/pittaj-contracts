@@ -5,9 +5,8 @@
 
 import type { RecipeResponse } from './RecipeResponse';
 import type { ProductionOrderResponse } from './ProductionOrderResponse';
-import type { SyncPullResponse, SyncPushResponse, SyncPushItemResult } from '../../sync';
+import type { SyncPullResponse, SyncPushResponse } from '../../sync';
 
-export type { SyncPushItemResult };
 
 export type SyncPushRecipeResponse = SyncPushResponse;
 export type SyncPullRecipeResponse = SyncPullResponse<RecipeResponse>;

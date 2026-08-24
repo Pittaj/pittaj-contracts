@@ -1,45 +1,14 @@
 /**
- * @fileoverview Respuesta del comando SyncPush de productos
- * @module SyncPushProductResponse
- * @version 1.0.0
- */
-
-/**
- * Resultado de una operación individual de sync push.
+ * @fileoverview Respuesta del push de sincronización.
  *
- * @interface SyncPushItemResult
- * @since 1.0.0
- */
-export interface SyncPushItemResult {
-    /** ID de la entidad procesada. */
-    readonly id: string;
-
-    /** Si la operación fue exitosa. */
-    readonly success: boolean;
-
-    /** Tipo de operación aplicada. */
-    readonly operation: 'create' | 'update' | 'delete' | 'upsert';
-
-    /** Error descriptivo si falló. */
-    readonly error?: string;
-}
-
-/**
- * Resultado del lote de sincronización push.
+ * **Es el tipo canónico de `shared`, no uno propio.** Antes cada módulo declaraba aquí su
+ * `SyncPushItemResult` con `{ id, success, operation, error }` y su propio agregado
+ * `{ processed, succeeded, failed }`. Al no compartirlos, `category` quedó con otra forma
+ * — `{ id, status, message }` — y el escritorio, que solo entendía la primera, leía como
+ * **fallo** los cambios de categoría que la nube había guardado bien.
  *
- * @interface SyncPushProductResponse
- * @since 1.0.0
+ * El alias existe para que el nombre por módulo siga funcionando; la forma es una sola.
  */
-export interface SyncPushProductResponse {
-    /** Total de cambios procesados. */
-    readonly processed: number;
+import type { SyncBatchResult } from '../../shared/index.js';
 
-    /** Total de cambios exitosos. */
-    readonly succeeded: number;
-
-    /** Total de cambios fallidos. */
-    readonly failed: number;
-
-    /** Detalle por cada operación. */
-    readonly results: SyncPushItemResult[];
-}
+export type SyncPushProductResponse = SyncBatchResult;

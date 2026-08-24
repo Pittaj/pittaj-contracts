@@ -5,5 +5,5 @@
 
 export type { DepartmentResponse } from './DepartmentResponse.js';
 export type { CreateDepartmentResponse } from './CreateDepartmentResponse.js';
-export type { SyncPushDepartmentResponse, SyncPushItemResult } from './SyncPushDepartmentResponse.js';
+export type { SyncPushDepartmentResponse } from './SyncPushDepartmentResponse.js';
 export type { SyncPullDepartmentResponse } from './SyncPullDepartmentResponse.js';

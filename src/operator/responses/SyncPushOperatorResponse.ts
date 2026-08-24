@@ -5,8 +5,7 @@
  * Type-alias del response genérico canónico de src/sync.
  */
 
-import type { SyncPushResponse, SyncPushItemResult } from '../../sync';
+import type { SyncPushResponse } from '../../sync';
 
-export type { SyncPushItemResult };
 
 export type SyncPushOperatorResponse = SyncPushResponse;

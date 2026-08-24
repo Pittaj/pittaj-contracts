@@ -5,5 +5,5 @@
 
 export type { CompanyResponse } from './CompanyResponse.js';
 export type { CreateCompanyResponse } from './CreateCompanyResponse.js';
-export type { SyncPushCompanyResponse, SyncPushItemResult } from './SyncPushCompanyResponse.js';
+export type { SyncPushCompanyResponse } from './SyncPushCompanyResponse.js';
 export type { SyncPullCompanyResponse } from './SyncPullCompanyResponse.js';

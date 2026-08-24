@@ -9,6 +9,5 @@ export type { UpdateSupplierResponse } from './UpdateSupplierResponse.js';
 export type { GetSuppliersResponse } from './GetSuppliersResponse.js';
 export type {
     SyncPushSupplierResponse,
-    SyncPushItemResult,
 } from './SyncPushSupplierResponse.js';
 export type { SyncPullSupplierResponse } from './SyncPullSupplierResponse.js';

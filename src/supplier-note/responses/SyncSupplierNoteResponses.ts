@@ -4,9 +4,8 @@
  */
 
 import type { SupplierNoteResponse, SupplierProductLinkResponse } from './SupplierNoteResponse';
-import type { SyncPullResponse, SyncPushResponse, SyncPushItemResult } from '../../sync';
+import type { SyncPullResponse, SyncPushResponse } from '../../sync';
 
-export type { SyncPushItemResult };
 
 export type SyncPushSupplierNoteResponse = SyncPushResponse;
 export type SyncPullSupplierNoteResponse = SyncPullResponse<SupplierNoteResponse>;

@@ -7,8 +7,7 @@
  * conservan los nombres exportados existentes).
  */
 
-import type { SyncPushResponse, SyncPushItemResult } from '../../sync/index.js';
+import type { SyncPushResponse } from '../../sync/index.js';
 
-export type { SyncPushItemResult };
 
 export type SyncPushCustomerResponse = SyncPushResponse;

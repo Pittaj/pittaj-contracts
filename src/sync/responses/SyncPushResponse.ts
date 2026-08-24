@@ -1,23 +1,14 @@
 /**
- * @fileoverview Response genérico del sync push (canónico)
- * @module sync/responses/SyncPushResponse
- * @version 1.0.0
+ * @fileoverview Respuesta del push de sincronización.
+ *
+ * **Es el tipo canónico de `shared`, no uno propio.** Antes cada módulo declaraba aquí su
+ * `SyncPushItemResult` con `{ id, success, operation, error }` y su propio agregado
+ * `{ processed, succeeded, failed }`. Al no compartirlos, `category` quedó con otra forma
+ * — `{ id, status, message }` — y el escritorio, que solo entendía la primera, leía como
+ * **fallo** los cambios de categoría que la nube había guardado bien.
+ *
+ * El alias existe para que el nombre por módulo siga funcionando; la forma es una sola.
  */
+import type { SyncBatchResult } from '../../shared/index.js';
 
-import type { SyncOperation } from '../schemas/syncSchemas.js';
-
-/** Resultado de procesar un cambio individual. */
-export interface SyncPushItemResult {
-    readonly id: string;
-    readonly success: boolean;
-    readonly operation: SyncOperation;
-    readonly error?: string;
-}
-
-/** Response genérico de POST /api/{plural}/sync/push. */
-export interface SyncPushResponse {
-    readonly processed: number;
-    readonly succeeded: number;
-    readonly failed: number;
-    readonly results: SyncPushItemResult[];
-}
+export type SyncPushResponse = SyncBatchResult;

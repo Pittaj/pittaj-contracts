@@ -1,19 +1,14 @@
 /**
- * @fileoverview Response del comando SyncPush de PosSession
- * @module SyncPushPosSessionResponse
- * @version 1.0.0
+ * @fileoverview Respuesta del push de sincronización.
+ *
+ * **Es el tipo canónico de `shared`, no uno propio.** Antes cada módulo declaraba aquí su
+ * `SyncPushItemResult` con `{ id, success, operation, error }` y su propio agregado
+ * `{ processed, succeeded, failed }`. Al no compartirlos, `category` quedó con otra forma
+ * — `{ id, status, message }` — y el escritorio, que solo entendía la primera, leía como
+ * **fallo** los cambios de categoría que la nube había guardado bien.
+ *
+ * El alias existe para que el nombre por módulo siga funcionando; la forma es una sola.
  */
+import type { SyncBatchResult } from '../../shared/index.js';
 
-export interface SyncPushItemResult {
-    readonly id: string;
-    readonly success: boolean;
-    readonly operation: 'create' | 'update' | 'delete' | 'upsert';
-    readonly error?: string;
-}
-
-export interface SyncPushPosSessionResponse {
-    readonly processed: number;
-    readonly succeeded: number;
-    readonly failed: number;
-    readonly results: SyncPushItemResult[];
-}
+export type SyncPushPosSessionResponse = SyncBatchResult;

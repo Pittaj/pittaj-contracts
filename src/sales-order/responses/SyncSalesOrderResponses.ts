@@ -3,10 +3,9 @@
  * @module Contracts/SalesOrder/Responses/Sync
  */
 
-import type { SyncPullResponse, SyncPushResponse, SyncPushItemResult } from '../../sync/index.js';
+import type { SyncPullResponse, SyncPushResponse } from '../../sync/index.js';
 import type { SalesOrderResponse } from './SalesOrderResponse.js';
 
-export type { SyncPushItemResult };
 
 /** POST /api/sales-orders/sync/pull */
 export type SyncPullSalesOrderResponse = SyncPullResponse<SalesOrderResponse>;
