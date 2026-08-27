@@ -29,6 +29,10 @@
       "types": "./src/banking/index.ts",
       "import": "./dist/banking/index.js"
     },
+    "./operating-result": {
+      "types": "./src/operating-result/index.ts",
+      "import": "./dist/operating-result/index.js"
+    },
     "./cash-closure": {
       "types": "./src/cash-closure/index.ts",
       "import": "./dist/cash-closure/index.js"
