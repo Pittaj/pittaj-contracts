@@ -28,7 +28,22 @@ Publica lo que le sirve al de al lado, no lo que hiciste: **números y nombres q
 Este repo lo consumen backend y frontend por `file:`. Tras cambiarlo hay que **reinstalar** en el
 consumidor para que vea lo nuevo; si algo "no compila con lo que acabas de exportar", suele ser eso.
 
-Los contratos siguen a la implementación **del escritorio**: desktop manda → contracts → web.
+**Un contrato es de las dos plataformas, no de una.** Desde el 2026-08-26 manda
+`arquitectura/paridad-de-plataformas.md` (docs): el usuario hace lo mismo esté donde esté, y un
+tipo que solo sirve a una punta es trabajo a medias. Ninguna de las cuatro excepciones legítimas
+—e.firma/CSD, periféricos, identidad del dispositivo, operador local— se resuelve con un contrato
+compartido, así que **en la práctica no hay tipo de este repo que sea «solo web» o «solo
+escritorio»**.
+
+> Aquí vivía la regla contraria —«desktop manda → contracts → web»— hasta el 2026-08-27. Describía
+> el reparto por dominio que se retiró, y por sí sola llevó a planear un módulo entero como
+> solo-nube. Si la ves citada en un spec o en un encabezado de archivo, está muerta: lo que vale es
+> el mandato de paridad.
+
+Quien escriba primero da igual; lo que no da igual es que el tipo contemple los dos orígenes. En
+concreto: identidad generada en origen (ids sync-ready con `deviceId`), `version` para concurrencia
+optimista en lo editable, y las cantidades acumuladas **fuera** del contrato de escritura — se
+derivan de sus movimientos (§4 del mandato).
 
 ## Compilar y probar es trabajo de Actions
 
