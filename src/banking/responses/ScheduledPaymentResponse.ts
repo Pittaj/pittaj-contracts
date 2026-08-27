@@ -13,6 +13,14 @@ export interface ScheduledPaymentResponse extends ScheduledPaymentPrimitives {
   readonly bankAccountName: string | null;
 }
 
+/** Página del listado plano (vista lista del calendario). */
+export interface ScheduledPaymentPageResponse {
+  readonly items: readonly ScheduledPaymentResponse[];
+  readonly total: number;
+  readonly page: number;
+  readonly limit: number;
+}
+
 /**
  * Un día del calendario, con su total y sus renglones.
  *
