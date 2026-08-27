@@ -187,6 +187,21 @@ export const CreateLocationSchema = z.object({
     .trim(),
 
   /**
+   * Código corto y único de la sucursal.
+   *
+   * **Es su punto de emisión de folios** (ADR-018): la serie de la terminal web se construye con
+   * él (`TKT-WCH-00042`), así que un ticket dice de dónde salió sin consultar nada. Por eso es
+   * corto, sin espacios y sin signos.
+   *
+   * @example "CH"
+   */
+  code: z.string()
+    .min(1, 'El código es obligatorio: es la serie de folios de la sucursal')
+    .max(5, 'El código no puede exceder 5 caracteres')
+    .regex(/^[A-Za-z0-9]+$/, 'El código solo admite letras y números (ej. CH, MTY)')
+    .trim(),
+
+  /**
    * Tipo de ubicación.
    * 
    * Valores válidos:

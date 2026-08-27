@@ -88,6 +88,12 @@ export interface LocationResponse {
   readonly name: string;
 
   /**
+   * Código corto y único por tenant. Es el punto de emisión de la sucursal (ADR-018): con él se
+   * arma la serie de folios de su terminal web.
+   */
+  readonly code: string;
+
+  /**
    * Tipo de ubicación (BRANCH, WAREHOUSE, OFFICE, FACTORY).
    */
   readonly type: 'BRANCH' | 'WAREHOUSE' | 'OFFICE' | 'FACTORY';
