@@ -278,6 +278,52 @@ export const BANKING_CONSTANTS = {
   ] as const,
 
   MONEY_EPSILON: 0.005,
+
+  // ── N4 · Programación de pagos ─────────────────────────────────────
+
+  /**
+   * De dónde nació la obligación.
+   *
+   * `MANUAL` es la que teclea el dueño y la única que existe el primer día;
+   * las otras tres las propone el sistema. `RECURRING` guarda además de qué
+   * plantilla salió (F2), y `CREDIT_CARD` es la línea sintética que arma
+   * `CreditCardCycle` a partir del día de corte y de pago de la cuenta.
+   */
+  SCHEDULED_PAYMENT_SOURCE_TYPES: ['PURCHASE', 'CREDIT_CARD', 'RECURRING', 'MANUAL'] as const,
+
+  /**
+   * Estado de una obligación — **derivado, nunca almacenado**.
+   *
+   * No hay columna `status` en `scheduled_payment` a propósito (§4 del mandato
+   * de paridad): con dos plataformas escribiendo, un estado guardado es el
+   * campo que dos lados ponen con información distinta y gana el último. Se
+   * calcula de dos hechos y del reloj:
+   *
+   * - `SETTLED`   ⟺ `settledTransactionId` no es nulo
+   * - `CANCELLED` ⟺ `cancelledAt` no es nulo
+   * - `OVERDUE`   ⟺ `dueDate` < hoy y ninguna de las anteriores
+   * - `PENDING`   ⟺ todo lo demás
+   *
+   * Este enum existe para el DTO y la pantalla, no para la base.
+   */
+  SCHEDULED_PAYMENT_STATES: ['PENDING', 'OVERDUE', 'SETTLED', 'CANCELLED'] as const,
+
+  SCHEDULED_PAYMENT_LIMITS: {
+    /** Longitud máxima del concepto («Renta del local»). */
+    MAX_DESCRIPTION_LENGTH: 200,
+
+    /**
+     * Horizonte máximo que admite una consulta de proyección, en días.
+     *
+     * 400 cubre el año más el mes de gracia con el que se planea el cierre.
+     * Más allá la proyección deja de ser útil: no hay obligaciones capturadas
+     * tan lejos y la curva se aplana en una recta que dice menos que nada.
+     */
+    MAX_PROJECTION_DAYS: 400,
+
+    /** Horizonte por omisión de la pantalla de flujo. */
+    DEFAULT_PROJECTION_DAYS: 30,
+  },
 } as const;
 
 export type BankAccountKindValue = (typeof BANKING_CONSTANTS.ACCOUNT_KINDS)[number];
@@ -297,6 +343,11 @@ export type ExtractionCheckName = (typeof BANKING_CONSTANTS.EXTRACTION_CHECKS)[n
 
 export type AccountNatureValue = (typeof BANKING_CONSTANTS.ACCOUNT_NATURES)[number];
 export type SummaryTermKindValue = (typeof BANKING_CONSTANTS.SUMMARY_TERM_KINDS)[number];
+
+export type ScheduledPaymentSourceTypeValue =
+  (typeof BANKING_CONSTANTS.SCHEDULED_PAYMENT_SOURCE_TYPES)[number];
+export type ScheduledPaymentStateValue =
+  (typeof BANKING_CONSTANTS.SCHEDULED_PAYMENT_STATES)[number];
 
 /** Definición de una categoría de sistema (seed por tenant, estilo CONTPAQi). */
 export interface SystemCategoryDef {
