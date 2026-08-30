@@ -9,8 +9,14 @@
 
 import { z } from 'zod';
 
-/** Estados de la compra (espejo de PurchaseStatus). */
-export const PURCHASE_STATUSES = ['DRAFT', 'RECEIVED', 'CANCELLED'] as const;
+/**
+ * Estados GUARDADOS de la compra (espejo de PurchaseStatus).
+ *
+ * ⚠️ `RECEIVED` se retiró (F5.1c): lo que se guarda es solo Borrador / Vigente /
+ * Cancelada. El filtro por el eje de mercancía (recibida, en parte…) se sirve
+ * derivado; aquí solo viaja lo que se persiste.
+ */
+export const PURCHASE_STATUSES = ['DRAFT', 'ACTIVE', 'CANCELLED'] as const;
 
 /**
  * Naturaleza del documento (espejo de `PurchaseKind` del escritorio).
@@ -35,11 +41,21 @@ export const PURCHASE_KINDS = ['INVENTORY', 'EXPENSE', 'FIXED_ASSET'] as const;
 
 export type PurchaseKindValue = (typeof PURCHASE_KINDS)[number];
 
-/** Query params de GET /api/purchases. */
+/**
+ * Query params de GET /api/purchases.
+ *
+ * `search` y `locationId` entraron con el editor web (F5.1): el buscador no existía
+ * en ninguna de las dos plataformas y la sucursal no se mostraba aunque `locationId`
+ * ya viajaba en el contrato.
+ */
 export const getPurchasesSchema = z.object({
+    /** Folio, proveedor, folio del comprobante o UUID del CFDI (contiene, sin distinguir mayúsculas). */
+    search: z.string().trim().max(100).optional(),
     status: z.enum(PURCHASE_STATUSES).optional(),
     kind: z.enum(PURCHASE_KINDS).optional(),
     supplierId: z.string().uuid().optional(),
+    /** Sucursal de la compra. */
+    locationId: z.string().uuid().optional(),
     dateFrom: z.coerce.date().optional(),
     dateTo: z.coerce.date().optional(),
     page: z.coerce.number().int().min(1).optional(),

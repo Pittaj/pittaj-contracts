@@ -1,4 +1,6 @@
 export * from './PurchaseResponse.js';
+export * from './CreatePurchaseResponse.js';
 export * from './GetPurchasesResponse.js';
 export * from './SyncPullPurchaseResponse.js';
 export * from './SyncPushPurchaseResponse.js';
+export * from './PurchasesWithoutCfdiResponse.js';

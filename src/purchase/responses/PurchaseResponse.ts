@@ -23,16 +23,38 @@ import type { PurchaseKindValue } from '../schemas/getPurchases.schema.js';
  */
 export type PurchaseKind = PurchaseKindValue;
 
-/** Estado de la compra. BORRADOR → RECIBIDA | CANCELADA. */
-export type PurchaseStatus = 'DRAFT' | 'RECEIVED' | 'CANCELLED';
+/**
+ * Estado guardado de la compra.
+ *
+ * ⚠️ Dejó de ser lineal: lo que se guarda es solo Borrador / Vigente / Cancelada.
+ * Los dos ejes (mercancía y papel) se DERIVAN de los contadores de cada renglón
+ * (`merchandiseState` / `paperState`) y no se guardan. El valor heredado
+ * `'RECEIVED'` ya no existe: una compra recibida es `ACTIVE` con contadores.
+ */
+export type PurchaseStatus = 'DRAFT' | 'ACTIVE' | 'CANCELLED';
+
+/** Estado de aceptación del comprobante (acuse con plazo, LatAm). */
+export const ACCEPTANCE_STATUSES = ['PENDING', 'ACCEPTED', 'CLAIMED'] as const;
+export type AcceptanceStatus = (typeof ACCEPTANCE_STATUSES)[number];
 
 /** Renglón de una compra (basado en costo). Snapshot del producto al comprar. */
 export interface PurchaseLineResponse {
     readonly id: string;
-    readonly productId: string;
+    /**
+     * Producto del catálogo, o `null` en un renglón **sin producto** (flete,
+     * maniobras, servicio): el escritorio los permite desde siempre y la
+     * descripción libre viaja en `productName`. Esos renglones no postean
+     * inventario al recibir.
+     *
+     * ⚠️ Era `string` y la columna de la nube era `uuid NOT NULL`, así que el
+     * escritorio mandaba `""` y el INSERT moría con *invalid input syntax for type
+     * uuid* — **una compra con un renglón de flete no llegaba nunca a la nube**, y
+     * en silencio, porque el push falla por renglón dentro de una respuesta 200.
+     */
+    readonly productId: string | null;
     readonly productName: string;
     readonly productCode: string;
-    /** Cantidad en la UNIDAD DE COMPRA (como la factura: 2 bultos). */
+    /** Pedido (cantidad en la UNIDAD DE COMPRA, como la factura: 2 bultos). */
     readonly quantity: number;
     /** Costo por esa unidad de compra. */
     readonly unitCost: number;
@@ -51,6 +73,54 @@ export interface PurchaseLineResponse {
     readonly taxBaseAmount: number;
     readonly taxAmount: number;
     readonly totalAmount: number;
+
+    // --- Los tres contadores del ciclo de compra (F5.1c) ---
+    /** Recibido acumulado, unidad de compra. Se suma/resta al recibir/revertir. */
+    readonly qtyReceived: number;
+    /** Facturado acumulado, unidad de compra. Lo mueve la conciliación de CFDI. */
+    readonly qtyInvoiced: number;
+    /**
+     * Cargo del documento (flete, maniobras): no es un producto, se prorratea
+     * al costo de los demás renglones (landed cost). Capa 3: el campo nace en
+     * la migración; la pantalla se pospone.
+     */
+    readonly isDocumentCharge: boolean;
+    /**
+     * Cerrado con faltante: «no se espera más de este renglón». Es el que
+     * explica por qué el documento dejó de estar abierto sin llegar a 100 %.
+     */
+    readonly closed: boolean;
+}
+
+/** Una entrega concreta de la compra: fecha, remisión, bodega y quién recibió. */
+export interface PurchaseReceptionResponse {
+    readonly id: string;
+    readonly purchaseId: string;
+    /** Fecha de la entrega (ISO 8601). */
+    readonly receivedAt: string;
+    /** Remisión o guía del proveedor (null = no la dio). */
+    readonly remittance: string | null;
+    /** Bodega donde entró la mercancía (soft ref). */
+    readonly warehouseId: string;
+    /** Quién recibió (nombre libre, como lo captura quien registra). */
+    readonly receivedBy: string | null;
+    /** Renglones de esta entrega. */
+    readonly lines: readonly PurchaseReceptionLineResponse[];
+    /** Fecha de creación (ISO 8601). */
+    readonly createdAt?: string;
+    /** Versión para optimistic locking. */
+    readonly version?: number;
+}
+
+/** Renglón de una recepción: la cantidad de ESA entrega. */
+export interface PurchaseReceptionLineResponse {
+    readonly id: string;
+    /** Renglón de la compra al que suma. */
+    readonly purchaseLineId: string;
+    /** Cantidad recibida en esta entrega, unidad de compra. */
+    readonly quantity: number;
+    /** Costo con el que entró (neto por unidad de compra, sin impuestos). */
+    readonly unitCost: number;
 }
 
 /** DTO de respuesta para consultas/sync de compras. */
@@ -68,7 +138,14 @@ export interface PurchaseResponse {
     /** Sucursal de la compra (null = general). */
     readonly locationId: string | null;
     readonly kind: PurchaseKind;
+    /** Estado GUARDADO: DRAFT | ACTIVE | CANCELLED. Los ejes van aparte. */
     readonly status: PurchaseStatus;
+
+    // --- Los dos ejes DERIVADOS (no se guardan) ---
+    /** Eje de mercancía: sin recibir / en parte / recibida / cerrada con faltante. */
+    readonly merchandiseState: import('../purchaseState.js').PurchaseMerchandiseState;
+    /** Eje de papel: sin factura / en parte / facturada. */
+    readonly paperState: import('../purchaseState.js').PurchasePaperState;
 
     // --- Datos mínimos del comprobante (CFDI del proveedor) ---
     readonly invoiceFolio: string | null;
@@ -96,12 +173,24 @@ export interface PurchaseResponse {
     readonly taxAmount: number;
     readonly totalAmount: number;
 
-    /** Fecha de recepción (ISO 8601, null si no recibida). */
+    /** Fecha de la última recepción (ISO 8601, null si ninguna). */
     readonly receivedAt: string | null;
     readonly cancellationReason: string | null;
 
+    // --- Acuse con plazo (LatAm). Los campos nacen en la migración; la
+    // pantalla se pospone a la capa 3. En México no se dibujan. ---
+    /** Fecha en que se recibió el comprobante (ISO 8601, null = sin recibir). */
+    readonly cfdiReceivedAt: string | null;
+    /** PENDING | ACCEPTED | CLAIMED. PENDING = sin acusar. */
+    readonly acceptanceStatus: AcceptanceStatus;
+    /** Plazo para reclamar (ISO 8601, null = sin plazo / no aplica). */
+    readonly acceptanceDeadline: string | null;
+
     /** Renglones (tabla hija purchase_lines). */
     readonly lines: PurchaseLineResponse[];
+
+    /** Historial de recepciones (entregas concretas, reversibles una a una). */
+    readonly receptions: PurchaseReceptionResponse[];
 
     /** Versión para optimistic locking. */
     readonly version: number;
