@@ -21,11 +21,16 @@
  * @module Contracts/SupplierNote
  */
 
-/** Tipo de nota. */
-export type SupplierNoteKind = 'RETURN' | 'CREDIT' | 'DEBIT';
-
-/** Estado: borrador editable → aplicada (con efecto) o cancelada. */
-export type SupplierNoteStatus = 'DRAFT' | 'APPLIED' | 'CANCELLED';
+/*
+ * El tipo y el estado se definen UNA vez, en `supplierNoteState.ts`, junto a las transiciones que
+ * los gobiernan. Aquí solo se reexportan.
+ *
+ * 🔴 Estaban declarados a mano en este archivo y la lista se quedó vieja: decía
+ * `'DRAFT' | 'APPLIED' | 'CANCELLED'` cuando el camino largo ya añadía `AUTHORIZED` e
+ * `IN_TRANSIT`. Una lista de estados en dos sitios es una lista de estados que se va a desfasar.
+ */
+export type { SupplierNoteKind, SupplierNoteStatus } from '../supplierNoteState.js';
+import type { SupplierNoteKind, SupplierNoteStatus } from '../supplierNoteState.js';
 
 /** Renglón de una devolución (solo en notas `RETURN`). */
 export interface SupplierNoteLineResponse {
@@ -40,6 +45,21 @@ export interface SupplierNoteLineResponse {
     readonly unitCost: number;
     readonly discountPercent: number;
     readonly taxPercent: number;
+
+    /**
+     * La compra de la que sale ESTE renglón — no la cabecera, que es donde vivía.
+     *
+     * Una nota puede cubrir renglones de varias compras, porque el proveedor manda una sola nota de
+     * crédito por tres facturas. Nulo = capturado a mano (salida de emergencia).
+     */
+    readonly purchaseId: string | null;
+    readonly purchaseNumber: string | null;
+    /** Renglón concreto de esa compra: contra él se cuenta lo ya devuelto. */
+    readonly purchaseLineId: string | null;
+    /** El costo al que entró en su compra origen. La salida se valúa con este, no con el promedio. */
+    readonly unitCostSource: number | null;
+    /** Motivo de este renglón, además del general de la nota. */
+    readonly reason: string | null;
 
     readonly subtotalAmount: number;
     readonly discountAmount: number;
@@ -62,10 +82,10 @@ export interface SupplierNoteResponse {
     /** RFC snapshot; puede faltar si el proveedor se capturó sin él. */
     readonly supplierTaxId: string | null;
 
-    /** Compra referenciada, si la nota nació de una. */
-    readonly purchaseId: string | null;
-    /** Snapshot del folio de esa compra. */
-    readonly purchaseNumber: string | null;
+    /*
+     * 🔴 Aquí ya NO hay `purchaseId` ni `purchaseNumber`: la referencia a la compra bajó al
+     * renglón, porque una nota puede cubrir varias compras. Se leen de `lines[].purchaseNumber`.
+     */
 
     /** Bodega de la que sale la mercancía (solo importa en `RETURN`). */
     readonly warehouseId: string;
@@ -74,6 +94,21 @@ export interface SupplierNoteResponse {
 
     readonly currency: string;
     readonly reason: string | null;
+
+    /**
+     * Canje: la mercancía sale y el proveedor la repone. **No es un cuarto tipo.**
+     *
+     * Cambia dos cosas visibles: el efecto sobre lo que debes es **cero** y aparece una fecha de
+     * reposición esperada.
+     */
+    readonly isExchange: boolean;
+    readonly expectedReplacementDate: string | null;
+
+    /** Folio de autorización del proveedor (RMA). Solo del camino largo. */
+    readonly authorizationCode: string | null;
+    readonly authorizationExpiresAt: string | null;
+    /** Cuándo salió la mercancía (camino largo: se envía antes de acreditarse). */
+    readonly shippedAt: string | null;
 
     /** Monto del documento. En `RETURN` sale de los renglones; en el resto se captura. */
     readonly amount: number;
