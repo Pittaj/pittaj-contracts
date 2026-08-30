@@ -4,3 +4,4 @@ export * from './GetPurchasesResponse.js';
 export * from './SyncPullPurchaseResponse.js';
 export * from './SyncPushPurchaseResponse.js';
 export * from './PurchasesWithoutCfdiResponse.js';
+export * from './CfdiMatchResponse.js';

@@ -92,6 +92,17 @@ export const purchaseLineInputSchema = z
 
         /** Unidades base por 1 de la unidad de compra (bulto de 25 kg → 25). */
         unitFactor: z.number().positive({ message: ERROR_MESSAGES.FACTOR_POSITIVE }).optional().default(1),
+
+        /**
+         * El renglón es un **cargo del documento** (flete, maniobras), no mercancía.
+         *
+         * Va en la entrada y no solo en la respuesta porque es una decisión de quien
+         * captura, no algo derivable: el mismo «FLETE» es un cargo para una tienda y el
+         * producto que vende una transportista. Un cargo del documento **no postea
+         * inventario** al recibir aunque lleve producto, que es justo lo que el dominio
+         * ya comprueba en `receive()`.
+         */
+        isDocumentCharge: z.boolean().optional().default(false),
     })
     .strict();
 
