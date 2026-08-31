@@ -7,3 +7,4 @@ export * from './PurchasesWithoutCfdiResponse.js';
 export * from './CfdiMatchResponse.js';
 export * from './CfdiBatchResponse.js';
 export * from './RecepcionesResponse.js';
+export * from './ReposicionResponse.js';

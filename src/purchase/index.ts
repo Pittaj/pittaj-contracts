@@ -9,3 +9,4 @@ export * from './purchaseMath.js';
 export * from './purchaseState.js';
 export * from './cfdiMatching.js';
 export * from './cfdiComparison.js';
+export * from './reposicion.js';
