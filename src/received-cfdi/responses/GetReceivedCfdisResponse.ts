@@ -28,5 +28,17 @@ export interface GetReceivedCfdisResponse {
         readonly ivaNuevos: number;
         /** IVA trasladado de los ya capturados (el «confirmado» del tablero). */
         readonly ivaVinculados: number;
+        /**
+         * Cancelados en el SAT que YA se convirtieron en un documento nuestro.
+         *
+         * 🔴 Es el número más caro de la pantalla: dedujiste algo que el emisor borró. Venía
+         * calculándose en el cliente filtrando los comprobantes **de la página cargada**, así
+         * que con más de una página salía corto — el mismo defecto que se corrigió para las
+         * sumas de IVA y que aquí quedó vivo justo donde más duele. Ahora lo cuenta el
+         * servidor sobre todo el buzón.
+         */
+        readonly canceladosYCapturados: number;
+        /** Comprobantes cuyo emisor aparece en la lista 69-B. Mismo caso: se contaba por página. */
+        readonly deEmisoresEnEfos: number;
     };
 }
