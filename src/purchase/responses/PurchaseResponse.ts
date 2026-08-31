@@ -104,6 +104,14 @@ export interface PurchaseReceptionResponse {
     readonly warehouseId: string;
     /** Quién recibió (nombre libre, como lo captura quien registra). */
     readonly receivedBy: string | null;
+    /**
+     * Cuándo se deshizo esta entrega (ISO 8601). Nulo = sigue en pie.
+     *
+     * ⚠️ Una entrega revertida **no desaparece**: se apaga y dice cuándo. El movimiento que la
+     * deshace queda en el kárdex, así que esconderla obligaría a explicar por qué la existencia no
+     * cuadra con la suma de entregas de la semana.
+     */
+    readonly reversedAt: string | null;
     /** Renglones de esta entrega. */
     readonly lines: readonly PurchaseReceptionLineResponse[];
     /** Fecha de creación (ISO 8601). */

@@ -10,3 +10,4 @@ export * from './reverseReception.schema.js';
 export * from './reconcileCfdi.schema.js';
 export * from './cfdiMatch.schema.js';
 export * from './cfdiBatch.schema.js';
+export * from './recepciones.schema.js';
