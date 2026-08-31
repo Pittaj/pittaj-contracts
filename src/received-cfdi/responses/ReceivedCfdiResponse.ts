@@ -39,6 +39,13 @@ export interface ReceivedCfdiResponse {
     readonly issuedAt: string | null;
     readonly currency: string | null;
     /** CFDI MétodoPago: "PUE" / "PPD". */
+    /**
+     * `I` ingreso · `E` egreso · `P` pago (REP) · `N` nómina · `T` traslado.
+     *
+     * Nulo en lo que entró al buzón antes de que se guardara: se lee como `I`, que es lo que era
+     * casi todo.
+     */
+    readonly tipoComprobante: string | null;
     readonly metodoPago: string | null;
     /** CFDI FormaPago: "01" efectivo, "03" transferencia, … */
     readonly formaPago: string | null;
