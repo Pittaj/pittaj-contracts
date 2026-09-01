@@ -9,3 +9,4 @@ export * from './CfdiBatchResponse.js';
 export * from './RecepcionesResponse.js';
 export * from './ReposicionResponse.js';
 export * from './PurchaseRequestResponse.js';
+export * from './QuoteRequestResponse.js';
