@@ -12,3 +12,4 @@ export * from './cfdiMatch.schema.js';
 export * from './cfdiBatch.schema.js';
 export * from './recepciones.schema.js';
 export * from './reposicion.schema.js';
+export * from './purchaseRequest.schema.js';
