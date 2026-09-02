@@ -30,6 +30,15 @@ const paymentSummarySchema = z.object({
     transactionCount: z.number().int().min(0),
 });
 
+/**
+ * Un renglón del conteo físico por denominación (arqueo del cierre Z).
+ * El importe del renglón y el total contado NO viajan: se derivan.
+ */
+const denominationSchema = z.object({
+    denomination: z.number().positive(),
+    pieces: z.number().int().min(0).max(LIMITS.MAX_DENOMINATION_PIECES),
+});
+
 /** Schema para cambios de sincronización */
 const syncChangeSchema = z.object({
     id: z.string().uuid(),
@@ -81,6 +90,13 @@ export const updateCashClosureSchema = z.object({
     openingFundAmount: z.number().min(LIMITS.MIN_OPENING_FUND).max(LIMITS.MAX_OPENING_FUND).optional(),
     currency: currencyEnum.optional(),
     paymentSummaries: z.array(paymentSummarySchema).max(LIMITS.MAX_PAYMENT_SUMMARIES).optional(),
+    /**
+     * Conteo físico por denominación. Opcional (la spec lo pide así): sin él, el
+     * efectivo contado es el `actualAmount` del resumen de efectivo. Con él, ESE
+     * importe se deriva del desglose y lo que venga en el resumen se ignora —
+     * mandan las piezas, que es lo único que se puede recontar.
+     */
+    denominations: z.array(denominationSchema).max(LIMITS.MAX_DENOMINATIONS).optional(),
     notes: z.string().max(LIMITS.MAX_NOTES_LENGTH).nullable().optional(),
 });
 

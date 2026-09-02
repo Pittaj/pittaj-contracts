@@ -4,6 +4,7 @@
  * @version 1.0.0
  */
 
+import type { CashClosureDenominationPrimitives } from '../primitives/index.js';
 import type { CashClosurePaymentSummaryPrimitives } from '../primitives/index.js';
 import type { CashClosurePeriodPrimitives } from '../primitives/index.js';
 import type {MoneyPrimitives} from '../../shared/index.js';
@@ -28,6 +29,12 @@ export interface CashClosureResponse {
     readonly sequence: number | null;
     readonly openingFund: MoneyPrimitives;
     readonly paymentSummaries: CashClosurePaymentSummaryPrimitives[];
+    /**
+     * Conteo físico por denominación del efectivo. Vacío = no se desglosó (el
+     * cajero tecleó el total). Con renglones, el `actualAmount` del resumen de
+     * efectivo ES su suma: no hay dos números que puedan discrepar.
+     */
+    readonly denominations: CashClosureDenominationPrimitives[];
     readonly notes: string | null;
     readonly rejectionReason: string | null;
     readonly reviewedBy: string | null;
