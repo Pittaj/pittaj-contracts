@@ -45,3 +45,14 @@ export const aplicarMinimosSchema = z.object({
 export type GetReposicionQuery = z.infer<typeof getReposicionSchema>;
 export type GetMinimosSugeridosQuery = z.infer<typeof getMinimosSugeridosSchema>;
 export type AplicarMinimosRequest = z.infer<typeof aplicarMinimosSchema>;
+
+/**
+ * La ventana del panorama de Compras.
+ *
+ * Las dos fechas o ninguna: media ventana obligaría al servidor a inventar la otra mitad, y el
+ * comparativo contra «los mismos días anteriores» dejaría de significar lo que dice.
+ */
+export const comprasOverviewSchema = z.object({
+    desde: z.string().datetime().optional(),
+    hasta: z.string().datetime().optional(),
+});

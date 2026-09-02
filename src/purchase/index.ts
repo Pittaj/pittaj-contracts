@@ -10,4 +10,5 @@ export * from './purchaseState.js';
 export * from './cfdiMatching.js';
 export * from './cfdiComparison.js';
 export * from './reposicion.js';
+export * from './comprasAtencion.js';
 export * from './quoteComparison.js';
