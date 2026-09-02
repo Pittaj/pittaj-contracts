@@ -14,6 +14,10 @@ export const CASH_CLOSURE_CONSTANTS = {
     AUTO_APPROVE_THRESHOLD: 10.00,
     /** Maximo resumenes de pago por cierre */
     MAX_PAYMENT_SUMMARIES: 20,
+    /** Maximo renglones de conteo por denominacion (billetes + monedas de un pais) */
+    MAX_DENOMINATIONS: 30,
+    /** Piezas maximas por renglon del conteo */
+    MAX_DENOMINATION_PIECES: 100_000,
     /** Longitud maxima de notas */
     MAX_NOTES_LENGTH: 1000,
     /** Longitud maxima de razon de rechazo */
