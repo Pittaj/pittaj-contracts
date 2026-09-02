@@ -24,8 +24,17 @@ export const POS_TICKET_CONSTANTS = {
     MAX_CANCELLATION_REASON_LENGTH: 500,
     /** Precio unitario maximo */
     MAX_UNIT_PRICE: 999_999_999.99,
-    /** Cantidad minima por linea */
-    MIN_QUANTITY: 1,
+    /**
+     * Cantidad minima por linea.
+     *
+     * 0.001 y no 1: hay productos que se venden a granel y medio kilo de queso es
+     * una venta perfectamente normal. Con el 1 que habia aqui, el POS rechazaba
+     * cualquier fraccion con un error de validacion — el propio dominio dice
+     * «La cantidad debe ser mayor a 0» y `sales-order` ya usaba 0.01, asi que el 1
+     * era un descuido, no una regla. Es ademas la misma cota que el escritorio
+     * aplica en su dialogo de granel.
+     */
+    MIN_QUANTITY: 0.001,
     /** Cantidad maxima por linea */
     MAX_QUANTITY: 99_999,
     /** Precision decimal para precios */
