@@ -160,6 +160,19 @@ export interface PurchaseResponse {
     readonly invoiceUuid: string | null;
     /** Fecha del comprobante (ISO 8601, null = sin capturar). */
     readonly invoiceDate: string | null;
+
+    /** Días de crédito que dio el proveedor, congelados al crear la compra. */
+    readonly creditDays: number;
+    /**
+     * Fecha límite de pago (ISO). `null` = de contado: sin días de crédito o método PUE.
+     *
+     * Congelada en el documento a propósito: si colgara del proveedor, cambiarle las condiciones
+     * movería los vencimientos de sus facturas viejas y la antigüedad de saldos cambiaría hacia
+     * atrás.
+     */
+    readonly dueDate: string | null;
+    /** Días de atraso a hoy. `0` si no ha vencido o si es de contado. **Derivado.** */
+    readonly diasDeAtraso: number;
     /** CFDI MétodoPago: "PUE" / "PPD". */
     readonly paymentMethod: string | null;
     /** CFDI FormaPago: "01" efectivo, "03" transferencia, … */
