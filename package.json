@@ -205,6 +205,10 @@
       "types": "./src/sales-return/index.ts",
       "import": "./dist/sales-return/index.js"
     },
+    "./search": {
+      "types": "./src/search/index.ts",
+      "import": "./dist/search/index.js"
+    },
     "./layaway": {
       "types": "./src/layaway/index.ts",
       "import": "./dist/layaway/index.js"
