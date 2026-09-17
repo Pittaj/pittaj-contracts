@@ -4,6 +4,7 @@
  */
 
 import type { Visibilidad } from '../schemas/visibilidad.schema.js';
+import { APPS_SIEMPRE_VISIBLES } from '../catalogo.js';
 
 /**
  * GET /api/suite/visibilidad — lo que ve ESTE negocio, ya resuelto (predeterminado u override).
@@ -21,6 +22,7 @@ export interface VisibilidadDeTenantResponse extends Visibilidad {
 
 /** ¿Se ve esta app? Clave ausente = sí. */
 export function appVisible(v: Visibilidad, appId: string): boolean {
+    if ((APPS_SIEMPRE_VISIBLES as readonly string[]).includes(appId)) return true;
     return v.apps[appId] !== false;
 }
 

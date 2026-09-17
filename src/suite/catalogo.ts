@@ -249,6 +249,12 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
 ];
 
 
+/**
+ * Apps que no se pueden apagar. Organización es donde viven la suscripción, los usuarios y la
+ * configuración: sin ella, un negocio con Bancos apagado no tendría ni dónde ver por qué.
+ */
+export const APPS_SIEMPRE_VISIBLES: readonly AppId[] = ['org'];
+
 /** Búsqueda rápida por id de app. */
 export function appDeLaSuite(id: string): AppDeLaSuite | undefined {
     return APPS_DE_LA_SUITE.find((a) => a.id === id);
