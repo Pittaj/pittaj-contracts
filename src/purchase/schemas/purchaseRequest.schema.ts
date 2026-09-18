@@ -34,6 +34,17 @@ export const createPurchaseRequestSchema = z.object({
         .max(100),
 });
 
+/**
+ * POST /api/purchases/requests/:id/resolve-with-purchase — se atendió comprando.
+ *
+ * NO crea la compra: la crea el alta de siempre (`POST /api/purchases`), y aquí solo se enlaza.
+ * Dos caminos para el mismo hecho son la forma de BUG-028. El folio lo lee el servidor de la
+ * compra; el cliente no lo repite.
+ */
+export const resolveWithPurchaseSchema = z.object({
+    purchaseId: z.string().uuid('Compra inválida'),
+});
+
 export const rejectPurchaseRequestSchema = z.object({
     /**
      * Por qué no se surte. **Obligatorio.**
@@ -65,4 +76,5 @@ export const resolveWithTransferSchema = z.object({
 export type GetPurchaseRequestsQuery = z.infer<typeof getPurchaseRequestsSchema>;
 export type CreatePurchaseRequestRequest = z.infer<typeof createPurchaseRequestSchema>;
 export type RejectPurchaseRequestRequest = z.infer<typeof rejectPurchaseRequestSchema>;
+export type ResolveWithPurchaseRequest = z.infer<typeof resolveWithPurchaseSchema>;
 export type ResolveWithTransferRequest = z.infer<typeof resolveWithTransferSchema>;
