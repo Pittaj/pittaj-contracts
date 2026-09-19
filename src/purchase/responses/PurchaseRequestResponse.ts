@@ -10,7 +10,8 @@
  */
 
 /** `PENDIENTE` está esperando · `ATENDIDA` se resolvió · `RECHAZADA` alguien dijo que no. */
-export const PURCHASE_REQUEST_STATUSES = ['PENDIENTE', 'ATENDIDA', 'RECHAZADA'] as const;
+/** `BORRADOR` = guardada a medias, todavía no pide nada; pasa a `PENDIENTE` al enviarse. */
+export const PURCHASE_REQUEST_STATUSES = ['BORRADOR', 'PENDIENTE', 'ATENDIDA', 'RECHAZADA'] as const;
 export type PurchaseRequestStatusType = (typeof PURCHASE_REQUEST_STATUSES)[number];
 
 export const PURCHASE_REQUEST_RESOLUTIONS = ['TRANSFER', 'PURCHASE'] as const;
@@ -52,6 +53,8 @@ export interface PurchaseRequestResponse {
     readonly resolvedAt: string | null;
 
     readonly createdAt: string;
+    /** Para editar y enviar el borrador con OCC. */
+    readonly version: number;
     readonly lines: readonly PurchaseRequestLineResponse[];
 
     /**

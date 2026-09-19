@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 export const getPurchaseRequestsSchema = z.object({
     /** Sin filtro = las pendientes, que es la pregunta de la pantalla. */
-    status: z.enum(['PENDIENTE', 'ATENDIDA', 'RECHAZADA']).optional(),
+    status: z.enum(['BORRADOR', 'PENDIENTE', 'ATENDIDA', 'RECHAZADA']).optional(),
     locationId: z.string().uuid().optional(),
     limit: z.coerce.number().int().min(1).max(300).optional().default(100),
 });
@@ -19,6 +19,30 @@ export const createPurchaseRequestSchema = z.object({
     locationId: z.string().uuid().nullish(),
     locationName: z.string().trim().max(200).nullish(),
     /** «ya no tenemos nada». Opcional, pero es lo que explica la urgencia. */
+    note: z.string().trim().max(1000).nullish(),
+    /**
+     * Guardarla a medias: nace `BORRADOR` y no cuenta como pendiente hasta que se envía
+     * (`POST /:id/send`). Sin esto, nace `PENDIENTE` de una vez, que es el camino corto.
+     */
+    draft: z.boolean().optional(),
+    lines: z
+        .array(
+            z
+                .object({
+                    productId: z.string().uuid(),
+                    productName: z.string().trim().min(1).max(200),
+                    quantity: z.number().positive('Pedir cero no es pedir'),
+                })
+                .strict()
+        )
+        .min(1, 'Una petición sin renglones no pide nada')
+        .max(100),
+});
+
+/** PUT /api/purchases/requests/:id — solo en borrador: lo que aún se puede cambiar. */
+export const updatePurchaseRequestSchema = z.object({
+    locationId: z.string().uuid().nullish(),
+    locationName: z.string().trim().max(200).nullish(),
     note: z.string().trim().max(1000).nullish(),
     lines: z
         .array(
@@ -32,6 +56,16 @@ export const createPurchaseRequestSchema = z.object({
         )
         .min(1, 'Una petición sin renglones no pide nada')
         .max(100),
+    version: z.number().int().min(1),
+});
+
+/** POST /api/purchases/requests/:id/send — el borrador pasa a pendiente. */
+export const sendPurchaseRequestSchema = z.object({
+    version: z.number().int().min(1),
+});
+
+export const purchaseRequestIdParamSchema = z.object({
+    id: z.string().uuid('Id de solicitud inválido'),
 });
 
 /**
@@ -82,6 +116,8 @@ export const resolveWithTransferSchema = z.object({
 
 export type GetPurchaseRequestsQuery = z.infer<typeof getPurchaseRequestsSchema>;
 export type CreatePurchaseRequestRequest = z.infer<typeof createPurchaseRequestSchema>;
+export type UpdatePurchaseRequestRequest = z.infer<typeof updatePurchaseRequestSchema>;
+export type SendPurchaseRequestRequest = z.infer<typeof sendPurchaseRequestSchema>;
 export type RejectPurchaseRequestRequest = z.infer<typeof rejectPurchaseRequestSchema>;
 export type ResolveWithPurchaseRequest = z.infer<typeof resolveWithPurchaseSchema>;
 export type ResolveWithTransferRequest = z.infer<typeof resolveWithTransferSchema>;
