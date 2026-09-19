@@ -49,6 +49,8 @@ export const DOCUMENT_LETTERS = {
     PURCHASE: 'C',
     /** Devoluciones y notas a proveedor. */
     SUPPLIER_NOTE: 'N',
+    /** Traspasos entre bodegas (`TW-00001` en la web, `TS1-00001` en la caja de la sucursal S1). */
+    STOCK_TRANSFER: 'T',
 } as const;
 
 export type DocumentLetter = (typeof DOCUMENT_LETTERS)[keyof typeof DOCUMENT_LETTERS];
