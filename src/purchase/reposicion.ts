@@ -164,3 +164,63 @@ export function minimosSugeridos(
     const maximo = Math.ceil(minimo + ventaSemanal * SEMANAS_DE_COBERTURA);
     return { minimo, maximo };
 }
+
+// ── Con qué se resuelve: traspaso o compra ──────────────────────────────────────────────────────
+
+/** Lo que otra bodega tiene de este producto. */
+export interface ExistenciaEnBodega {
+    readonly warehouseId: string;
+    readonly warehouseName: string;
+    readonly existencia: number;
+}
+
+export type ViaDeReposicion = 'TRANSFER' | 'PURCHASE' | 'NONE';
+
+/** De dónde saldría el traspaso, si sale. */
+export interface TraspasoPosible {
+    readonly warehouseId: string;
+    readonly warehouseName: string;
+    /** Lo que esa bodega puede soltar sin quedarse ella bajo el mínimo. */
+    readonly disponible: number;
+}
+
+/**
+ * ¿Hay otra bodega que pueda mandar lo que falta **sin quedarse ella bajo mínimo**?
+ *
+ * Es la columna que ahorra dinero: si el producto ya está en la otra sucursal, comprar es tirar el
+ * dinero dos veces. La regla es entera a propósito —cubre la cantidad sugerida completa o no
+ * cuenta—: un traspaso que resuelve la mitad y una compra para la otra mitad son dos documentos
+ * por un renglón, y eso nadie lo hace a mano ni quiere que se lo hagan.
+ *
+ * El mínimo es por producto y no por bodega (así está en la ficha), así que a cada bodega se le
+ * exige el mismo colchón. Se elige la que más puede soltar.
+ */
+export function traspasoPosible(
+    cantidad: number,
+    minimo: number,
+    otras: readonly ExistenciaEnBodega[]
+): TraspasoPosible | null {
+    if (cantidad <= 0) return null;
+    let mejor: TraspasoPosible | null = null;
+    for (const b of otras) {
+        const disponible = b.existencia - Math.max(minimo, 0);
+        if (disponible < cantidad) continue;
+        if (!mejor || disponible > mejor.disponible) {
+            mejor = { warehouseId: b.warehouseId, warehouseName: b.warehouseName, disponible };
+        }
+    }
+    return mejor;
+}
+
+/**
+ * Traspaso si alguna bodega puede; si no, compra al proveedor habitual; y si nunca se ha comprado
+ * ni hay en ninguna bodega, `NONE`: la pantalla lo dice y deja que alguien decida a quién pedírselo.
+ */
+export function viaDeReposicion(
+    traspaso: TraspasoPosible | null,
+    supplierId: string | null
+): ViaDeReposicion {
+    if (traspaso) return 'TRANSFER';
+    if (supplierId) return 'PURCHASE';
+    return 'NONE';
+}

@@ -71,6 +71,13 @@ export const resolveWithTransferSchema = z.object({
             z.object({ productId: z.string().uuid(), quantity: z.number().positive() }).strict()
         )
         .min(1),
+    /**
+     * Desde el 2026-09-19 esto arma un traspaso (`TR-…`) en Inventario en vez de mover al instante.
+     * `send` lo envía de una vez (la mercancía ya sale); por defecto queda en borrador para que
+     * quien lo empaque lo envíe desde Traspasos.
+     */
+    send: z.boolean().optional().default(false),
+    actorName: z.string().trim().max(200).nullish(),
 });
 
 export type GetPurchaseRequestsQuery = z.infer<typeof getPurchaseRequestsSchema>;

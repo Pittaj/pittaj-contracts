@@ -109,7 +109,7 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
             { ruta: 'inicio', nombre: 'Inicio' },
             { ruta: 'existencias', nombre: 'Existencias' },
             { ruta: 'movimientos', nombre: 'Movimientos' },
-            { ruta: 'transferencias', nombre: 'Transferencias' },
+            { ruta: 'traspasos', nombre: 'Traspasos' },
             { ruta: 'ajustes', nombre: 'Ajustes' },
             { ruta: 'conteos', nombre: 'Conteos Físicos' },
             { ruta: 'productos', nombre: 'Productos' },
@@ -132,6 +132,7 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
         nombre: 'Compras',
         modulos: [
             { ruta: 'inicio', nombre: 'Inicio' },
+            { ruta: 'reabastecimiento', nombre: 'Reabastecimiento' },
             { ruta: 'solicitudes', nombre: 'Solicitudes' },
             { ruta: 'cotizaciones', nombre: 'Cotizaciones' },
             { ruta: 'ordenes', nombre: 'Órdenes de Compra' },

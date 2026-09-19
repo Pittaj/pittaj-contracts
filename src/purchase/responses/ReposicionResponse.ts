@@ -7,7 +7,7 @@
  * siempre solo haya que pulsar.
  */
 
-import type { UrgenciaDeReposicion } from '../reposicion.js';
+import type { TraspasoPosible, UrgenciaDeReposicion, ViaDeReposicion } from '../reposicion.js';
 
 /** Un producto que hay que reponer, con todo lo que hace falta para decidir. */
 export interface ReposicionItemResponse {
@@ -38,6 +38,14 @@ export interface ReposicionItemResponse {
     readonly cantidadSugerida: number;
     /** La cuenta en palabras: de dónde salen los 36 y no los 40. */
     readonly explicacion: string;
+
+    /**
+     * Con qué se resuelve: traspaso desde otra bodega si alguna puede soltar la cantidad sin quedar
+     * ella bajo mínimo; si no, compra al proveedor habitual; `NONE` si no hay ni lo uno ni lo otro.
+     * Solo aplica con bodega elegida: sin bodega la existencia es la suma y no hay «otra».
+     */
+    readonly seResuelveCon: ViaDeReposicion;
+    readonly traspasoDesde: TraspasoPosible | null;
 }
 
 export interface GetReposicionResponse {
