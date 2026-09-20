@@ -63,6 +63,7 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
             { ruta: 'sesiones', nombre: 'Sesiones' },
             { ruta: 'tickets', nombre: 'Tickets' },
             { ruta: 'cierres', nombre: 'Cierres' },
+            { ruta: 'apartados', nombre: 'Apartados' },
             { ruta: 'clientes', nombre: 'Clientes' },
             { ruta: 'productos', nombre: 'Productos' },
             { ruta: 'categorias', nombre: 'Categorías' },
