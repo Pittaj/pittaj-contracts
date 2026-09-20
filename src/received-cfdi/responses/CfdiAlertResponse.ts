@@ -80,6 +80,25 @@ export interface CfdiAlertResponse {
     readonly reviewedBy: string | null;
     /** Qué pasó, en palabras de quien lo revisó. */
     readonly note: string | null;
+
+    // ── De qué comprobante o de qué emisor (2026-09-20) ──
+    //
+    // Se resuelven al LEER, no se guardan con el aviso: el aviso es un hecho («te cancelaron
+    // esto»), y el emisor, el folio y el total son del comprobante, que ya vive en el buzón.
+    // Duplicarlos en la fila del aviso sería una segunda copia que envejece. Nulos cuando el
+    // aviso no es de un comprobante ni de un emisor (el barrido), o si el comprobante ya no está.
+
+    /** Nombre del emisor: del comprobante (RECEIVED_CFDI) o del proveedor (SUPPLIER). */
+    readonly issuerName: string | null;
+    readonly issuerRfc: string | null;
+    /** Serie-folio del comprobante. Solo para avisos de un comprobante. */
+    readonly folioDisplay: string | null;
+    readonly issuedAt: string | null;
+    readonly total: number | null;
+    /** En qué se capturó («OC-0042»), si el aviso es de un comprobante capturado. */
+    readonly linkedDocumentNumber: string | null;
+    /** Solo para avisos de un emisor: cuántos comprobantes suyos hay en el buzón. */
+    readonly comprobantes: number | null;
 }
 
 export interface GetCfdiAlertsResponse {
