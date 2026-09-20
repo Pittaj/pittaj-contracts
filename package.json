@@ -285,6 +285,10 @@
       "types": "./src/suite/index.ts",
       "import": "./dist/suite/index.js"
     },
+    "./checkout": {
+      "types": "./src/checkout/index.ts",
+      "import": "./dist/checkout/index.js"
+    },
     "./seed": {
       "types": "./src/seed/index.ts",
       "import": "./dist/seed/index.js"
