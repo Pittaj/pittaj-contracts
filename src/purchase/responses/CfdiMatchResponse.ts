@@ -32,6 +32,12 @@ export interface CfdiMatchedConceptoResponse {
     readonly matchedBy: CfdiMatchSource;
     /** El concepto parece un cargo del documento (flete, maniobras). Sugerencia. */
     readonly suggestedDocumentCharge: boolean;
+    /** La sugerencia con porcentaje, cuando `matchedBy` es SUGGESTED (ver `CfdiMatchedConcepto`). */
+    readonly suggestedProductId?: string | null;
+    readonly suggestedProductName?: string | null;
+    readonly matchScore?: number | null;
+    readonly matchedAlias?: string | null;
+    readonly matchedAliasSupplierRfc?: string | null;
 }
 
 /** POST /api/purchases/cfdi-match. */
@@ -54,12 +60,18 @@ export interface CreatePurchaseFromCfdiResponse {
 
 /** Una equivalencia aprendida: concepto del proveedor → producto del catálogo. */
 export interface SupplierProductLinkResponse {
+    /** Id del enlace: es lo que se borra desde «Cómo te lo facturan». Opcional por compatibilidad. */
+    readonly id?: string;
     readonly conceptoKey: string;
     readonly productId: string;
     readonly description: string;
+    /** El proveedor, cuando se consulta por producto («Cómo te lo facturan»). */
+    readonly supplierRfc?: string;
+    readonly supplierName?: string | null;
+    readonly updatedAt?: string;
 }
 
-/** GET /api/purchases/supplier-links?rfc= */
+/** GET /api/purchases/supplier-links?rfc= · o ?productId= (los alias de un producto) */
 export interface SupplierProductLinksResponse {
     readonly items: readonly SupplierProductLinkResponse[];
 }

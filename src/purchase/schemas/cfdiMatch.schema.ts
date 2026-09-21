@@ -170,8 +170,13 @@ export const createPurchaseFromCfdiSchema = z
 export type CreatePurchaseFromCfdiRequest = z.infer<typeof createPurchaseFromCfdiSchema>;
 
 /** GET /api/purchases/supplier-links?rfc= — la memoria aprendida de un proveedor. */
-export const supplierProductLinksQuerySchema = z.object({
-    rfc: z.string().trim().min(1).max(20),
-});
+export const supplierProductLinksQuerySchema = z
+    .object({
+        /** La memoria de un proveedor (Emparejar). */
+        rfc: z.string().trim().min(1).max(20).optional(),
+        /** Los alias de un producto: «Cómo te lo facturan», en su ficha. */
+        productId: z.string().uuid().optional(),
+    })
+    .refine((q) => Boolean(q.rfc) || Boolean(q.productId), { message: 'Indica rfc o productId' });
 
 export type SupplierProductLinksQuery = z.infer<typeof supplierProductLinksQuerySchema>;

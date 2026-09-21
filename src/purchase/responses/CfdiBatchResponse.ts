@@ -53,6 +53,22 @@ export interface CfdiBatchResolvedConcepto {
     readonly matchedProductName: string | null;
     readonly isDocumentCharge: boolean;
     readonly createProduct: boolean;
+
+    // ── La sugerencia (2026-09-21): un candidato con porcentaje que la persona acepta ──
+    //
+    // Cuando `productId` es nulo pero hay `suggestedProductId`, la pantalla lo prellena y lo dice
+    // («Azucar Moreno · 91 % · se parece a como te lo factura Bimbo»). Aceptarlo mueve el id a
+    // `productId`; el lote no sigue con sugerencias sin aceptar.
+    readonly suggestedProductId?: string | null;
+    readonly suggestedProductName?: string | null;
+    /** Parecido 0–100. */
+    readonly matchScore?: number | null;
+    /** El alias por el que pegó, si fue por cómo te lo factura otro proveedor. */
+    readonly matchedAlias?: string | null;
+    readonly matchedAliasSupplierRfc?: string | null;
+    readonly matchedAliasSupplierName?: string | null;
+    /** BARCODE · NAME · ALIAS · LEARNED · SUGGESTED · NONE: para decir de dónde salió. */
+    readonly matchedBy?: import('../cfdiMatching.js').CfdiMatchSource;
 }
 
 /** Un comprobante del lote, ya evaluado. */
