@@ -40,6 +40,8 @@ export interface LayawayResponse {
     readonly folio: string;
     /** Cliente del apartado (null = sin cliente; soft ref). */
     readonly customerId: string | null;
+    /** Nombre del cliente en snapshot (null en apartados viejos o sin cliente). */
+    readonly customerName: string | null;
     /** Estado: OPEN | COMPLETED | CANCELLED | EXPIRED. */
     readonly status: LayawayStatusPrimitive;
     /** Importe total del apartado (suma de los renglones). */

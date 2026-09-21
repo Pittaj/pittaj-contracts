@@ -25,6 +25,8 @@ export const createLayawayLineSchema = z.object({
 export const createLayawaySchema = z.object({
     /** Cliente del apartado (opcional; soft ref). */
     customerId: z.string().optional(),
+    /** Nombre del cliente en snapshot, como lo eligió la caja (opcional). */
+    customerName: z.string().max(200).nullable().optional(),
     /** Sesión de caja para el anticipo (CASH_IN/DEPOSIT). */
     sessionId: z.string().min(1, 'La sesión de caja es obligatoria'),
     /** Moneda (default MXN). */
