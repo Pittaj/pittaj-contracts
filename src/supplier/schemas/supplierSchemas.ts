@@ -53,7 +53,12 @@ export const createSupplierSchema = z.object({
     /** UUID generado por el cliente (offline-first). */
     id: z.string().uuid(),
     name: z.string().min(LIMITS.MIN_NAME_LENGTH).max(LIMITS.MAX_NAME_LENGTH),
-    code: z.string().min(1).max(LIMITS.MAX_CODE_LENGTH),
+    /**
+     * Opcional desde 2026-09-21: sin código, la nube asigna el siguiente `PROV-NNNNN`, igual que
+     * el escritorio. Es lo que permite dar de alta al proveedor desde un CFDI con un clic (el
+     * emisor trae nombre y RFC, pero nadie va a inventar un código en medio de una conversión).
+     */
+    code: z.string().min(1).max(LIMITS.MAX_CODE_LENGTH).optional(),
     taxId: z.string().min(LIMITS.MIN_TAX_ID_LENGTH).max(LIMITS.MAX_TAX_ID_LENGTH).nullable().optional(),
     regimenFiscal: z.string().max(LIMITS.MAX_REGIMEN_FISCAL_LENGTH).nullable().optional(),
     email: z.string().email().max(LIMITS.MAX_EMAIL_LENGTH).nullable().optional(),
