@@ -63,6 +63,12 @@ export const verifyCredentialsSchema = z.object({
     clientHash: z.string().length(64, 'clientHash debe ser un hash hex de 64 caracteres'),
     /** Permiso requerido; si se envía, el usuario verificado debe poseerlo. */
     permission: z.string().max(120).optional(),
+    /**
+     * Acción a autorizar, como los permisos que pide (contracts/checkout `reglaDeAutorizacion`).
+     * Pasa quien tenga `*`, `checkout.supervisor` o todos ellos; la respuesta trae entonces un
+     * `vale` para mandar en `X-Pittaj-Vale` con la petición autorizada.
+     */
+    permissions: z.array(z.string().max(120)).min(1).max(10).optional(),
 });
 
 

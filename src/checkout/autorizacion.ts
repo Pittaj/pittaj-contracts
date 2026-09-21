@@ -39,6 +39,12 @@ export const CLAVE_UMBRAL_DE_DESCUENTO = 'checkout.discount-threshold-percent';
 /** Umbral cuando la clave no está, no es número o está fuera de 0–100. */
 export const UMBRAL_DE_DESCUENTO_POR_OMISION = 10;
 
+/**
+ * Encabezado en el que viaja el vale de autorización de un supervisor (lo devuelve
+ * `POST /api/auth/verify-credentials` con `permissions`). Solo en la petición autorizada.
+ */
+export const ENCABEZADO_DEL_VALE = 'X-Pittaj-Vale';
+
 /** El permiso que autoriza CUALQUIER acción sensible de otro cajero. */
 export const PERMISO_SUPERVISOR = 'checkout.supervisor';
 

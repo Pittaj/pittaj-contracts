@@ -10,4 +10,10 @@ export interface VerifyCredentialsResponse {
         readonly email: string;
         readonly displayName: string;
     };
+    /**
+     * Vale de autorización firmado (solo si se pidió con `permissions` y ok=true). Se manda en el
+     * encabezado `X-Pittaj-Vale` de la petición que el supervisor autorizó; vale tres minutos y
+     * no abre sesión.
+     */
+    readonly vale?: string;
 }
