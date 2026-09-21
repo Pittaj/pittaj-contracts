@@ -61,6 +61,13 @@ export const openPosSessionSchema = z.object({
         .min(LIMITS.MIN_OPENING_BALANCE)
         .max(LIMITS.MAX_OPENING_BALANCE),
     currency: currencyEnum.optional(),
+    /**
+     * Caja registradora en la que se abre el turno, y su nombre en snapshot (renombrarla no toca
+     * los turnos pasados). Opcional: hasta el 2026-09-20 la nube no lo modelaba y el escritorio
+     * lo guardaba solo en local. El escritorio lo manda con el turno; la web lo elige al abrir.
+     */
+    registerId: z.string().max(36).nullable().optional(),
+    registerName: z.string().max(100).nullable().optional(),
 });
 
 export const versionBodySchema = z.object({

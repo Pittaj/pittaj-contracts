@@ -18,6 +18,9 @@ export interface PosSessionResponse {
     readonly userId: string;
     /** Snapshot del nombre del operador (el Operator local del desktop no sincroniza). */
     readonly userName: string | null;
+    /** Caja registradora del turno (null en turnos viejos o abiertos sin caja). */
+    readonly registerId: string | null;
+    readonly registerName: string | null;
     /** Dispositivo de origen (anti-rebote: el feed lo expone como originDeviceId). */
     readonly deviceId?: string | null;
     readonly openingBalance: OpeningBalancePrimitives;
