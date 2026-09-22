@@ -30,6 +30,8 @@ export const correctPurchaseLineSchema = z
         moverCodigoDeBarras: z.boolean().optional().default(false),
         /** Corregir también las otras compras que arrastran el mismo error (ids de compra). */
         tambienEnCompras: z.array(z.string().uuid()).max(50).optional().default([]),
+        /** Nombre de quien corrige (snapshot para la marca del renglón, como `receivedBy`). */
+        userName: z.string().trim().max(120).nullish(),
     })
     .strict();
 
