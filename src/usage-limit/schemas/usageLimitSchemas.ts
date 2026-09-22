@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { STAMP_QUOTA_LIMITS } from '../primitives/index.js';
+import { STAMP_QUOTA_LIMITS, OPERATION_KINDS, OPERATION_PERIOD_REGEX } from '../primitives/index.js';
 
 /** Filtros del listado de uso por tenant (backoffice). */
 export const listTenantUsageSchema = z.object({
@@ -31,3 +31,27 @@ export const setStampQuotaSchema = z.object({
 });
 
 export type SetStampQuotaInput = z.infer<typeof setStampQuotaSchema>;
+
+/** Periodo a consultar; sin él, el mes en curso. */
+const operationPeriod = z
+    .string()
+    .trim()
+    .regex(OPERATION_PERIOD_REGEX, 'El periodo debe tener la forma AAAA-MM')
+    .optional();
+
+/** Resumen de operaciones de un mes. */
+export const operationUsageQuerySchema = z.object({
+    period: operationPeriod,
+});
+
+export type OperationUsageQuery = z.infer<typeof operationUsageQuerySchema>;
+
+/** Lista auditable de las operaciones de un mes, documento por documento. */
+export const listOperationsQuerySchema = z.object({
+    period: operationPeriod,
+    kind: z.enum(OPERATION_KINDS as [string, ...string[]]).optional(),
+    page: z.coerce.number().int().positive().default(1),
+    pageSize: z.coerce.number().int().positive().max(200).default(50),
+});
+
+export type ListOperationsQuery = z.infer<typeof listOperationsQuerySchema>;
