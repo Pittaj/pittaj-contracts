@@ -3,7 +3,7 @@
  * @module Contracts/UsageLimit/Responses
  */
 
-import type { StampQuotaSource } from '../primitives/index.js';
+import type { StampQuotaSource, OperationKind } from '../primitives/index.js';
 
 /** Renglón del listado de uso: consumo real + cobro estimado + cuota de timbres. */
 export type TenantUsageListItem = {
@@ -58,4 +58,39 @@ export type TenantStampQuotaResponse = {
     readonly includedStamps: number;
     readonly stampsQuotaSource: StampQuotaSource;
     readonly quotaNotes: string | null;
+};
+
+/** Operaciones de un tenant en un mes (mes calendario, hora de Ciudad de México). */
+export type OperationUsageResponse = {
+    /** `YYYY-MM`. */
+    readonly period: string;
+    /** Inicio del mes, ISO en UTC (inclusivo). */
+    readonly periodStart: string;
+    /** Inicio del mes siguiente, ISO en UTC (exclusivo). */
+    readonly periodEnd: string;
+    readonly total: number;
+    /** Solo los tipos con al menos una operación. */
+    readonly byKind: Readonly<Partial<Record<OperationKind, number>>>;
+};
+
+/** Una operación contada: lo que el cliente ve para auditar su cobro. */
+export type OperationListItem = {
+    readonly id: string;
+    readonly kind: OperationKind;
+    readonly documentId: string;
+    /** Folio legible del documento; null si no tiene. */
+    readonly reference: string | null;
+    /** Cuándo llegó a la nube (ISO). Lo del escritorio cuenta en el mes en que sube. */
+    readonly countedAt: string;
+};
+
+export type OperationListResponse = {
+    readonly period: string;
+    readonly items: readonly OperationListItem[];
+    readonly pagination: {
+        readonly page: number;
+        readonly pageSize: number;
+        readonly total: number;
+        readonly totalPages: number;
+    };
 };
