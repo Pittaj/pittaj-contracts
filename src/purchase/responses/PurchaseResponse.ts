@@ -11,6 +11,7 @@
  */
 
 import type { PurchaseLineOrigin } from '../purchaseLineOrigin.js';
+import type { PurchaseCfdiAdjustmentResponse } from './CfdiImportResponse.js';
 import type { PurchaseKindValue } from '../schemas/getPurchases.schema.js';
 
 /**
@@ -226,6 +227,12 @@ export interface PurchaseResponse {
 
     /** Historial de recepciones (entregas concretas, reversibles una a una). */
     readonly receptions: PurchaseReceptionResponse[];
+    /**
+     * Ajustes por redondeo contra su CFDI (2026-09-22), revertidos incluidos: se apagan, no se
+     * borran. Viajan anidados en el sync como las recepciones. Opcional para no romper a quien
+     * arma la respuesta sin cargarlos.
+     */
+    readonly cfdiAdjustments?: PurchaseCfdiAdjustmentResponse[];
 
     /** Versión para optimistic locking. */
     readonly version: number;
