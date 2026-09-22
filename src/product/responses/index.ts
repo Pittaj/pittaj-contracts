@@ -1,5 +1,6 @@
 export * from './CreateProductResponse.js';
 export * from './PaginatedProductsResult.js';
+export * from './MergeProductsResponse.js';
 export * from './ProductCursorResponse.js';
 export * from './ProductListResponse.js';
 export * from './ProductResponse.js';
