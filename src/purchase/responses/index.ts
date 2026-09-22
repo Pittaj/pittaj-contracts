@@ -8,6 +8,7 @@ export * from './PurchasesWithoutCfdiResponse.js';
 export * from './CfdiMatchResponse.js';
 export * from './CfdiBatchResponse.js';
 export * from './CfdiImportResponse.js';
+export * from './CorrectLineResponse.js';
 export * from './RecepcionesResponse.js';
 export * from './ReposicionResponse.js';
 export * from './PurchaseRequestResponse.js';
