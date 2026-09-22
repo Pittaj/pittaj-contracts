@@ -10,6 +10,7 @@
  * @module Contracts/Purchase
  */
 
+import type { PurchaseLineOrigin } from '../purchaseLineOrigin.js';
 import type { PurchaseKindValue } from '../schemas/getPurchases.schema.js';
 
 /**
@@ -90,6 +91,19 @@ export interface PurchaseLineResponse {
      * explica por qué el documento dejó de estar abierto sin llegar a 100 %.
      */
     readonly closed: boolean;
+
+    // --- Marca de procedencia (2026-09-22: todo lo automático se deshace) ---
+    /** De dónde salió el producto de este renglón. Nulo en renglones anteriores a la marca. */
+    readonly origin: PurchaseLineOrigin | null;
+    /**
+     * El dato que lo explica: el texto del alias que pegó, el código de barras, «84 %» de la
+     * sugerencia, el folio del CFDI del que se dio de alta. Libre, corto, para enseñar.
+     */
+    readonly originDetail: string | null;
+    /** Quién lo aceptó o lo eligió (nombre, snapshot). Nulo si lo hizo el sistema solo. */
+    readonly originUser: string | null;
+    /** Cuándo (ISO 8601). */
+    readonly originAt: string | null;
 }
 
 /** Una entrega concreta de la compra: fecha, remisión, bodega y quién recibió. */

@@ -25,6 +25,7 @@
  */
 
 import { z } from 'zod';
+import { PURCHASE_LINE_ORIGINS } from '../purchaseLineOrigin.js';
 import { PURCHASE_KINDS } from './getPurchases.schema.js';
 
 const ERROR_MESSAGES = {
@@ -103,6 +104,14 @@ export const cfdiResolvedConceptoSchema = cfdiConceptoSchema
         isDocumentCharge: z.boolean().optional().default(false),
         /** Dar de alta el producto con el margen del lote. Ignorado si ya hay `productId`. */
         createProduct: z.boolean().optional().default(false),
+        /**
+         * Cómo quedó resuelto (2026-09-22): lo que el motor devolvió en `matchedBy` si el usuario
+         * no lo tocó, `SUGGESTED` si aceptó la sugerencia, `MANUAL` si eligió otro. La nube lo
+         * guarda como marca del renglón; cargo y alta la ponen sola.
+         */
+        origin: z.enum(PURCHASE_LINE_ORIGINS).nullish(),
+        originDetail: z.string().trim().max(200).nullish(),
+        originUser: z.string().trim().max(120).nullish(),
     })
     .strict();
 

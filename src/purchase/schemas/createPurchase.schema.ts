@@ -28,6 +28,7 @@
  */
 
 import { z } from 'zod';
+import { PURCHASE_LINE_ORIGINS } from '../purchaseLineOrigin.js';
 import { PURCHASE_KINDS } from './getPurchases.schema.js';
 
 const ERROR_MESSAGES = {
@@ -103,6 +104,16 @@ export const purchaseLineInputSchema = z
          * ya comprueba en `receive()`.
          */
         isDocumentCharge: z.boolean().optional().default(false),
+
+        /**
+         * Marca de procedencia (2026-09-22). Quien captura a mano no la manda: la nube pone
+         * `MANUAL`. Convertir un CFDI sí la manda, porque es el único que sabe si el renglón
+         * salió de la memoria, del código de barras o de una sugerencia aceptada.
+         */
+        origin: z.enum(PURCHASE_LINE_ORIGINS).nullish(),
+        originDetail: z.string().trim().max(200).nullish(),
+        /** Nombre de quien lo aceptó o eligió (snapshot). */
+        originUser: z.string().trim().max(120).nullish(),
     })
     .strict();
 
