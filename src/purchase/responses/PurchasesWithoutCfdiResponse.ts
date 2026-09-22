@@ -4,12 +4,17 @@
  */
 
 import type { PurchaseResponse } from './PurchaseResponse.js';
+import type { PurchaseCfdiAdjustmentResponse } from './CfdiImportResponse.js';
 
 /** Resultado de conciliar un CFDI contra N compras. */
 export interface ReconcileCfdiResponse {
     readonly purchases: readonly PurchaseResponse[];
     /** Compra a la que quedó vinculado el comprobante (la de mayor importe). */
     readonly linkedPurchaseId: string;
+    /** CFDI − suma de las compras. */
+    readonly diferencia?: number;
+    /** El ajuste por redondeo, si se pidió `difference: 'REGISTRAR_AJUSTE'`. */
+    readonly adjustment?: PurchaseCfdiAdjustmentResponse | null;
 }
 
 /**

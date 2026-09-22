@@ -9,6 +9,7 @@ export * from './purchaseMath.js';
 export * from './purchaseState.js';
 export * from './cfdiMatching.js';
 export * from './purchaseLineOrigin.js';
+export * from './cfdiImport.js';
 export * from './cfdiComparison.js';
 export * from './reposicion.js';
 export * from './comprasAtencion.js';

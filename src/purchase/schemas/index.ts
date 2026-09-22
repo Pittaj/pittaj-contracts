@@ -9,6 +9,7 @@ export * from './receivePurchase.schema.js';
 export * from './reopenPurchase.schema.js';
 export * from './reverseReception.schema.js';
 export * from './reconcileCfdi.schema.js';
+export * from './cfdiImport.schema.js';
 export * from './cfdiMatch.schema.js';
 export * from './cfdiBatch.schema.js';
 export * from './recepciones.schema.js';
