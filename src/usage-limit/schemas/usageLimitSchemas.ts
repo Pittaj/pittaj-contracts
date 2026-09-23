@@ -50,6 +50,8 @@ export type OperationUsageQuery = z.infer<typeof operationUsageQuerySchema>;
 export const listOperationsQuerySchema = z.object({
     period: operationPeriod,
     kind: z.enum(OPERATION_KINDS as [string, ...string[]]).optional(),
+    /** Parte del folio (sin distinguir mayúsculas): «¿esta compra me contó?». */
+    search: z.string().trim().min(1).max(100).optional(),
     page: z.coerce.number().int().positive().default(1),
     pageSize: z.coerce.number().int().positive().max(200).default(50),
 });
