@@ -195,3 +195,25 @@ export interface CardSubscriptionResponse {
         readonly expYear: number;
     };
 }
+
+/**
+ * Lo que la pantalla necesita para la tarjeta del cobro por operaciones.
+ * `GET /api/billing/card-subscription`.
+ */
+export interface CardSubscriptionInfoResponse {
+    /**
+     * ¿Se cobra con Mercado Pago? Solo si la pasarela está configurada y el plan cobra por
+     * operaciones. Si es false, la tarjeta sigue en el flujo viejo (Stripe) hasta el retiro.
+     */
+    readonly available: boolean;
+    /** Llave pública para el SDK de Mercado Pago; null si no está disponible. */
+    readonly publicKey: string | null;
+    /** Estado de la suscripción en Mercado Pago; null si todavía no hay. */
+    readonly subscriptionStatus: string | null;
+    readonly card: {
+        readonly brand: string;
+        readonly last4: string;
+        readonly expMonth: number;
+        readonly expYear: number;
+    } | null;
+}
