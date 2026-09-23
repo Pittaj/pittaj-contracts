@@ -11,3 +11,4 @@ export type {
     SyncPushSupplierResponse,
 } from './SyncPushSupplierResponse.js';
 export type { SyncPullSupplierResponse } from './SyncPullSupplierResponse.js';
+export * from './MergeSuppliersResponse.js';

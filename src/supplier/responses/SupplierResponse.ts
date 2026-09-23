@@ -15,6 +15,12 @@ export interface SupplierResponse {
     readonly name: string;
     readonly code: string;
     readonly status: SupplierStatusValue;
+    /**
+     * Fusionado en otro proveedor: este era el repetido y aquel se quedó con todo.
+     *
+     * Viaja en el sync para que la otra plataforma haga su propio barrido.
+     */
+    readonly mergedIntoId: string | null;
     /** RFC/NIT del proveedor. */
     readonly taxId: string | null;
     /** Clave de régimen fiscal del SAT (para el CFDI de compra). */

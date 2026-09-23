@@ -4,3 +4,4 @@
  */
 
 export * from './supplierSchemas.js';
+export * from './mergeSuppliers.schema.js';
