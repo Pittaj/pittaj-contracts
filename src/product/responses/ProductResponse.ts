@@ -28,6 +28,13 @@ export interface ProductResponse {
     readonly code: string;
     readonly sku: string | null;
     readonly barcode: string | null;
+    /**
+     * Fusionado en otro producto: este era el repetido y aquel se quedó con todo.
+     *
+     * Viaja en el sync para que la otra plataforma haga su propio barrido: una marca sin barrido
+     * dejaría allí un producto inactivo con su historial intacto, que es peor que no sincronizar.
+     */
+    readonly mergedIntoId: string | null;
     readonly type: string;
     readonly status: string;
     readonly price: ProductPricePrimitives;
