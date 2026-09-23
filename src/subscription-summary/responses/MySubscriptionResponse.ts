@@ -106,6 +106,17 @@ export interface AvailablePlan {
     readonly oneTimeStamps: number;
     readonly capabilities: readonly string[];
     /**
+     * Operaciones incluidas al mes (modelo por operaciones, docs `producto/modelo-negocio.md`).
+     * null = el plan no mide operaciones (los tres niveles viejos).
+     */
+    readonly includedOperations: number | null;
+    /** $ por cada 1,000 operaciones extra. 0 si el plan no cobra excedente. */
+    readonly overagePricePerThousand: number;
+    /** Lo más que se cobra en un mes con plan + excedente; null = sin tope. */
+    readonly overageCap: number | null;
+    /** $ por timbre extra. */
+    readonly extraStampPrice: number;
+    /**
      * false = existe pero **todavía no se vende**.
      *
      * Se devuelve igual, en vez de esconderlo: el dueño tiene que poder ver a qué
