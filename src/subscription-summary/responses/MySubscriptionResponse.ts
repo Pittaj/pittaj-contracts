@@ -177,3 +177,21 @@ export interface PendingPlanChange {
     /** Cuándo entra (ISO 8601). Es el día 1 del mes siguiente al de la petición. */
     readonly effectiveFrom: string;
 }
+
+/** Resultado del alta (o cambio) de la tarjeta del cobro por operaciones. */
+export interface CardSubscriptionResponse {
+    /** `created` = alta nueva; `card_changed` = ya existía y cambió de tarjeta. */
+    readonly outcome: 'created' | 'card_changed';
+    /** Estado en Mercado Pago: pending · authorized · paused · cancelled. */
+    readonly subscriptionStatus: string;
+    /** Mensualidad que cobrará, MXN con IVA. */
+    readonly amount: number;
+    /** Próximo cobro (ISO); el primero es el próximo día 3. */
+    readonly nextChargeAt: string | null;
+    readonly card: {
+        readonly brand: string;
+        readonly last4: string;
+        readonly expMonth: number;
+        readonly expYear: number;
+    };
+}
