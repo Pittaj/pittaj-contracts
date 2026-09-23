@@ -244,6 +244,7 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
             { ruta: 'auditoria/accesos', nombre: 'Registro de Accesos' },
             { ruta: 'auditoria/instalaciones', nombre: 'Bitácora de Instalaciones' },
             { ruta: 'mi-suscripcion', nombre: 'Mi Suscripción' },
+            { ruta: 'operaciones', nombre: 'Operaciones del mes' },
             { ruta: 'planes', nombre: 'Planes' },
             { ruta: 'historial-facturacion', nombre: 'Historial' },
         ],
