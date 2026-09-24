@@ -114,6 +114,11 @@ export interface LocationResponse {
   readonly isDefault: boolean;
 
   /**
+   * Línea de negocio por omisión (null = ninguna).
+   */
+  readonly defaultBusinessLineId?: string | null;
+
+  /**
    * Indica si la ubicación está activa.
    */
   readonly isActive: boolean;

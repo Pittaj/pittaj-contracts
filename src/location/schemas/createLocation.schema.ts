@@ -14,6 +14,7 @@
  */
 
 import { z } from 'zod';
+import { businessLineRefSchema } from '../../business-line/schemas/createBusinessLine.schema.js';
 
 /**
  * Enum para los tipos de ubicaciones físicas.
@@ -253,6 +254,13 @@ export const CreateLocationSchema = z.object({
 
   /** Nombre de la caja que nace con la sucursal. Solo si `capabilities.hasPointOfSale`. */
   registerName: z.string().trim().min(1).max(50).nullish(),
+
+  /**
+   * Línea de negocio por omisión de lo que pasa en esta sucursal: el último eslabón antes de
+   * «Sin línea» (renglón → producto → categoría → sucursal). Sirve para lo que no trae producto
+   * —un gasto, el SaaS— y para las sucursales de un solo giro (el obrador → Panadería).
+   */
+  defaultBusinessLineId: businessLineRefSchema,
 });
 
 /**

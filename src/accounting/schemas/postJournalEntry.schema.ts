@@ -20,6 +20,8 @@ export const journalLineSchema = z
         debit: z.number().min(0).default(0),
         credit: z.number().min(0).default(0),
         locationId: z.string().max(36).nullable().optional(),
+        /** Línea de negocio: solo en cuentas de resultados; en balance se ignora. */
+        businessLineId: z.string().uuid().nullable().optional(),
     })
     .refine((l) => (l.debit > 0) !== (l.credit > 0), {
         message: 'Cada partida carga o abona, no las dos ni ninguna',
