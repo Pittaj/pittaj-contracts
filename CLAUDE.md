@@ -31,7 +31,7 @@ consumidor para que vea lo nuevo; si algo "no compila con lo que acabas de expor
 **Un contrato es de las dos plataformas, no de una.** Desde el 2026-08-26 manda
 `arquitectura/paridad-de-plataformas.md` (docs): el usuario hace lo mismo esté donde esté, y un
 tipo que solo sirve a una punta es trabajo a medias. Ninguna de las cuatro excepciones legítimas
-—e.firma/CSD, periféricos, identidad del dispositivo, operador local— se resuelve con un contrato
+—e.firma en modo local, periféricos, identidad del dispositivo, operador local— se resuelve con un contrato
 compartido, así que **en la práctica no hay tipo de este repo que sea «solo web» o «solo
 escritorio»**.
 
