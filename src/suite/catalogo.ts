@@ -144,6 +144,8 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
             { ruta: 'pagos/realizados', nombre: 'Pagos Realizados' },
             { ruta: 'pagos/antiguedad', nombre: 'Antigüedad de Saldos' },
             { ruta: 'proveedores', nombre: 'Proveedores' },
+            { ruta: 'productos', nombre: 'Productos' },
+            { ruta: 'categorias', nombre: 'Categorías' },
             { ruta: 'reportes/por-periodo', nombre: 'Compras por Período' },
             { ruta: 'reportes/por-proveedor', nombre: 'Por Proveedor' },
             { ruta: 'reportes/por-producto', nombre: 'Por Producto' },
