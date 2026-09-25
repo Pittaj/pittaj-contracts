@@ -54,6 +54,8 @@ export interface ProductResponse {
     readonly taxInfo: ProductTaxInfoPrimitives;
     readonly posConfig: ProductPosConfigPrimitives;
     readonly categoryId: string | null;
+    /** Línea de negocio propia (null = hereda la de la categoría). */
+    readonly businessLineId?: string | null;
     readonly tenantId: string;
     readonly createdAt: Date;
     readonly createdBy: string | null;

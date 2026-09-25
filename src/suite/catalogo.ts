@@ -236,6 +236,7 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
             { ruta: 'sucursales', nombre: 'Sucursales' },
             { ruta: 'dispositivos', nombre: 'Dispositivos' },
             { ruta: 'departamentos', nombre: 'Departamentos' },
+            { ruta: 'lineas-de-negocio', nombre: 'Líneas de negocio' },
             { ruta: 'configuracion/impuestos', nombre: 'Impuestos' },
             { ruta: 'configuracion/cfdi', nombre: 'CFDI' },
             { ruta: 'configuracion/monedas', nombre: 'Monedas' },

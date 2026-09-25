@@ -189,6 +189,8 @@ export interface JournalLineResponse {
     readonly credit: number;
     /** Sucursal como dimensión del asiento. */
     readonly locationId: string | null;
+    /** Línea de negocio (giro) como dimensión; null = «Sin línea» o cuenta de balance. */
+    readonly businessLineId?: string | null;
 }
 
 /** Referencia al CFDI que ampara la operación. Es la trazabilidad que pide el SAT. */

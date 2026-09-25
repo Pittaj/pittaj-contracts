@@ -10,6 +10,7 @@
  */
 
 import { z } from 'zod';
+import { businessLineRefSchema } from '../../business-line/schemas/createBusinessLine.schema.js';
 import { PRODUCT_CONSTANTS } from '../constants/index.js';
 
 
@@ -211,6 +212,8 @@ export const createProductSchema = z.object({
     taxInfo: productTaxInfoSchema.optional(),
     posConfig: productPosConfigSchema.optional(),
     categoryId: z.string().uuid().nullable().optional(),
+    /** Línea de negocio propia; gana a la de la categoría. */
+    businessLineId: businessLineRefSchema,
     deviceId: z.string().optional(),
 });
 
@@ -267,6 +270,8 @@ export const updateProductSchema = z.object({
     taxInfo: productTaxInfoSchema.partial().optional(),
     posConfig: productPosConfigSchema.partial().optional(),
     categoryId: z.string().uuid().nullable().optional(),
+    /** `undefined` = no cambia; `null` = quitarle la línea (hereda la de la categoría). */
+    businessLineId: businessLineRefSchema,
 });
 
 /**

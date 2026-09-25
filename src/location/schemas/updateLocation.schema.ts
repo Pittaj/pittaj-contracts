@@ -1,5 +1,6 @@
 /** @fileoverview Schema Zod para actualización de ubicación. */
 import { z } from 'zod';
+import { businessLineRefSchema } from '../../business-line/schemas/createBusinessLine.schema.js';
 
 export const updateLocationSchema = z.object({
   version: z.number().int().min(1),
@@ -26,6 +27,8 @@ export const updateLocationSchema = z.object({
     }).optional(),
   }).optional(),
   isDefault: z.boolean().optional(),
+  /** `undefined` = no cambia; `null` = quitarle la línea. */
+  defaultBusinessLineId: businessLineRefSchema,
 });
 
 export type UpdateLocationRequest = z.infer<typeof updateLocationSchema>;

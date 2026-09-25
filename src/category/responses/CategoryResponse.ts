@@ -35,6 +35,8 @@ export interface CategoryResponse {
     readonly status: string;
     readonly tenantId: string;
     readonly parentId: string | null;
+    /** Línea de negocio propia (null = sin línea). */
+    readonly businessLineId?: string | null;
     readonly displayOrder: number;
     readonly attributes: Record<string, any> | null;
     /** Color hex del botón POS (del desktop; null si no se capturó). */

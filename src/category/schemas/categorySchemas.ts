@@ -10,6 +10,7 @@
  */
 
 import { z } from 'zod';
+import { businessLineRefSchema } from '../../business-line/schemas/createBusinessLine.schema.js';
 
 // ============================================================
 // ENUMS compartidos
@@ -97,6 +98,8 @@ export const createCategorySchema = z.object({
         .nullable()
         .optional(),
     attributes: z.record(z.unknown()).optional(),
+    /** Línea de negocio de la categoría; la heredan sus productos sin línea propia. */
+    businessLineId: businessLineRefSchema,
     deviceId: z
         .string()
         .max(255, 'El deviceId no debe exceder 255 caracteres')
@@ -150,6 +153,8 @@ export const updateCategorySchema = z.object({
         .nullable()
         .optional(),
     attributes: z.record(z.unknown()).optional(),
+    /** `undefined` = no cambia; `null` = quitarle la línea. */
+    businessLineId: businessLineRefSchema,
 });
 
 /**
