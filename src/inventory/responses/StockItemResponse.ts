@@ -1,10 +1,11 @@
 /**
- * @fileoverview DTO de respuesta para StockItem (sync).
+ * @fileoverview DTO de respuesta para StockItem: la existencia de un producto en una bodega.
  *
- * Espejo del StockDto desktop (existencia ACTUAL de un producto en una bodega,
- * proyección del ledger). La nube es RELAY: NO recalcula el costo promedio ni las
- * existencias (eso ocurre en el desktop al postear movimientos); los valores viajan
- * tal cual (round-trip 1:1). Entidad PLANA (sin hijos).
+ * Es la PROYECCIÓN del kárdex (F2.1, 2026-09-26): la nube la recalcula con un trigger de
+ * `stock_movements` y el escritorio con su ledger, con la misma regla de costo promedio.
+ * **Ya no viaja por sync** (`stock-item` salió del feed): los tipos de sync de abajo se quedan
+ * porque el push lo sigue aceptando —y descartando— para que un escritorio anterior vacíe su
+ * cola. Solo lectura. Entidad PLANA (sin hijos).
  *
  * @module Contracts/Inventory
  */

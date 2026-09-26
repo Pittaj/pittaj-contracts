@@ -2,9 +2,9 @@
  * @fileoverview DTO de respuesta para StockMovement (sync).
  *
  * Espejo del StockMovementDto desktop (entrada del ledger de existencias,
- * APPEND-ONLY: un error se corrige con un movimiento inverso, no editando). La nube
- * es RELAY: guarda el movimiento tal cual (round-trip 1:1) sin recalcular
- * existencias. Entidad PLANA (sin hijos). La cantidad va en unidad base.
+ * APPEND-ONLY: un error se corrige con un movimiento inverso, no editando). Viaja en las
+ * dos direcciones tal cual (round-trip 1:1) y es LA VERDAD del inventario: cada punta
+ * deriva de él su existencia (F2.1). Entidad PLANA (sin hijos). Cantidad en unidad base.
  *
  * @module Contracts/Inventory
  */
