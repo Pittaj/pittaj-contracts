@@ -123,6 +123,11 @@ export type PublishImportJobRequest = z.infer<typeof publishImportJobSchema>;
 export const credentialImportedSchema = z
     .object({
         kmsKeyVersion: z.string().trim().min(1).max(400),
+        /**
+         * Cuándo se comprobó la pareja: el HSM firmó un reto y la firma verificó contra el `.cer`.
+         * Es una firma más y va a la bitácora (`VERIFICAR_PAREJA`).
+         */
+        pairVerifiedAt: z.string().datetime({ offset: true }),
     })
     .strict();
 export type CredentialImportedRequest = z.infer<typeof credentialImportedSchema>;
@@ -153,6 +158,8 @@ export const satSignatureEntrySchema = z
 
 export const reportClaimSchema = z
     .object({
+        /** La credencial que firmó este paso. Si se renovó a medio vuelo, no es la que reclamó. */
+        credentialId: z.string().uuid(),
         status: z.enum(['SOLICITADA', 'LISTA', 'DESCARGADA', 'SIN_RESPUESTA', 'RECHAZADA', 'AGOTADA', 'VENCIDA']),
         satRequestId: z.string().trim().max(64).optional(),
         /** El `CodEstatus` / `CodigoEstadoSolicitud` que dio el SAT. */
