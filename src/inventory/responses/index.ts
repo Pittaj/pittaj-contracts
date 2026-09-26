@@ -16,3 +16,4 @@ export * from './GetWarehousesResponse.js';
 export * from './GetStockItemsResponse.js';
 export * from './GetStockMovementsResponse.js';
 export * from './StockTransferResponse.js';
+export * from './StockAdjustmentResponse.js';

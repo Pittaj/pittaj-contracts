@@ -32,3 +32,9 @@ export const syncPullStockMovementSchema = syncPullRequestSchema;
 export const syncPushStockTransferSchema = syncPushRequestSchema;
 /** POST /api/stock-transfers/sync/pull — deriva del canónico src/sync */
 export const syncPullStockTransferSchema = syncPullRequestSchema;
+
+// ── StockAdjustment (ajustes y conteos físicos) ──────────────────────
+/** POST /api/stock-adjustments/sync/push — deriva del canónico src/sync */
+export const syncPushStockAdjustmentSchema = syncPushRequestSchema;
+/** POST /api/stock-adjustments/sync/pull — deriva del canónico src/sync */
+export const syncPullStockAdjustmentSchema = syncPullRequestSchema;

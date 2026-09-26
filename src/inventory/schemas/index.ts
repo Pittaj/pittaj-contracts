@@ -9,3 +9,4 @@ export * from './getWarehouses.schema.js';
 export * from './getStockItems.schema.js';
 export * from './getStockMovements.schema.js';
 export * from './stockTransfer.schema.js';
+export * from './stockAdjustment.schema.js';
