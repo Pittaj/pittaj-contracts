@@ -16,6 +16,7 @@
 
 import { z } from 'zod';
 import { ABC_CLASSES } from './countPlan.schema.js';
+import { CLOSED_PERIOD_POLICIES, CROSS_COMPANY_TRANSFER_POLICIES } from './inventoryAccounting.schema.js';
 
 export const INVENTORY_VALUATION_METHODS = ['AVERAGE'] as const;
 
@@ -83,6 +84,19 @@ export const inventorySettingsSchema = z.object({
         cutoffB: z.number().min(2).max(100).default(95),
         historyDays: z.number().int().min(30).max(730).default(180),
     }),
+    /**
+     * Contabilidad (1.19.0). Opcional para no romper a quien ya manda el documento sin ella.
+     * Las cuentas NO se eligen aquí: cada motivo va a su hueco y el hueco se mapea en
+     * Contabilidad › Cuentas del motor. Aquí solo lo que decide Inventario.
+     */
+    accounting: z
+        .object({
+            closedPeriodPolicy: z.enum(CLOSED_PERIOD_POLICIES).default('BLOCK'),
+            crossCompanyTransfers: z.enum(CROSS_COMPANY_TRANSFER_POLICIES).default('BLOCK'),
+            /** Bajas por robo, caducidad o daño que pasen de este valor piden soporte fiscal. 0 = nunca. */
+            requireEvidenceAboveValue: z.number().min(0).default(0),
+        })
+        .default({}),
     labels: z.object({
         defaultTemplateId: z.string().uuid().nullish(),
         /** Imprimir etiquetas al recibir una compra (propone la cantidad recibida). */

@@ -63,6 +63,11 @@ const warehouseBody = z.object({
     isDefault: z.boolean().optional().default(false),
     address: z.string().trim().max(300).nullish(),
     responsibleUserId: z.string().uuid().nullish(),
+    /**
+     * Cuenta de inventario de la bodega (1.19.0). Ausente = la del tipo
+     * (`WAREHOUSE_INVENTORY_SLOT`): producción usa materia prima; las demás, mercancía.
+     */
+    inventoryAccountSlot: z.enum(['INVENTORY', 'INVENTORY_RAW', 'INVENTORY_FINISHED']).nullish(),
     /** Reservado para ubicaciones (pasillo/anaquel). Hoy solo `false`. */
     usesBins: z.literal(false).optional().default(false),
 });

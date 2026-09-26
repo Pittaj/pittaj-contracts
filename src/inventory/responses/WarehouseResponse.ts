@@ -36,6 +36,9 @@ export interface WarehouseResponse {
     readonly countsInAvailable?: boolean;
     readonly address?: string | null;
     readonly responsibleUserId?: string | null;
+    /** Cuenta de inventario efectiva (propia o la del tipo) y la empresa, por su sucursal (1.19.0). */
+    readonly inventoryAccountSlot?: 'INVENTORY' | 'INVENTORY_RAW' | 'INVENTORY_FINISHED';
+    readonly companyId?: string | null;
     /** Reservado para ubicaciones (pasillo/anaquel); hoy siempre `false`. */
     readonly usesBins?: boolean;
 

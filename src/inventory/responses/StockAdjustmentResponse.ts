@@ -14,6 +14,11 @@ import type {
     StockCountScope,
 } from '../schemas/stockAdjustment.schema.js';
 import type { SyncPullResponse, SyncPushResponse } from '../../sync/index.js';
+import type {
+    InventoryPostingInfo,
+    InventoryPostingSlot,
+    WriteOffEvidenceInput,
+} from '../schemas/inventoryAccounting.schema.js';
 
 export interface StockAdjustmentLineResponse {
     readonly id: string;
@@ -78,6 +83,16 @@ export interface StockAdjustmentResponse {
     readonly countPlanId?: string | null;
     readonly assigneeUserId?: string | null;
     readonly assigneeName?: string | null;
+
+    /**
+     * Contabilidad (1.19.0, opcional). La fecha que llevan sus movimientos, el hueco de la
+     * contrapartida (derivado del tipo y el motivo con `huecoDeAjuste`), el soporte de la baja y
+     * su póliza.
+     */
+    readonly effectiveAt?: string | null;
+    readonly postingSlot?: InventoryPostingSlot;
+    readonly evidence?: readonly WriteOffEvidenceInput[];
+    readonly posting?: InventoryPostingInfo | null;
 
     /** Desde qué instalación nació (para que el feed no se lo devuelva a quien lo subió). */
     readonly deviceId: string | null;

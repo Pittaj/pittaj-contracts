@@ -85,6 +85,15 @@ export interface InventoryHomeResponse {
     /** Rotación anualizada (costo de venta / inventario promedio) y días de inventario. */
     readonly turnover: number | null;
     readonly daysOfInventory: number | null;
+    /**
+     * Contabilidad (1.19.0, opcional; ausente si la cuenta no lleva contabilidad en Pittaj):
+     * documentos sin póliza o en excepción, y la diferencia de la última conciliación.
+     */
+    readonly accounting?: {
+        readonly pendingPostings: number;
+        readonly exceptions: number;
+        readonly reconciliationDifference: number | null;
+    };
     /** Valor por bodega, para la franja. */
     readonly byWarehouse: readonly {
         readonly warehouseId: string;

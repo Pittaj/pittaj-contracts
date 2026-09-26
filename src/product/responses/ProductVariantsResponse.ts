@@ -4,6 +4,7 @@
  */
 
 import type { VariantAttributeInput } from '../schemas/productVariants.schema.js';
+import type { InventoryPostingInfo } from '../../inventory/schemas/inventoryAccounting.schema.js';
 
 export interface ProductVariantResponse {
     readonly id: string;
@@ -52,4 +53,33 @@ export interface ProductComponentsResponse {
     /** Cuántos kits se pueden armar con lo que hay (el componente que menos alcanza). */
     readonly buildable: number;
     readonly version: number;
+}
+
+/**
+ * Un armado (o desarmado) de kits: folio `K`, la salida de cada componente y la entrada del kit
+ * al costo sumado. Contabilidad lo postea como una orden de producción de un renglón: si la
+ * cuenta de los componentes y la del kit son la misma (lo normal en retail), no hay nada que
+ * asentar (`SKIPPED`).
+ */
+export interface KitAssemblyResponse {
+    readonly id: string;
+    /** `KW-00003`. */
+    readonly assemblyNumber: string;
+    readonly kitProductId: string;
+    readonly kitProductName: string;
+    readonly warehouseId: string;
+    readonly warehouseName: string;
+    /** Positivo = armado; negativo = desarmado. */
+    readonly quantity: number;
+    readonly unitCost: number;
+    readonly components: readonly {
+        readonly productId: string;
+        readonly productName: string;
+        readonly quantity: number;
+        readonly unitCost: number;
+    }[];
+    readonly effectiveAt: string;
+    readonly createdByName: string | null;
+    readonly posting: InventoryPostingInfo | null;
+    readonly createdAt: string;
 }

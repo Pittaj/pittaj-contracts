@@ -35,6 +35,7 @@
 
 import { z } from 'zod';
 import { incomingLotSchema, lotAllocationSchema, serialNumbersSchema } from './stockLot.schema.js';
+import { writeOffEvidenceSchema } from './inventoryAccounting.schema.js';
 
 export const STOCK_ADJUSTMENT_KINDS = ['ADJUSTMENT', 'COUNT'] as const;
 export type StockAdjustmentKind = (typeof STOCK_ADJUSTMENT_KINDS)[number];
@@ -193,6 +194,14 @@ export const createStockAdjustmentSchema = z.object({
     countPlanId: z.string().uuid().nullish(),
     /** A quién le toca contar. */
     assigneeUserId: z.string().uuid().nullish(),
+    /**
+     * Contabilidad (1.19.0). `effectiveAt`: la fecha en que ocurrió (el conteo del día 31 que se
+     * aplica el 2); sin ella, al aplicar. No puede ser futura ni caer en un periodo cerrado
+     * (`INVENTORY_PERIOD_CLOSED`, ver `inventoryAccounting.schema.ts`). `evidence`: el soporte
+     * fiscal de una baja (aviso de destrucción, acta, donación).
+     */
+    effectiveAt: z.coerce.date().nullish(),
+    evidence: z.array(writeOffEvidenceSchema).max(10).optional(),
 });
 
 /**
@@ -224,6 +233,9 @@ export const updateStockAdjustmentSchema = z.object({
 export const applyStockAdjustmentSchema = z.object({
     version: z.number().int().min(1),
     actorName: z.string().trim().max(200).nullish(),
+    /** Fecha efectiva (1.19.0); ver `createStockAdjustmentSchema.effectiveAt`. */
+    effectiveAt: z.coerce.date().nullish(),
+    evidence: z.array(writeOffEvidenceSchema).max(10).optional(),
 });
 
 /** POST /:id/cancel — solo en borrador. */

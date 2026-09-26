@@ -53,6 +53,8 @@ export const DOCUMENT_LETTERS = {
     STOCK_TRANSFER: 'T',
     /** Ajustes y conteos físicos, una serie para los dos (`AW-00001`, `AS1-00001`). */
     STOCK_ADJUSTMENT: 'A',
+    /** Armado y desarmado de kits (`KW-00001`, `KS1-00001`). Sus movimientos son `PRODUCTION`. */
+    KIT_ASSEMBLY: 'K',
 } as const;
 
 export type DocumentLetter = (typeof DOCUMENT_LETTERS)[keyof typeof DOCUMENT_LETTERS];

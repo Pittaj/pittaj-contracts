@@ -9,6 +9,8 @@
  * @module Contracts/Inventory
  */
 
+import type { StockAdjustmentReason } from '../schemas/stockAdjustment.schema.js';
+
 /** Dirección del movimiento: IN (entrada) | OUT (salida). */
 export type MovementDirection = 'IN' | 'OUT';
 
@@ -72,6 +74,11 @@ export interface StockMovementResponse {
      * corrido). Solo lo llena `GET /api/stock-movements?withBalance=true` con `productId`.
      */
     readonly balanceAfter?: number;
+    /**
+     * Contabilidad (1.19.0, opcional). El motivo del ajuste que lo escribió: Contabilidad lo lee
+     * para elegir la cuenta sin ir al documento. Nulo en todo lo que no es ajuste o conteo.
+     */
+    readonly reason?: StockAdjustmentReason | null;
 
     /** Versión para optimistic locking. */
     readonly version: number;

@@ -37,6 +37,12 @@ export const INVENTORY_REPORT_KINDS = [
     'REPLENISHMENT',
     /** Trazabilidad de un lote o una serie: de dónde vino y a dónde fue. */
     'TRACEABILITY',
+    /**
+     * Inventario contra contabilidad (1.19.0): el valor del kárdex por cuenta de inventario frente
+     * al saldo de esa cuenta en la balanza, con la diferencia explicada (movimientos sin póliza,
+     * excepciones, pólizas manuales a la cuenta).
+     */
+    'ACCOUNTING_RECONCILIATION',
 ] as const;
 export type InventoryReportKind = (typeof INVENTORY_REPORT_KINDS)[number];
 
@@ -52,6 +58,7 @@ export const INVENTORY_REPORT_LABELS: Readonly<Record<InventoryReportKind, strin
     COUNT_ACCURACY: 'Exactitud de conteos',
     REPLENISHMENT: 'Sugerido de reabasto',
     TRACEABILITY: 'Trazabilidad de lote o serie',
+    ACCOUNTING_RECONCILIATION: 'Inventario contra contabilidad',
 };
 
 export const REPORT_FORMATS = ['json', 'xlsx', 'csv', 'pdf'] as const;
@@ -148,6 +155,13 @@ export const traceabilityReportSchema = z
     })
     .refine((v) => v.lotId || v.serialNumber, { message: 'Di qué lote o qué serie rastrear.' });
 
+export const accountingReconciliationReportSchema = z.object({
+    /** Una empresa: la balanza es por contribuyente. */
+    companyId: z.string().uuid(),
+    asOf: z.coerce.date(),
+    format: z.enum(REPORT_FORMATS).optional().default('json'),
+});
+
 /** POST /api/inventory/reports/:kind — cada reporte con su esquema. */
 export const INVENTORY_REPORT_SCHEMAS = {
     STOCK_AT_DATE: stockAtDateReportSchema,
@@ -161,6 +175,7 @@ export const INVENTORY_REPORT_SCHEMAS = {
     COUNT_ACCURACY: countAccuracyReportSchema,
     REPLENISHMENT: replenishmentReportSchema,
     TRACEABILITY: traceabilityReportSchema,
+    ACCOUNTING_RECONCILIATION: accountingReconciliationReportSchema,
 } as const satisfies Record<InventoryReportKind, z.ZodTypeAny>;
 
 export type StockAtDateReportRequest = z.infer<typeof stockAtDateReportSchema>;
@@ -173,4 +188,5 @@ export type ShrinkageReportRequest = z.infer<typeof shrinkageReportSchema>;
 export type RotationAbcReportRequest = z.infer<typeof rotationAbcReportSchema>;
 export type CountAccuracyReportRequest = z.infer<typeof countAccuracyReportSchema>;
 export type ReplenishmentReportRequest = z.infer<typeof replenishmentReportSchema>;
+export type AccountingReconciliationReportRequest = z.infer<typeof accountingReconciliationReportSchema>;
 export type TraceabilityReportRequest = z.infer<typeof traceabilityReportSchema>;

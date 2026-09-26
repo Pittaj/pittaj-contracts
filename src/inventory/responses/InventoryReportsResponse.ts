@@ -155,3 +155,25 @@ export interface TraceabilityRow {
     readonly quantity: number;
     readonly balanceAfter: number;
 }
+
+/**
+ * ACCOUNTING_RECONCILIATION: una fila por cuenta de inventario. `difference` debe ser cero; si
+ * no, las columnas de la derecha dicen de dónde sale, y lo que no explican es `unexplained`.
+ */
+export interface AccountingReconciliationRow {
+    readonly slot: 'INVENTORY' | 'INVENTORY_RAW' | 'INVENTORY_FINISHED';
+    readonly ledgerAccountCode: string | null;
+    readonly ledgerAccountName: string | null;
+    /** Σ existencia × costo del kárdex en las bodegas que usan esta cuenta, a la fecha. */
+    readonly inventoryValue: number;
+    /** Saldo de la cuenta en la balanza a la fecha. */
+    readonly ledgerBalance: number;
+    readonly difference: number;
+    /** Movimientos posteables que todavía no pasan el barrido (valor). */
+    readonly pendingPostingValue: number;
+    /** Movimientos que cayeron en excepción (valor). */
+    readonly exceptionValue: number;
+    /** Pólizas capturadas a mano contra la cuenta (valor): el motor no las explica. */
+    readonly manualEntriesValue: number;
+    readonly unexplained: number;
+}
