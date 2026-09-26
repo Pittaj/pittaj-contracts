@@ -34,6 +34,26 @@ export interface StockItemResponse {
     /** Sucursal (scoping denormalizado; null = general; soft ref). */
     readonly locationId: string | null;
 
+    /**
+     * Lectura enriquecida (1.18.0, opcional): lo que la lista de Existencias necesita para no
+     * pedir tres cosas más. Nada de esto viaja por sync ni se guarda: se deriva al leer.
+     */
+    /** `onHand − reserved`: lo que se puede vender o prometer. */
+    readonly available?: number;
+    /** `onHand × averageCost`. */
+    readonly value?: number;
+    /** Nivel efectivo de la bodega (propio o heredado del producto). */
+    readonly minStock?: number;
+    readonly reorderPoint?: number;
+    readonly maxStock?: number;
+    readonly levelStatus?: 'NEGATIVE' | 'OUT' | 'LOW' | 'OK' | 'OVER';
+    /** Rastreo del producto y, si va por lote, la caducidad más próxima con saldo. */
+    readonly tracking?: 'NONE' | 'LOT' | 'SERIAL';
+    readonly nearestExpiry?: string | null;
+    readonly unit?: string | null;
+    readonly categoryName?: string | null;
+    readonly lastMovementAt?: string | null;
+
     /** Versión para optimistic locking. */
     readonly version: number;
     /** Fecha de creación (ISO 8601). */

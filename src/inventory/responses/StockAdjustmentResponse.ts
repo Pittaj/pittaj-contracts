@@ -11,6 +11,7 @@ import type {
     StockAdjustmentKind,
     StockAdjustmentReason,
     StockAdjustmentStatus,
+    StockCountScope,
 } from '../schemas/stockAdjustment.schema.js';
 import type { SyncPullResponse, SyncPushResponse } from '../../sync/index.js';
 
@@ -33,6 +34,12 @@ export interface StockAdjustmentLineResponse {
      * aplicado, el que de verdad se usó.
      */
     readonly unitCost: number | null;
+    /** Rastreo (1.18.0, opcional). */
+    readonly lotId?: string | null;
+    readonly lotNumber?: string | null;
+    readonly lots?: readonly { readonly lotId: string; readonly lotNumber: string; readonly quantity: number }[];
+    readonly serialNumbers?: readonly string[];
+    readonly note?: string | null;
 }
 
 export interface StockAdjustmentResponse {
@@ -64,6 +71,13 @@ export interface StockAdjustmentResponse {
     readonly pendingLines: number;
 
     readonly lines: readonly StockAdjustmentLineResponse[];
+
+    /** Conteo (1.18.0, opcional): ciego, alcance, plan de origen y a quién le toca. */
+    readonly blind?: boolean;
+    readonly scope?: StockCountScope | null;
+    readonly countPlanId?: string | null;
+    readonly assigneeUserId?: string | null;
+    readonly assigneeName?: string | null;
 
     /** Desde qué instalación nació (para que el feed no se lo devuelva a quien lo subió). */
     readonly deviceId: string | null;

@@ -21,6 +21,9 @@ export interface StockTransferLineResponse {
     readonly receivedQuantity: number | null;
     /** Costo promedio en origen al enviar: el traspaso no cambia el costo, solo el sitio. */
     readonly unitCost: number;
+    /** Rastreo (1.18.0, opcional): lotes y series que viajan. Recibir respeta los mismos. */
+    readonly lots?: readonly { readonly lotId: string; readonly lotNumber: string; readonly quantity: number; readonly receivedQuantity: number | null }[];
+    readonly serialNumbers?: readonly string[];
 }
 
 export interface StockTransferResponse {

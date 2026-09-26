@@ -9,6 +9,8 @@
  * @module Contracts/Inventory
  */
 
+import type { WarehouseType } from '../schemas/warehouse.schema.js';
+
 /** Estado de la bodega: ACTIVE | INACTIVE. */
 export type WarehouseStatus = 'ACTIVE' | 'INACTIVE';
 
@@ -24,6 +26,18 @@ export interface WarehouseResponse {
     /** Bodega predeterminada (el POS descuenta de ella). */
     readonly isDefault: boolean;
     readonly status: WarehouseStatus;
+
+    /**
+     * Tipo y reglas de venta (1.18.0). Opcionales mientras el escritorio no los mande: ausente =
+     * `STORE`, vende y cuenta en disponible, que es como se comportaban todas hasta hoy.
+     */
+    readonly type?: WarehouseType;
+    readonly allowsSale?: boolean;
+    readonly countsInAvailable?: boolean;
+    readonly address?: string | null;
+    readonly responsibleUserId?: string | null;
+    /** Reservado para ubicaciones (pasillo/anaquel); hoy siempre `false`. */
+    readonly usesBins?: boolean;
 
     /** Versión para optimistic locking. */
     readonly version: number;

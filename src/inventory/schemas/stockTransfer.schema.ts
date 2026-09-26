@@ -19,6 +19,7 @@
  */
 
 import { z } from 'zod';
+import { lotAllocationSchema, serialNumbersSchema } from './stockLot.schema.js';
 
 export const STOCK_TRANSFER_STATUSES = ['DRAFT', 'SENT', 'RECEIVED', 'CANCELLED'] as const;
 export type StockTransferStatus = (typeof STOCK_TRANSFER_STATUSES)[number];
@@ -35,6 +36,13 @@ const lineSchema = z
         productName: z.string().trim().min(1).max(200),
         productCode: z.string().trim().max(50).nullish(),
         quantity: z.number().positive('Traspasar cero no es traspasar'),
+        /**
+         * Producto por lote: de qué lotes sale (Σ = `quantity`). Ausente = los elige la política
+         * de la cuenta (FEFO/FIFO) al enviar. El lote viaja: entra en destino con el mismo id.
+         */
+        lots: z.array(lotAllocationSchema).max(50).optional(),
+        /** Producto por serie: cuáles piezas viajan. */
+        serialNumbers: serialNumbersSchema.optional(),
     })
     .strict();
 

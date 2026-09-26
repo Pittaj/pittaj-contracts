@@ -34,6 +34,7 @@
  */
 
 import { z } from 'zod';
+import { incomingLotSchema, lotAllocationSchema, serialNumbersSchema } from './stockLot.schema.js';
 
 export const STOCK_ADJUSTMENT_KINDS = ['ADJUSTMENT', 'COUNT'] as const;
 export type StockAdjustmentKind = (typeof STOCK_ADJUSTMENT_KINDS)[number];
@@ -129,10 +130,29 @@ const lineSchema = z
          * promedio vigente. Las salidas siempre salen al promedio.
          */
         unitCost: z.number().min(0).nullish(),
+        /**
+         * Rastreo (1.18.0). Producto por lote: una ENTRADA dice en qué lote(s) nace o se suma
+         * (`incomingLots`); una SALIDA, de cuáles sale (`lots`; ausente = FEFO/FIFO). En un conteo
+         * de producto por lote se cuenta **por lote**: un renglón por lote, con `lotId`.
+         */
+        lotId: z.string().uuid().nullish(),
+        lots: z.array(lotAllocationSchema).max(50).optional(),
+        incomingLots: z.array(incomingLotSchema).max(50).optional(),
+        serialNumbers: serialNumbersSchema.optional(),
+        /** Conteo: nota del renglón («caja abierta», «estaba en la otra bodega»). */
+        note: z.string().trim().max(300).nullish(),
     })
     .strict();
 
 export type StockAdjustmentLineInput = z.infer<typeof lineSchema>;
+
+/**
+ * Qué abarca un conteo (1.18.0). Decide qué renglones se precargan al crearlo: `FULL` todo lo
+ * de la bodega con existencia o nivel, `CATEGORY` lo de unas categorías, `PARTIAL` lo que se
+ * escanee o agregue a mano, `CYCLIC` lo que eligió un plan de conteo cíclico.
+ */
+export const STOCK_COUNT_SCOPES = ['FULL', 'CATEGORY', 'PARTIAL', 'CYCLIC'] as const;
+export type StockCountScope = (typeof STOCK_COUNT_SCOPES)[number];
 
 /** GET /api/stock-adjustments · /api/stock-counts */
 export const getStockAdjustmentsSchema = z.object({
@@ -162,6 +182,33 @@ export const createStockAdjustmentSchema = z.object({
     apply: z.boolean().optional().default(false),
     /** Quién lo hace, con nombre: el documento lo enseña y el token solo trae el id. */
     actorName: z.string().trim().max(200).nullish(),
+    /**
+     * Conteo (1.18.0). `blind`: quien cuenta no ve el teórico ni la diferencia hasta cerrar la
+     * captura — el que ve «deberían ser 12» cuenta 12. `scope` y `categoryIds` precargan
+     * renglones; `countPlanId` lo liga a su plan cíclico.
+     */
+    blind: z.boolean().optional(),
+    scope: z.enum(STOCK_COUNT_SCOPES).optional(),
+    categoryIds: z.array(z.string().uuid()).max(200).optional(),
+    countPlanId: z.string().uuid().nullish(),
+    /** A quién le toca contar. */
+    assigneeUserId: z.string().uuid().nullish(),
+});
+
+/**
+ * POST /api/stock-counts/:id/lines/scan — capturar un conteo pistola en mano: cada lectura suma
+ * al renglón del producto (o lo agrega si no estaba). Pensado para el escritorio y la web en
+ * móvil; es un atajo de `update`, no un canal aparte, y lleva la misma versión.
+ */
+export const scanStockCountLineSchema = z.object({
+    version: z.number().int().min(1),
+    /** Código de barras, código o código de una presentación (suma su factor). */
+    code: z.string().trim().min(1).max(80),
+    /** Cuántas se suman con esta lectura (por defecto 1; negativa para corregir). */
+    quantity: z.number().optional().default(1),
+    lotId: z.string().uuid().nullish(),
+    /** Id del renglón que se crea si el producto no estaba (identidad en origen). */
+    newLineId: z.string().uuid().optional(),
 });
 
 /** PUT /:id — solo en borrador. */
@@ -190,5 +237,6 @@ export const stockAdjustmentIdParamSchema = z.object({ id: z.string().uuid() });
 export type GetStockAdjustmentsQuery = z.infer<typeof getStockAdjustmentsSchema>;
 export type CreateStockAdjustmentRequest = z.infer<typeof createStockAdjustmentSchema>;
 export type UpdateStockAdjustmentRequest = z.infer<typeof updateStockAdjustmentSchema>;
+export type ScanStockCountLineRequest = z.infer<typeof scanStockCountLineSchema>;
 export type ApplyStockAdjustmentRequest = z.infer<typeof applyStockAdjustmentSchema>;
 export type CancelStockAdjustmentRequest = z.infer<typeof cancelStockAdjustmentSchema>;

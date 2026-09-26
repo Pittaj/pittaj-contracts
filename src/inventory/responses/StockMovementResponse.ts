@@ -59,6 +59,20 @@ export interface StockMovementResponse {
     /** Sucursal (scoping denormalizado; null = general; soft ref). */
     readonly locationId: string | null;
 
+    /**
+     * Rastreo (1.18.0, opcional hasta que las dos puntas lo escriban). Un movimiento nombra a lo
+     * sumo UN lote: una salida que toma de dos lotes se escribe como dos movimientos con el mismo
+     * `sourceDocId`. Las series van en el movimiento y su número es igual a `quantity`.
+     */
+    readonly lotId?: string | null;
+    readonly lotNumber?: string | null;
+    readonly serialNumbers?: readonly string[] | null;
+    /**
+     * Lectura: saldo de la pareja producto×bodega después de este movimiento (kárdex con saldo
+     * corrido). Solo lo llena `GET /api/stock-movements?withBalance=true` con `productId`.
+     */
+    readonly balanceAfter?: number;
+
     /** Versión para optimistic locking. */
     readonly version: number;
     /** Fecha de creación (ISO 8601). */
