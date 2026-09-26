@@ -119,3 +119,71 @@ export type UpsertStockLevelRequest = z.infer<typeof upsertStockLevelSchema>;
 export type BulkUpsertStockLevelsRequest = z.infer<typeof bulkUpsertStockLevelsSchema>;
 export type SuggestStockLevelsRequest = z.infer<typeof suggestStockLevelsSchema>;
 export type GetStockLevelsQuery = z.infer<typeof getStockLevelsSchema>;
+
+// ── Reglas compartidas (espejo exacto en el escritorio: `NivelDeExistencia.cs`) ─────────────────
+
+/** Los números de un nivel que usan las reglas. Todo en unidad base. */
+export interface NivelNumeros {
+    readonly minStock: number;
+    readonly reorderPoint: number;
+    readonly maxStock: number;
+}
+
+/**
+ * El estado de una existencia contra su nivel. Es lo que pinta la pastilla de Existencias y lo que
+ * alimenta la alerta de existencia baja.
+ *
+ * - `NEGATIVE` — bajo cero: se vendió sin existencia (un conteo o una captura la corrige).
+ * - `OUT` — en cero exacto.
+ * - `LOW` — por debajo del mínimo, **o** en/bajo el punto de reorden: ya toca pedir.
+ * - `OVER` — por encima del máximo (solo si hay máximo).
+ * - `OK` — lo demás, incluido «no tiene nivel».
+ */
+export function estadoDeNivel(
+    onHand: number,
+    nivel: NivelNumeros | null | undefined
+): 'NEGATIVE' | 'OUT' | 'LOW' | 'OK' | 'OVER' {
+    if (onHand < 0) return 'NEGATIVE';
+    if (onHand === 0) return 'OUT';
+    if (!nivel) return 'OK';
+    if (nivel.minStock > 0 && onHand < nivel.minStock) return 'LOW';
+    if (nivel.reorderPoint > 0 && onHand <= nivel.reorderPoint) return 'LOW';
+    if (nivel.maxStock > 0 && onHand > nivel.maxStock) return 'OVER';
+    return 'OK';
+}
+
+/** Parámetros de la sugerencia, con los mismos defaults que `suggestStockLevelsSchema`. */
+export interface ParametrosDeSugerencia {
+    readonly safetyDays: number;
+    readonly leadTimeDays: number;
+    readonly coverageDays: number;
+    /** Redondear a enteros (productos que no se venden en fracción). */
+    readonly enteros: boolean;
+}
+
+/**
+ * Propone un nivel a partir de la venta diaria promedio.
+ *
+ * - mínimo = venta diaria × días de colchón
+ * - reorden = venta diaria × (colchón + días de entrega): al cruzarlo, lo pedido llega antes de
+ *   tocar el mínimo
+ * - máximo = venta diaria × días de cobertura, y nunca por debajo del reorden
+ *
+ * Siempre hacia arriba (un mínimo de 2.1 piezas es 3). Sin venta, todo en cero: no se inventa
+ * un mínimo para lo que no se mueve.
+ */
+export function sugerirNivel(ventaDiaria: number, p: ParametrosDeSugerencia): NivelNumeros {
+    if (!(ventaDiaria > 0)) return { minStock: 0, reorderPoint: 0, maxStock: 0 };
+    const arriba = (x: number) => (p.enteros ? Math.ceil(x - 1e-9) : Math.ceil(x * 100 - 1e-9) / 100);
+    const minStock = arriba(ventaDiaria * p.safetyDays);
+    const reorderPoint = arriba(ventaDiaria * (p.safetyDays + p.leadTimeDays));
+    const maxStock = Math.max(reorderPoint, arriba(ventaDiaria * p.coverageDays));
+    return { minStock, reorderPoint, maxStock };
+}
+
+export const stockLevelIdParamSchema = z.object({ id: z.string().uuid() });
+
+/** DELETE /api/stock-levels/:id?version=N — la bodega vuelve a usar el nivel del producto. */
+export const deleteStockLevelQuerySchema = z.object({
+    version: z.coerce.number().int().min(1).optional(),
+});

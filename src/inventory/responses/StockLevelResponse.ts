@@ -41,8 +41,30 @@ export interface StockLevelSuggestionResponse {
     readonly suggested: { readonly minStock: number; readonly reorderPoint: number; readonly maxStock: number };
 }
 
+/**
+ * Un renglón de la hoja «Niveles de existencia»: un producto en una bodega, **tenga o no** nivel
+ * propio. Los que no lo tienen son justo los que hay que capturar, por eso la hoja se lista por
+ * producto y no por nivel.
+ */
+export interface StockLevelSheetRowResponse {
+    readonly productId: string;
+    readonly productName: string;
+    readonly productCode: string | null;
+    readonly warehouseId: string;
+    readonly warehouseName: string | null;
+    readonly onHand: number;
+    /** El nivel que manda: el propio de la bodega, o el del producto si no hay propio. */
+    readonly effective: { readonly minStock: number; readonly reorderPoint: number; readonly maxStock: number };
+    /** `WAREHOUSE`/`SUGGESTED` si es propio; `PRODUCT_DEFAULT` si hereda del producto. */
+    readonly effectiveSource: StockLevelSource;
+    /** `estadoDeNivel(onHand, effective)`. */
+    readonly status: 'NEGATIVE' | 'OUT' | 'LOW' | 'OK' | 'OVER';
+    /** El nivel propio, si lo hay (con id y versión para editarlo). */
+    readonly level: StockLevelResponse | null;
+}
+
 export interface GetStockLevelsResponse {
-    readonly items: readonly StockLevelResponse[];
+    readonly items: readonly StockLevelSheetRowResponse[];
     readonly total: number;
     readonly page: number;
     readonly limit: number;
