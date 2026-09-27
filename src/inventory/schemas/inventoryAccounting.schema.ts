@@ -176,4 +176,13 @@ export interface InventoryPostingInfo {
     readonly postedAt: string | null;
     /** Por qué quedó en excepción, en cristiano. */
     readonly detail: string | null;
+    /**
+     * (1.21.0) Contabilidad postea **una póliza por renglón** de un ajuste: cada movimiento es una
+     * decisión y así se contesta «¿por qué bajó el inventario?» sin abrir el almacén. Aquí va
+     * cuántas lleva; `journalEntryId` es la primera.
+     */
+    readonly entryCount?: number;
+    /** (1.21.0) Para abrir la póliza en Contabilidad: empresa y mes. */
+    readonly companyId?: string | null;
+    readonly fiscalPeriodId?: string | null;
 }
