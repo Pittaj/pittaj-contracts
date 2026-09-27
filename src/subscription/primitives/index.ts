@@ -45,6 +45,9 @@ export type SubscriptionSummaryPrimitives = {
     readonly planName: string | null;
     /** Mensualidad del tenant (MXN, IVA incluido). */
     readonly basePrice: number;
+    /** Precio especial acordado; null si paga el de su plan. */
+    readonly specialPrice: number | null;
+    readonly specialPriceNote: string | null;
     /** MRR = la mensualidad, solo si ACTIVE. */
     readonly mrr: number;
 };
