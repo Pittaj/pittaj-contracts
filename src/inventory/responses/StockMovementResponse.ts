@@ -2,12 +2,14 @@
  * @fileoverview DTO de respuesta para StockMovement (sync).
  *
  * Espejo del StockMovementDto desktop (entrada del ledger de existencias,
- * APPEND-ONLY: un error se corrige con un movimiento inverso, no editando). La nube
- * es RELAY: guarda el movimiento tal cual (round-trip 1:1) sin recalcular
- * existencias. Entidad PLANA (sin hijos). La cantidad va en unidad base.
+ * APPEND-ONLY: un error se corrige con un movimiento inverso, no editando). Viaja en las
+ * dos direcciones tal cual (round-trip 1:1) y es LA VERDAD del inventario: cada punta
+ * deriva de él su existencia (F2.1). Entidad PLANA (sin hijos). Cantidad en unidad base.
  *
  * @module Contracts/Inventory
  */
+
+import type { StockAdjustmentReason } from '../schemas/stockAdjustment.schema.js';
 
 /** Dirección del movimiento: IN (entrada) | OUT (salida). */
 export type MovementDirection = 'IN' | 'OUT';
@@ -58,6 +60,25 @@ export interface StockMovementResponse {
     readonly occurredAt: string;
     /** Sucursal (scoping denormalizado; null = general; soft ref). */
     readonly locationId: string | null;
+
+    /**
+     * Rastreo (1.18.0, opcional hasta que las dos puntas lo escriban). Un movimiento nombra a lo
+     * sumo UN lote: una salida que toma de dos lotes se escribe como dos movimientos con el mismo
+     * `sourceDocId`. Las series van en el movimiento y su número es igual a `quantity`.
+     */
+    readonly lotId?: string | null;
+    readonly lotNumber?: string | null;
+    readonly serialNumbers?: readonly string[] | null;
+    /**
+     * Lectura: saldo de la pareja producto×bodega después de este movimiento (kárdex con saldo
+     * corrido). Solo lo llena `GET /api/stock-movements?withBalance=true` con `productId`.
+     */
+    readonly balanceAfter?: number;
+    /**
+     * Contabilidad (1.19.0, opcional). El motivo del ajuste que lo escribió: Contabilidad lo lee
+     * para elegir la cuenta sin ir al documento. Nulo en todo lo que no es ajuste o conteo.
+     */
+    readonly reason?: StockAdjustmentReason | null;
 
     /** Versión para optimistic locking. */
     readonly version: number;

@@ -35,6 +35,12 @@ export interface ProductResponse {
      * dejaría allí un producto inactivo con su historial intacto, que es peor que no sincronizar.
      */
     readonly mergedIntoId: string | null;
+    /**
+     * Variante (1.18.0, opcional): el producto `VARIABLE` del que es una combinación, y sus
+     * valores (`{ Talla: 'M', Color: 'Negro' }`). Ver `productVariants.schema.ts`.
+     */
+    readonly parentProductId?: string | null;
+    readonly variantValues?: Readonly<Record<string, string>> | null;
     readonly type: string;
     readonly status: string;
     readonly price: ProductPricePrimitives;

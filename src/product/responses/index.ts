@@ -7,3 +7,4 @@ export * from './ProductResponse.js';
 export * from './SyncPullProductResponse.js';
 export * from './SyncPushProductResponse.js';
 export * from './UpdateProductResponse.js';
+export * from './ProductVariantsResponse.js';

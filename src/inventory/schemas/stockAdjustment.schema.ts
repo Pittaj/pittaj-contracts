@@ -1,0 +1,254 @@
+/**
+ * @fileoverview Ajustes y conteos físicos de inventario: el documento.
+ * @module Contracts/Inventory/Schemas/StockAdjustment
+ *
+ * ── Por qué un documento y no «poner la existencia en 8» ──
+ *
+ * El mandato de paridad (§4, `arquitectura/paridad-de-plataformas.md`): **ninguna operación
+ * escribe una cantidad; escribe un movimiento, y la cantidad se deriva**. Un ajuste es la lista de
+ * movimientos de cuadre con su motivo, y un conteo físico es lo mismo con la diferencia calculada.
+ * Así el conteo deja rastro en el kárdex en vez de pisar el dato, y dos plataformas pueden ajustar
+ * a la vez sin que la última borre lo que hizo la otra.
+ *
+ * ── Los dos tipos, un documento ──
+ *
+ * - `ADJUSTMENT` — ajuste: cada renglón dice **cuánto** entra (+) o sale (−), con un motivo para
+ *   todo el documento (merma, daño, carga inicial…).
+ * - `COUNT` — conteo físico: cada renglón dice **cuánto se contó**. Al capturarlo se fija el
+ *   teórico de ese momento (`expectedQuantity`) y la diferencia es `contado − teórico`.
+ *
+ * ⚠️ **La diferencia se fija al contar, no al aplicar.** Si se aplicara «llevar a lo contado»
+ * contra la existencia del momento de aplicar, una venta hecha entre contar y aplicar se perdería:
+ * el cuadre la pisaría. Guardada como delta, la venta se descuenta aparte y el cuadre también.
+ *
+ * ── Estados ──
+ *
+ * `DRAFT` (se arma o se cuenta, en una sesión o en varias) → `APPLIED` (escribió sus movimientos).
+ * `CANCELLED` solo desde borrador: uno aplicado ya está en el kárdex, y el kárdex no se edita — se
+ * corrige con otro ajuste.
+ *
+ * ── Folio ──
+ *
+ * Letra `A` (`DOCUMENT_LETTERS.STOCK_ADJUSTMENT`), una serie para los dos tipos: `AW-00001` en la
+ * web, `AS1-00001` en el escritorio de la sucursal S1 (ADR-018).
+ */
+
+import { z } from 'zod';
+import { incomingLotSchema, lotAllocationSchema, serialNumbersSchema } from './stockLot.schema.js';
+import { writeOffEvidenceSchema } from './inventoryAccounting.schema.js';
+
+export const STOCK_ADJUSTMENT_KINDS = ['ADJUSTMENT', 'COUNT'] as const;
+export type StockAdjustmentKind = (typeof STOCK_ADJUSTMENT_KINDS)[number];
+
+export const STOCK_ADJUSTMENT_STATUSES = ['DRAFT', 'APPLIED', 'CANCELLED'] as const;
+export type StockAdjustmentStatus = (typeof STOCK_ADJUSTMENT_STATUSES)[number];
+
+/**
+ * El motivo del ajuste. Decide el tipo de movimiento del kárdex (y con él la póliza, que ya lee
+ * `stock_movements` por tipo): ver {@link sourceTypeDeAjuste}.
+ */
+export const STOCK_ADJUSTMENT_REASONS = [
+    /** Merma: se echó a perder, se evaporó, se pesó de menos. */
+    'SHRINKAGE',
+    /** Dañado: roto, abierto, mojado. */
+    'DAMAGE',
+    /** Robo o faltante sin explicación. */
+    'THEFT',
+    /** Caducado. */
+    'EXPIRED',
+    /** Consumo interno: lo usó el negocio, no se vendió. */
+    'INTERNAL_USE',
+    /** Error de captura: corregir un movimiento mal hecho. */
+    'CORRECTION',
+    /** Inventario inicial: la carga de arranque. Su contrapartida es capital, no pérdida. */
+    'OPENING',
+    /** Diferencia de un conteo físico. Solo los documentos `COUNT`. */
+    'COUNT',
+    'OTHER',
+] as const;
+export type StockAdjustmentReason = (typeof STOCK_ADJUSTMENT_REASONS)[number];
+
+/** Nombre en cristiano de cada motivo, para la web y como referencia del escritorio. */
+export const STOCK_ADJUSTMENT_REASON_LABELS: Readonly<Record<StockAdjustmentReason, string>> = {
+    SHRINKAGE: 'Merma',
+    DAMAGE: 'Dañado',
+    THEFT: 'Robo o faltante',
+    EXPIRED: 'Caducado',
+    INTERNAL_USE: 'Consumo interno',
+    CORRECTION: 'Error de captura',
+    OPENING: 'Inventario inicial',
+    COUNT: 'Conteo físico',
+    OTHER: 'Otro',
+};
+
+/** Los motivos que se eligen en un ajuste (el de conteo lo pone el tipo `COUNT`). */
+export const ADJUSTMENT_REASONS_ELEGIBLES: readonly StockAdjustmentReason[] = STOCK_ADJUSTMENT_REASONS.filter(
+    (r) => r !== 'COUNT'
+);
+
+/** Motivos que son una pérdida: su salida se registra como `MERMA` para reportarla por separado. */
+const MOTIVOS_DE_PERDIDA: ReadonlySet<StockAdjustmentReason> = new Set([
+    'SHRINKAGE',
+    'DAMAGE',
+    'THEFT',
+    'EXPIRED',
+    'INTERNAL_USE',
+]);
+
+/**
+ * El tipo de movimiento que escribe un renglón. **Espejo exacto en el escritorio**
+ * (`StockAdjustment.TipoDeMovimiento`).
+ *
+ * - Conteo → `COUNT` («Diferencia de conteo» en la póliza).
+ * - Inventario inicial → `INITIAL` (contra capital de apertura, no contra resultados).
+ * - Una pérdida que SALE → `MERMA` (el reporte de merma por producto la cuenta aparte).
+ * - Todo lo demás → `ADJUSTMENT`.
+ */
+export function sourceTypeDeAjuste(
+    kind: StockAdjustmentKind,
+    reason: StockAdjustmentReason,
+    direction: 'IN' | 'OUT'
+): 'COUNT' | 'INITIAL' | 'MERMA' | 'ADJUSTMENT' {
+    if (kind === 'COUNT') return 'COUNT';
+    if (reason === 'OPENING') return 'INITIAL';
+    if (direction === 'OUT' && MOTIVOS_DE_PERDIDA.has(reason)) return 'MERMA';
+    return 'ADJUSTMENT';
+}
+
+const lineSchema = z
+    .object({
+        /** Id generado por el cliente: los renglones viajan por sync y necesitan identidad estable. */
+        id: z.string().uuid().optional(),
+        productId: z.string().uuid(),
+        productName: z.string().trim().min(1).max(200),
+        productCode: z.string().trim().max(50).nullish(),
+        /** Ajuste: cuánto entra (+) o sale (−). Ignorado en un conteo. */
+        quantity: z.number().optional(),
+        /** Conteo: lo que se contó. Nulo = todavía no se cuenta ese renglón. */
+        countedQuantity: z.number().min(0, 'No se cuentan piezas negativas').nullish(),
+        /**
+         * Costo unitario de una ENTRADA (típico: inventario inicial). Sin él, entra al costo
+         * promedio vigente. Las salidas siempre salen al promedio.
+         */
+        unitCost: z.number().min(0).nullish(),
+        /**
+         * Rastreo (1.18.0). Producto por lote: una ENTRADA dice en qué lote(s) nace o se suma
+         * (`incomingLots`); una SALIDA, de cuáles sale (`lots`; ausente = FEFO/FIFO). En un conteo
+         * de producto por lote se cuenta **por lote**: un renglón por lote, con `lotId`.
+         */
+        lotId: z.string().uuid().nullish(),
+        lots: z.array(lotAllocationSchema).max(50).optional(),
+        incomingLots: z.array(incomingLotSchema).max(50).optional(),
+        serialNumbers: serialNumbersSchema.optional(),
+        /** Conteo: nota del renglón («caja abierta», «estaba en la otra bodega»). */
+        note: z.string().trim().max(300).nullish(),
+    })
+    .strict();
+
+export type StockAdjustmentLineInput = z.infer<typeof lineSchema>;
+
+/**
+ * Qué abarca un conteo (1.18.0). Decide qué renglones se precargan al crearlo: `FULL` todo lo
+ * de la bodega con existencia o nivel, `CATEGORY` lo de unas categorías, `PARTIAL` lo que se
+ * escanee o agregue a mano, `CYCLIC` lo que eligió un plan de conteo cíclico.
+ */
+export const STOCK_COUNT_SCOPES = ['FULL', 'CATEGORY', 'PARTIAL', 'CYCLIC'] as const;
+export type StockCountScope = (typeof STOCK_COUNT_SCOPES)[number];
+
+/** GET /api/stock-adjustments · /api/stock-counts */
+export const getStockAdjustmentsSchema = z.object({
+    status: z.enum(STOCK_ADJUSTMENT_STATUSES).optional(),
+    warehouseId: z.string().uuid().optional(),
+    reason: z.enum(STOCK_ADJUSTMENT_REASONS).optional(),
+    dateFrom: z.coerce.date().optional(),
+    dateTo: z.coerce.date().optional(),
+    /** Folio o producto. */
+    search: z.string().trim().max(100).optional(),
+    includeCancelled: z.coerce.boolean().optional().default(false),
+    page: z.coerce.number().int().min(1).optional().default(1),
+    limit: z.coerce.number().int().min(1).max(200).optional().default(50),
+});
+
+/** POST /api/stock-adjustments · /api/stock-counts */
+export const createStockAdjustmentSchema = z.object({
+    /** Id generado por el cliente: identidad en origen, hace el POST reintentable. */
+    id: z.string().uuid('Id de ajuste inválido'),
+    warehouseId: z.string().uuid('Bodega inválida'),
+    /** En un conteo se ignora: el motivo es `COUNT`. */
+    reason: z.enum(STOCK_ADJUSTMENT_REASONS).optional().default('OTHER'),
+    note: z.string().trim().max(1000).nullish(),
+    /** Un conteo puede nacer vacío y llenarse después; un ajuste también se puede guardar a medias. */
+    lines: z.array(lineSchema).max(2000),
+    /** Aplicar de una vez (escribe los movimientos). */
+    apply: z.boolean().optional().default(false),
+    /** Quién lo hace, con nombre: el documento lo enseña y el token solo trae el id. */
+    actorName: z.string().trim().max(200).nullish(),
+    /**
+     * Conteo (1.18.0). `blind`: quien cuenta no ve el teórico ni la diferencia hasta cerrar la
+     * captura — el que ve «deberían ser 12» cuenta 12. `scope` y `categoryIds` precargan
+     * renglones; `countPlanId` lo liga a su plan cíclico.
+     */
+    blind: z.boolean().optional(),
+    scope: z.enum(STOCK_COUNT_SCOPES).optional(),
+    categoryIds: z.array(z.string().uuid()).max(200).optional(),
+    countPlanId: z.string().uuid().nullish(),
+    /** A quién le toca contar. */
+    assigneeUserId: z.string().uuid().nullish(),
+    /**
+     * Contabilidad (1.19.0). `effectiveAt`: la fecha en que ocurrió (el conteo del día 31 que se
+     * aplica el 2); sin ella, al aplicar. No puede ser futura ni caer en un periodo cerrado
+     * (`INVENTORY_PERIOD_CLOSED`, ver `inventoryAccounting.schema.ts`). `evidence`: el soporte
+     * fiscal de una baja (aviso de destrucción, acta, donación).
+     */
+    effectiveAt: z.coerce.date().nullish(),
+    evidence: z.array(writeOffEvidenceSchema).max(10).optional(),
+});
+
+/**
+ * POST /api/stock-counts/:id/lines/scan — capturar un conteo pistola en mano: cada lectura suma
+ * al renglón del producto (o lo agrega si no estaba). Pensado para el escritorio y la web en
+ * móvil; es un atajo de `update`, no un canal aparte, y lleva la misma versión.
+ */
+export const scanStockCountLineSchema = z.object({
+    version: z.number().int().min(1),
+    /** Código de barras, código o código de una presentación (suma su factor). */
+    code: z.string().trim().min(1).max(80),
+    /** Cuántas se suman con esta lectura (por defecto 1; negativa para corregir). */
+    quantity: z.number().optional().default(1),
+    lotId: z.string().uuid().nullish(),
+    /** Id del renglón que se crea si el producto no estaba (identidad en origen). */
+    newLineId: z.string().uuid().optional(),
+});
+
+/** PUT /:id — solo en borrador. */
+export const updateStockAdjustmentSchema = z.object({
+    warehouseId: z.string().uuid(),
+    reason: z.enum(STOCK_ADJUSTMENT_REASONS).optional(),
+    note: z.string().trim().max(1000).nullish(),
+    lines: z.array(lineSchema).max(2000),
+    version: z.number().int().min(1),
+});
+
+/** POST /:id/apply */
+export const applyStockAdjustmentSchema = z.object({
+    version: z.number().int().min(1),
+    actorName: z.string().trim().max(200).nullish(),
+    /** Fecha efectiva (1.19.0); ver `createStockAdjustmentSchema.effectiveAt`. */
+    effectiveAt: z.coerce.date().nullish(),
+    evidence: z.array(writeOffEvidenceSchema).max(10).optional(),
+});
+
+/** POST /:id/cancel — solo en borrador. */
+export const cancelStockAdjustmentSchema = z.object({
+    version: z.number().int().min(1),
+    reason: z.string().trim().min(1, 'Di por qué se cancela').max(1000),
+});
+
+export const stockAdjustmentIdParamSchema = z.object({ id: z.string().uuid() });
+
+export type GetStockAdjustmentsQuery = z.infer<typeof getStockAdjustmentsSchema>;
+export type CreateStockAdjustmentRequest = z.infer<typeof createStockAdjustmentSchema>;
+export type UpdateStockAdjustmentRequest = z.infer<typeof updateStockAdjustmentSchema>;
+export type ScanStockCountLineRequest = z.infer<typeof scanStockCountLineSchema>;
+export type ApplyStockAdjustmentRequest = z.infer<typeof applyStockAdjustmentSchema>;
+export type CancelStockAdjustmentRequest = z.infer<typeof cancelStockAdjustmentSchema>;

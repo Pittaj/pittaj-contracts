@@ -9,6 +9,7 @@
 
 import type { StockTransferOrigin, StockTransferStatus } from '../schemas/stockTransfer.schema.js';
 import type { SyncPullResponse, SyncPushResponse } from '../../sync/index.js';
+import type { InventoryPostingInfo, InventoryPostingSlot } from '../schemas/inventoryAccounting.schema.js';
 
 export interface StockTransferLineResponse {
     readonly id: string;
@@ -21,6 +22,9 @@ export interface StockTransferLineResponse {
     readonly receivedQuantity: number | null;
     /** Costo promedio en origen al enviar: el traspaso no cambia el costo, solo el sitio. */
     readonly unitCost: number;
+    /** Rastreo (1.18.0, opcional): lotes y series que viajan. Recibir respeta los mismos. */
+    readonly lots?: readonly { readonly lotId: string; readonly lotNumber: string; readonly quantity: number; readonly receivedQuantity: number | null }[];
+    readonly serialNumbers?: readonly string[];
 }
 
 export interface StockTransferResponse {
@@ -57,6 +61,18 @@ export interface StockTransferResponse {
     readonly missingQuantity: number;
 
     readonly lines: readonly StockTransferLineResponse[];
+
+    /**
+     * Contabilidad (1.19.0, opcional). Un traspaso dentro de la misma empresa y entre bodegas de
+     * la misma cuenta no tiene póliza (`posting.status = 'SKIPPED'`). Si las cuentas difieren
+     * (almacén → producción) es una reclasificación y sí se postea. Entre empresas distintas no
+     * existe: lo bloquea la política (`INVENTORY_CROSS_COMPANY_TRANSFER`).
+     */
+    readonly fromCompanyId?: string | null;
+    readonly toCompanyId?: string | null;
+    readonly fromInventorySlot?: InventoryPostingSlot;
+    readonly toInventorySlot?: InventoryPostingSlot;
+    readonly posting?: InventoryPostingInfo | null;
 
     /** Desde qué instalación nació (para que el feed no se lo devuelva a quien lo subió). */
     readonly deviceId: string | null;

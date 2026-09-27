@@ -43,6 +43,11 @@ const productInventoryConfigSchema = z.object({
     reorderPoint: z.number().min(0).default(0),
     unitOfMeasure: z.enum(['UNIT', 'KG', 'LT', 'MT', 'BOX', 'PACK']).default('UNIT'),
     valuationMethod: z.enum(['FIFO', 'AVERAGE', 'SPECIFIC']).default('AVERAGE'),
+    /** Rastreo (1.18.0). Ver `ProductInventoryConfigPrimitives`. */
+    tracking: z.enum(['NONE', 'LOT', 'SERIAL']).optional(),
+    requiresExpiry: z.boolean().optional(),
+    shelfLifeDays: z.number().int().min(1).max(3650).nullish(),
+    warrantyMonths: z.number().int().min(0).max(240).nullish(),
 });
 
 /**
