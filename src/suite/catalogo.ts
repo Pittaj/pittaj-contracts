@@ -199,6 +199,7 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
             { ruta: 'auxiliar', nombre: 'Auxiliar de cuenta' },
             { ruta: 'estado-resultados', nombre: 'Estado de resultados' },
             { ruta: 'balance-general', nombre: 'Balance general' },
+            { ruta: 'inventario', nombre: 'Inventario contra libro' },
             { ruta: 'iva', nombre: 'IVA del mes' },
             { ruta: 'diot', nombre: 'DIOT' },
             { ruta: 'anexo-24', nombre: 'Anexo 24 (SAT)' },

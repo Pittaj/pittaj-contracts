@@ -3,9 +3,9 @@
  * @module device
  *
  * Cada instalación desktop (deviceId GUID persistido) se registra en la nube
- * anclada a un tenant + sucursal. El registro habilita: inventario de la flota,
- * kill-switch (revocar un equipo robado/dado de baja) y, más adelante, el
- * cobro por caja. El heartbeat viaja implícito en el pull del feed de sync.
+ * anclada a un tenant + sucursal. El registro habilita: inventario de la flota y
+ * kill-switch (revocar un equipo robado/dado de baja). No cobra: se cobra por
+ * operaciones. El heartbeat viaja implícito en el pull del feed de sync.
  */
 import { z } from 'zod';
 

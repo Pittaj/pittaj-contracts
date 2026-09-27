@@ -66,6 +66,17 @@ export function hayCambio(antes: PlanTerms, despues: PlanTerms): boolean {
     );
 }
 
+/**
+ * La mensualidad de una cuenta: su precio especial si lo tiene («A la medida» o un acuerdo), si no,
+ * el del plan. Una sola regla para el cobro del día 3, «Mi suscripción», el MRR y el backoffice:
+ * si cada uno la armara por su lado, el cliente vería un precio y se le cobraría otro.
+ */
+export function mensualidadDeLaCuenta(precioDelPlan: number, precioEspecial: number | null | undefined): number {
+    return precioEspecial != null && Number.isFinite(precioEspecial) && precioEspecial >= 0
+        ? precioEspecial
+        : precioDelPlan;
+}
+
 /** «$1,234» o «$0.50»: sin centavos cuando no los hay. */
 export function pesosDelPlan(monto: number): string {
     const entero = Number.isInteger(Math.round(monto * 100) / 100);

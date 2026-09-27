@@ -31,15 +31,6 @@ export const invoiceIdParamSchema = z.object({
 
 export type InvoiceIdParam = z.infer<typeof invoiceIdParamSchema>;
 
-/** Generación de las facturas de un periodo mensual (YYYY-MM). */
-export const generateInvoicesSchema = z.object({
-    period: z
-        .string()
-        .regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'El periodo debe tener formato YYYY-MM'),
-});
-
-export type GenerateInvoicesInput = z.infer<typeof generateInvoicesSchema>;
-
 /** Cancelación de una factura. */
 export const cancelInvoiceSchema = z.object({
     reason: z

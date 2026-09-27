@@ -25,27 +25,18 @@ export type TenantUsageListItem = {
     /**
      * Lo que se cobraría el próximo día 3 si el mes cerrara hoy: plan + excedente de operaciones
      * con su tope, con la misma regla que la factura (sin timbres extra ni prorrateos). En prueba,
-     * solo el plan: el primer cobro no lleva excedente. 0 en beta; null si el plan no mide
-     * operaciones (entonces vale `estimatedMonthly`, del modelo por caja).
+     * solo el plan: el primer cobro no lleva excedente. 0 en beta. Si el plan no mide operaciones
+     * («A la medida»), la mensualidad.
      */
-    readonly estimatedCharge: number | null;
+    readonly estimatedCharge: number;
     /** Sucursales activas. Informativo: no cuestan. */
     readonly activeLocations: number;
     readonly activeUsers: number;
     readonly activeCompanies: number;
-    /** Cajas activas: lo único que mueve el cobro. */
+    /** Cajas activas. Informativo: no cuestan. */
     readonly activeDevices: number;
-    /** Cajas por encima de las incluidas en la mensualidad. */
-    readonly extraDevices: number;
-    /** Mensualidad vigente del tenant (MXN, IVA incluido). */
+    /** Mensualidad vigente del tenant (MXN, IVA incluido): el plan, o su precio especial. */
     readonly basePrice: number;
-    /** Precio de cada caja adicional al mes (MXN, IVA incluido). */
-    readonly pricePerExtraDevice: number;
-    /**
-     * basePrice + extraDevices × pricePerExtraDevice: el cobro del modelo por caja, que ya no se
-     * vende. Se queda por los planes viejos; para los del modelo por operaciones vale `estimatedCharge`.
-     */
-    readonly estimatedMonthly: number;
     readonly currency: 'MXN';
     /**
      * Timbres CFDI incluidos, con la misma precedencia con la que se timbra: override → prueba o
@@ -57,6 +48,22 @@ export type TenantUsageListItem = {
     readonly stampsUsed: number | null;
     /** Motivo del override; null si aplica el default. */
     readonly quotaNotes: string | null;
+    /**
+     * Uso intensivo: el plan que le saldría igual o más barato con lo que hace este mes (p. ej.
+     * Negocio en el tope de $499 → Crecimiento, $499 con 100,000 incluidas). null si su plan le
+     * conviene. Es para proponérselo, no se cambia solo.
+     */
+    readonly suggestedPlan: { readonly code: string; readonly name: string; readonly price: number } | null;
+    /**
+     * Otras cuentas que parecen del mismo dueño: mismo RFC en una empresa, o mismo correo (el de
+     * quien abrió la cuenta o el que paga en Mercado Pago). Para revisar pruebas encadenadas, no
+     * para bloquear: un contador lleva varias cuentas con todo derecho.
+     */
+    readonly sameOwnerAs: readonly {
+        readonly tenantId: string;
+        readonly tenantName: string;
+        readonly via: 'RFC' | 'CORREO';
+    }[];
 };
 
 export type TenantUsageListResponse = {
