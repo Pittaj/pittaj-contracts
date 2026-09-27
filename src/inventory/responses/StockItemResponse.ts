@@ -1,10 +1,11 @@
 /**
- * @fileoverview DTO de respuesta para StockItem (sync).
+ * @fileoverview DTO de respuesta para StockItem: la existencia de un producto en una bodega.
  *
- * Espejo del StockDto desktop (existencia ACTUAL de un producto en una bodega,
- * proyección del ledger). La nube es RELAY: NO recalcula el costo promedio ni las
- * existencias (eso ocurre en el desktop al postear movimientos); los valores viajan
- * tal cual (round-trip 1:1). Entidad PLANA (sin hijos).
+ * Es la PROYECCIÓN del kárdex (F2.1, 2026-09-26): la nube la recalcula con un trigger de
+ * `stock_movements` y el escritorio con su ledger, con la misma regla de costo promedio.
+ * **Ya no viaja por sync** (`stock-item` salió del feed): los tipos de sync de abajo se quedan
+ * porque el push lo sigue aceptando —y descartando— para que un escritorio anterior vacíe su
+ * cola. Solo lectura. Entidad PLANA (sin hijos).
  *
  * @module Contracts/Inventory
  */
@@ -32,6 +33,26 @@ export interface StockItemResponse {
     readonly averageCost: number;
     /** Sucursal (scoping denormalizado; null = general; soft ref). */
     readonly locationId: string | null;
+
+    /**
+     * Lectura enriquecida (1.18.0, opcional): lo que la lista de Existencias necesita para no
+     * pedir tres cosas más. Nada de esto viaja por sync ni se guarda: se deriva al leer.
+     */
+    /** `onHand − reserved`: lo que se puede vender o prometer. */
+    readonly available?: number;
+    /** `onHand × averageCost`. */
+    readonly value?: number;
+    /** Nivel efectivo de la bodega (propio o heredado del producto). */
+    readonly minStock?: number;
+    readonly reorderPoint?: number;
+    readonly maxStock?: number;
+    readonly levelStatus?: 'NEGATIVE' | 'OUT' | 'LOW' | 'OK' | 'OVER';
+    /** Rastreo del producto y, si va por lote, la caducidad más próxima con saldo. */
+    readonly tracking?: 'NONE' | 'LOT' | 'SERIAL';
+    readonly nearestExpiry?: string | null;
+    readonly unit?: string | null;
+    readonly categoryName?: string | null;
+    readonly lastMovementAt?: string | null;
 
     /** Versión para optimistic locking. */
     readonly version: number;
