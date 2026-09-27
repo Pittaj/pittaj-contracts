@@ -26,15 +26,6 @@ export type InvoiceDetailResponse = InvoicePrimitives & {
     readonly payments: readonly PaymentPrimitives[];
 };
 
-/** Resultado de generar las facturas de un periodo. */
-export type GenerateInvoicesResponse = {
-    readonly period: string;
-    /** Facturas creadas en esta corrida. */
-    readonly created: number;
-    /** Tenants que ya tenían factura del periodo (la generación es idempotente). */
-    readonly skipped: number;
-};
-
 /**
  * Un cobro de la cuenta autenticada, como lo ve «Mi suscripción → Cobros anteriores»
  * (`GET /api/billing/invoices`). Desglosado igual que la factura, para contestar «¿por qué me

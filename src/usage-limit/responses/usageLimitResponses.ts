@@ -48,6 +48,22 @@ export type TenantUsageListItem = {
     readonly stampsUsed: number | null;
     /** Motivo del override; null si aplica el default. */
     readonly quotaNotes: string | null;
+    /**
+     * Uso intensivo: el plan que le saldría igual o más barato con lo que hace este mes (p. ej.
+     * Negocio en el tope de $499 → Crecimiento, $499 con 100,000 incluidas). null si su plan le
+     * conviene. Es para proponérselo, no se cambia solo.
+     */
+    readonly suggestedPlan: { readonly code: string; readonly name: string; readonly price: number } | null;
+    /**
+     * Otras cuentas que parecen del mismo dueño: mismo RFC en una empresa, o mismo correo (el de
+     * quien abrió la cuenta o el que paga en Mercado Pago). Para revisar pruebas encadenadas, no
+     * para bloquear: un contador lleva varias cuentas con todo derecho.
+     */
+    readonly sameOwnerAs: readonly {
+        readonly tenantId: string;
+        readonly tenantName: string;
+        readonly via: 'RFC' | 'CORREO';
+    }[];
 };
 
 export type TenantUsageListResponse = {

@@ -58,11 +58,17 @@ export type InvoicePrimitives = {
     readonly baseAmount: number;
     /** Prorrateos de subidas a mitad de mes que entran en esta factura. */
     readonly prorationAmount: number;
+    /** Operaciones por encima de las incluidas en el mes que cerró, y su importe (con el tope ya aplicado). */
+    readonly overageOperations: number;
+    readonly overageAmount: number;
+    /** Timbres por encima de los incluidos en el mes que cerró, y su importe. */
+    readonly extraStamps: number;
+    readonly extraStampsAmount: number;
     /** Descuento por cupón aplicado (0 si no hay). */
     readonly discountAmount: number;
     /** Código del cupón aplicado (snapshot), null si no hay. */
     readonly couponCode: string | null;
-    /** Importe a cobrar: (base + prorrateo) − descuento. */
+    /** Importe a cobrar: (base + prorrateo + excedente + timbres extra) − descuento. */
     readonly amount: number;
     /** Suma de los pagos no reembolsados. */
     readonly paidAmount: number;
