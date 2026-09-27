@@ -1,15 +1,14 @@
 /**
  * @fileoverview DTO de "Mi Suscripción" para el tenant autenticado.
  *
- * Modelo de negocio: precio único con COBRO POR CAJA — sin planes por niveles
- * y sin cobro por sucursal. La mensualidad (setting billing.base-price, $399
- * MXN IVA incluido) cubre 3 cajas en TODA la cuenta, y de ahí en adelante se
- * cobra por caja. Abrir sucursales no cuesta.
- *
- * Incluye 100 timbres CFDI/mes POR CUENTA (no por sucursal), extras por paquete.
+ * Modelo de negocio vigente (docs `producto/modelo-negocio.md`): se cobra por OPERACIONES al mes,
+ * con timbres CFDI incluidos por plan, y Mercado Pago cobra el día 3. Los campos de cajas
+ * (`includedDevices`, `extraDevices`, `pricePerExtraDevice`) son del modelo por caja que ya no se
+ * vende; siguen aquí por los planes viejos.
  *
  * @module Contracts/SubscriptionSummary
  */
+import type { ScheduledPlanTerms } from '../../plan/cambios.js';
 
 /** Estados de la suscripción (espejo del dominio backend). */
 export const MY_SUBSCRIPTION_STATUSES = [
@@ -133,6 +132,11 @@ export interface AvailablePlan {
      * devoluciones de la gente que menos conviene perder.
      */
     readonly beta: boolean;
+    /**
+     * Cambio de precio o de lo incluido ya programado para un día 1 (backoffice). La pantalla de
+     * Planes lo dice desde que se programa, para que nadie se entere en el cobro. null si no hay.
+     */
+    readonly scheduledChange?: ScheduledPlanTerms | null;
 }
 
 /** Respuesta de GET /api/subscriptions/me. */
@@ -168,6 +172,48 @@ export interface MySubscriptionResponse {
      * que cualquiera.
      */
     readonly betaSince: string | null;
+    /**
+     * Lo que el próximo cobro lleva **además** del plan y del excedente de operaciones: los timbres
+     * extra y los cargos ya anotados (la diferencia de una subida a mitad de mes).
+     *
+     * Sin esto, la pantalla sumaba plan + operaciones y el cargo real traía algo más: el primer
+     * cobro después de la prueba incluye todos los timbres extra aceptados, y el de después de una
+     * subida incluye el prorrateo. Un total que no cuadra con el banco es la forma más rápida de
+     * perder la confianza del cliente.
+     */
+    readonly nextChargeExtras: NextChargeExtras;
+}
+
+/** Cargos del próximo cobro que no son el plan ni el excedente de operaciones. */
+export interface NextChargeExtras {
+    readonly extraStamps: NextChargeExtraStamps;
+    /** Cargos anotados que todavía no entran en una factura, en el orden en que se anotaron. */
+    readonly pendingCharges: readonly NextChargePendingCharge[];
+}
+
+/**
+ * Timbres extra ($ c/u del plan) que entran en el próximo cobro.
+ *
+ * En el primer cobro son **todos** los de la prueba o la beta; después, los del mes que cierra
+ * antes del día 3. `count` 0 = ninguno (el renglón no se pinta).
+ */
+export interface NextChargeExtraStamps {
+    readonly count: number;
+    /** MXN por timbre, IVA incluido (`plans.extra_stamp_price`). */
+    readonly unitPrice: number;
+    /** count × unitPrice, redondeado a centavos: lo mismo que pone la factura. */
+    readonly amount: number;
+    /** Cuándo aceptó la cuenta que se cobraran (ISO); null si nunca hizo falta aceptar. */
+    readonly acceptedAt: string | null;
+    /** Quién lo aceptó, «Nombre Apellido»; null si no se sabe. */
+    readonly acceptedByName: string | null;
+}
+
+export interface NextChargePendingCharge {
+    /** El texto que irá en la factura, p. ej. «Diferencia por subir a Crecimiento (8 días)». */
+    readonly description: string;
+    /** MXN, IVA incluido. */
+    readonly amount: number;
 }
 
 /** Una bajada de nivel programada para el inicio del siguiente periodo. */
@@ -203,7 +249,7 @@ export interface CardSubscriptionResponse {
 export interface CardSubscriptionInfoResponse {
     /**
      * ¿Se cobra con Mercado Pago? Solo si la pasarela está configurada y el plan cobra por
-     * operaciones. Si es false, la tarjeta sigue en el flujo viejo (Stripe) hasta el retiro.
+     * operaciones. Si es false, no hay tarjeta que capturar y la pantalla no la muestra.
      */
     readonly available: boolean;
     /** Llave pública para el SDK de Mercado Pago; null si no está disponible. */

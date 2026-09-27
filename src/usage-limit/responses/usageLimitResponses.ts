@@ -13,6 +13,22 @@ export type TenantUsageListItem = {
     readonly tenantCode: string;
     /** Estado de la suscripción; null si el tenant aún no tiene fila. */
     readonly subscriptionStatus: string | null;
+    /** Plan contratado; null si el tenant no tiene suscripción. */
+    readonly planCode: string | null;
+    readonly planName: string | null;
+    /** En el programa beta: no se le cobra mientras dure. */
+    readonly isBeta: boolean;
+    /** Operaciones del mes en curso (hora de Ciudad de México). */
+    readonly operationsUsed: number;
+    /** Operaciones que incluye el plan; null si el plan no mide operaciones. */
+    readonly includedOperations: number | null;
+    /**
+     * Lo que se cobraría el próximo día 3 si el mes cerrara hoy: plan + excedente de operaciones
+     * con su tope, con la misma regla que la factura (sin timbres extra ni prorrateos). En prueba,
+     * solo el plan: el primer cobro no lleva excedente. 0 en beta; null si el plan no mide
+     * operaciones (entonces vale `estimatedMonthly`, del modelo por caja).
+     */
+    readonly estimatedCharge: number | null;
     /** Sucursales activas. Informativo: no cuestan. */
     readonly activeLocations: number;
     readonly activeUsers: number;
@@ -25,16 +41,19 @@ export type TenantUsageListItem = {
     readonly basePrice: number;
     /** Precio de cada caja adicional al mes (MXN, IVA incluido). */
     readonly pricePerExtraDevice: number;
-    /** basePrice + extraDevices × pricePerExtraDevice. */
+    /**
+     * basePrice + extraDevices × pricePerExtraDevice: el cobro del modelo por caja, que ya no se
+     * vende. Se queda por los planes viejos; para los del modelo por operaciones vale `estimatedCharge`.
+     */
     readonly estimatedMonthly: number;
     readonly currency: 'MXN';
-    /** Timbres CFDI incluidos al mes (override del tenant o default de plataforma). */
+    /**
+     * Timbres CFDI incluidos, con la misma precedencia con la que se timbra: override → prueba o
+     * beta (25 en total) → plan → default de plataforma. Ver `stampsQuotaSource`.
+     */
     readonly includedStamps: number;
     readonly stampsQuotaSource: StampQuotaSource;
-    /**
-     * Timbres consumidos en el periodo. Hoy SIEMPRE null: el timbrado ocurre en
-     * TPV/desktop y todavía no reporta a la nube. Se llenará cuando lo haga.
-     */
+    /** Timbres consumidos este mes; con fuente TRIAL, desde que empezó la prueba o la beta. */
     readonly stampsUsed: number | null;
     /** Motivo del override; null si aplica el default. */
     readonly quotaNotes: string | null;
