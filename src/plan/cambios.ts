@@ -219,6 +219,18 @@ export interface ScheduledPlanTerms {
     readonly costsMore: boolean;
 }
 
+/**
+ * Un plan del catálogo público: `GET /api/plans`, sin sesión. La landing lo lee al construir, así
+ * que un cambio programado en el backoffice llega al sitio en la siguiente publicación.
+ */
+export interface PublicPlanItem {
+    readonly code: string;
+    readonly name: string;
+    readonly description: string | null;
+    readonly terms: PlanTerms;
+    readonly scheduledChange: ScheduledPlanTerms | null;
+}
+
 // ── Paquetes de timbres ────────────────────────────────────────────────────────
 
 export type StampPackageStatus = 'ON_SALE' | 'RETIRED';
