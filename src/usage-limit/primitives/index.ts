@@ -42,6 +42,13 @@ export const STAMP_QUOTA_SOURCE = {
     DEFAULT: 'DEFAULT',
     /** El tenant tiene una cuota propia asignada desde el backoffice. */
     OVERRIDE: 'OVERRIDE',
+    /** Los timbres al mes de su plan (`plans.monthly_stamps`). */
+    PLAN: 'PLAN',
+    /**
+     * Prueba o beta: 25 en TODO el periodo, no por mes. Con esta fuente, `includedStamps` es el
+     * total (25) y `stampsUsed` lo usado desde que empezó, no solo este mes.
+     */
+    TRIAL: 'TRIAL',
 } as const;
 
 export type StampQuotaSource = (typeof STAMP_QUOTA_SOURCE)[keyof typeof STAMP_QUOTA_SOURCE];

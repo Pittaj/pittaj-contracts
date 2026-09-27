@@ -201,11 +201,20 @@ export type TenantContextUsage = {
     readonly activeLocations: number;
     readonly activeUsers: number;
     readonly activeCompanies: number;
+    /** Lo que se cobraría el próximo día 3 (plan + operaciones extra); en planes viejos, por caja. */
     readonly estimatedMonthly: number;
     readonly currency: string;
+    /** Plan contratado; null sin suscripción. */
+    readonly planName: string | null;
+    readonly isBeta: boolean;
+    /** Operaciones del mes en curso y las que incluye el plan (null = el plan no las mide). */
+    readonly operationsUsed: number;
+    readonly includedOperations: number | null;
     readonly includedStamps: number;
-    /** Timbres usados; null mientras el TPV no reporte a la nube. */
+    /** Timbres usados este mes; en prueba o beta, desde que empezó (contra 25). */
     readonly stampsUsed: number | null;
+    /** De dónde salen los incluidos: OVERRIDE · TRIAL · PLAN · DEFAULT. */
+    readonly stampsQuotaSource: string;
 };
 
 /** Cobranza pendiente del tenant. */
