@@ -1,7 +1,6 @@
 /**
- * Modelo de negocio (2026-07): PRECIO ÚNICO POR SUCURSAL — sin planes por niveles.
- * La suscripción lleva estado del ciclo de vida + facturación estimada
- * (sucursales activas × precio por sucursal). Ya no hay planId/planName.
+ * Las suscripciones de todos los tenants, para el backoffice (modelo por operaciones). El MRR es el
+ * precio del plan de las cuentas activas; el excedente del mes vive en Uso por tenant.
  */
 
 export type SubscriptionStatus =
@@ -22,11 +21,11 @@ export type SubscriptionPrimitives = {
     readonly currentPeriodEnd: string | null;
     /** Sucursales activas del tenant. Informativo: no cuestan. */
     readonly activeLocations: number;
-    /** Cajas activas: la base del cobro. */
-    readonly activeDevices: number;
-    /** Mensualidad del tenant (MXN, IVA incluido). */
+    /** Plan contratado; null si la cuenta no tiene. */
+    readonly planName: string | null;
+    /** Mensualidad del tenant (MXN, IVA incluido): el plan, o su precio especial. */
     readonly basePrice: number;
-    /** MRR estimado = mensualidad + cajas extra × precio (solo si ACTIVE). */
+    /** MRR = la mensualidad, solo si ACTIVE. */
     readonly mrr: number;
     readonly currency: string;
     readonly createdAt: string;
@@ -40,10 +39,9 @@ export type SubscriptionSummaryPrimitives = {
     readonly status: SubscriptionStatus;
     /** Sucursales activas. Informativo: no cuestan. */
     readonly activeLocations: number;
-    /** Cajas activas: la base del MRR. */
-    readonly activeDevices: number;
+    readonly planName: string | null;
     /** Mensualidad del tenant (MXN, IVA incluido). */
     readonly basePrice: number;
-    /** MRR = mensualidad + cajas extra × precio (solo si ACTIVE). */
+    /** MRR = la mensualidad, solo si ACTIVE. */
     readonly mrr: number;
 };

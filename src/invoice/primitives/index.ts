@@ -52,17 +52,12 @@ export type InvoicePrimitives = {
     readonly periodStart: string;
     /** Fin del periodo facturado (ISO, último día del mes). */
     readonly periodEnd: string;
-    /** Sucursales activas al generar. Dato del periodo: ya no entra en el cálculo. */
-    readonly activeLocations: number;
-    /** Mensualidad base del periodo (cubre las cajas incluidas). */
+    /** Precio del plan del periodo. */
     readonly basePrice: number;
-    /** Cargo base del mes: la mensualidad, sin cajas extra. */
+    /** Cargo base del mes: el plan. */
     readonly baseAmount: number;
-    /** Heredado del modelo por sucursal; hoy siempre 0. */
+    /** Prorrateos de subidas a mitad de mes que entran en esta factura. */
     readonly prorationAmount: number;
-    /** Cajas cobradas por encima de las incluidas, en cajas-mes (fraccionario). */
-    readonly extraDevices: number;
-    readonly extraDevicesAmount: number;
     /** Descuento por cupón aplicado (0 si no hay). */
     readonly discountAmount: number;
     /** Código del cupón aplicado (snapshot), null si no hay. */

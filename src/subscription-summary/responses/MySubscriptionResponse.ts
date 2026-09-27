@@ -2,9 +2,8 @@
  * @fileoverview DTO de "Mi Suscripción" para el tenant autenticado.
  *
  * Modelo de negocio vigente (docs `producto/modelo-negocio.md`): se cobra por OPERACIONES al mes,
- * con timbres CFDI incluidos por plan, y Mercado Pago cobra el día 3. Los campos de cajas
- * (`includedDevices`, `extraDevices`, `pricePerExtraDevice`) son del modelo por caja que ya no se
- * vende; siguen aquí por los planes viejos.
+ * con timbres CFDI incluidos por plan, y Mercado Pago cobra el día 3. Sin cajas, sin licencias ni
+ * capacidades: todas las apps van en todos los planes (el modelo viejo se retiró en 2.0.0).
  *
  * @module Contracts/SubscriptionSummary
  */
@@ -27,62 +26,23 @@ export interface SubscriptionUsage {
     readonly companies: number;
     /** Sucursales activas. Informativo: no cuestan. */
     readonly locations: number;
-    /** Cajas activas hoy en toda la cuenta: lo único que se cobra. */
+    /** Cajas activas hoy en toda la cuenta. Informativo: no cuestan. */
     readonly devices: number;
 }
 
-/** Datos de cobro estimado (preliminar hasta integrar pagos). */
+/** La mensualidad de la cuenta. El excedente del mes se estima aparte, con las operaciones. */
 export interface SubscriptionBilling {
-    /** Sucursales activas. Se conserva por compatibilidad; ya no cobra nada. */
-    readonly activeLocations: number;
-    /** Mensualidad, IVA incluido (setting billing.base-price). */
+    /** Precio del plan al mes, IVA incluido (o el precio especial de la cuenta). */
     readonly basePrice: number;
-    /** Cajas cubiertas por la mensualidad. */
-    readonly includedDevices: number;
-    /** Cajas activas por encima de las incluidas. */
-    readonly extraDevices: number;
-    /** Precio de cada caja adicional al mes, IVA incluido. */
-    readonly pricePerExtraDevice: number;
     readonly currency: 'MXN';
-    /** basePrice + extraDevices × pricePerExtraDevice, menos el cupón vigente. */
+    /** Lo que se cobraría el próximo día 3 sin excedente: el plan. */
     readonly estimatedMonthly: number;
-    /** true mientras no exista integración de pagos (precio preliminar). */
-    readonly preliminary: boolean;
 }
 
-/** Modelos de cobro de una licencia. */
-export const BILLING_MODELS = ['PERPETUAL', 'SUBSCRIPTION'] as const;
-export type BillingModel = (typeof BILLING_MODELS)[number];
-
-/**
- * La licencia contratada: qué se compró, no qué puede hacer el usuario.
- *
- * El código nunca pregunta «¿qué plan tiene?» sino «¿tiene esta capacidad?»; este
- * bloque existe para lo único que sí necesita saber el nombre del plan, que es
- * enseñárselo al dueño y decidir qué tarjeta pintar.
- */
+/** El plan contratado, para pintarlo. */
 export interface SubscriptionLicense {
-    /** Código del plan: 'escritorio' | 'conectado' | 'completo'. */
     readonly planCode: string;
     readonly planName: string;
-    /** PERPETUAL se compró una vez; SUBSCRIPTION se renta. */
-    readonly billingModel: BillingModel;
-    /** Cajas que cubre el nivel: 1 en la perpetua, 3 en las de renta. */
-    readonly includedDevices: number;
-    /**
-     * Hasta cuándo recibe funciones nuevas la licencia perpetua (ISO 8601).
-     * null en las de renta: ahí el mantenimiento va dentro de la mensualidad.
-     */
-    readonly maintenanceUntil: string | null;
-    /**
-     * false solo cuando una perpetua tiene el mantenimiento caducado.
-     *
-     * **No corta nada.** Deja de recibir funciones nuevas y lo obligatorio por ley
-     * entra siempre: un punto de venta que no puede timbrar está muerto.
-     */
-    readonly maintenanceActive: boolean;
-    /** Qué apps abre el nivel: 'sync' | 'web' | 'bancos' | 'contabilidad' | 'fiscal'. */
-    readonly capabilities: readonly string[];
 }
 
 /**
@@ -95,18 +55,13 @@ export interface AvailablePlan {
     readonly code: string;
     readonly name: string;
     readonly description: string | null;
-    /** MXN, IVA incluido. Mensual salvo que `billingModel` sea PERPETUAL. */
+    /** Mensualidad, MXN, IVA incluido. */
     readonly price: number;
-    readonly billingModel: BillingModel;
-    readonly includedDevices: number;
-    /** Timbres que se reponen cada mes. 0 en la perpetua. */
+    /** Timbres que se reponen cada mes. */
     readonly monthlyStamps: number;
-    /** Timbres de bienvenida, una sola vez en la vida de la licencia. */
-    readonly oneTimeStamps: number;
-    readonly capabilities: readonly string[];
     /**
-     * Operaciones incluidas al mes (modelo por operaciones, docs `producto/modelo-negocio.md`).
-     * null = el plan no mide operaciones (los tres niveles viejos).
+     * Operaciones incluidas al mes (docs `producto/modelo-negocio.md`). null = no mide
+     * operaciones («A la medida»).
      */
     readonly includedOperations: number | null;
     /** $ por cada 1,000 operaciones extra. 0 si el plan no cobra excedente. */

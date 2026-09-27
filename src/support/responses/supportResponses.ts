@@ -201,7 +201,7 @@ export type TenantContextUsage = {
     readonly activeLocations: number;
     readonly activeUsers: number;
     readonly activeCompanies: number;
-    /** Lo que se cobraría el próximo día 3 (plan + operaciones extra); en planes viejos, por caja. */
+    /** Lo que se cobraría el próximo día 3 (plan + operaciones extra). */
     readonly estimatedMonthly: number;
     readonly currency: string;
     /** Plan contratado; null sin suscripción. */
