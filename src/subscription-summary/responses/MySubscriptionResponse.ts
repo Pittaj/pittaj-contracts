@@ -243,7 +243,7 @@ export interface CardSubscriptionResponse {
 export interface CardSubscriptionInfoResponse {
     /**
      * ¿Se cobra con Mercado Pago? Solo si la pasarela está configurada y el plan cobra por
-     * operaciones. Si es false, la tarjeta sigue en el flujo viejo (Stripe) hasta el retiro.
+     * operaciones. Si es false, no hay tarjeta que capturar y la pantalla no la muestra.
      */
     readonly available: boolean;
     /** Llave pública para el SDK de Mercado Pago; null si no está disponible. */
