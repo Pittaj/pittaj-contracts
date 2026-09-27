@@ -8,6 +8,7 @@
  *
  * @module Contracts/SubscriptionSummary
  */
+import type { ScheduledPlanTerms } from '../../plan/cambios.js';
 
 /** Estados de la suscripción (espejo del dominio backend). */
 export const MY_SUBSCRIPTION_STATUSES = [
@@ -131,6 +132,11 @@ export interface AvailablePlan {
      * devoluciones de la gente que menos conviene perder.
      */
     readonly beta: boolean;
+    /**
+     * Cambio de precio o de lo incluido ya programado para un día 1 (backoffice). La pantalla de
+     * Planes lo dice desde que se programa, para que nadie se entere en el cobro. null si no hay.
+     */
+    readonly scheduledChange?: ScheduledPlanTerms | null;
 }
 
 /** Respuesta de GET /api/subscriptions/me. */
@@ -243,7 +249,7 @@ export interface CardSubscriptionResponse {
 export interface CardSubscriptionInfoResponse {
     /**
      * ¿Se cobra con Mercado Pago? Solo si la pasarela está configurada y el plan cobra por
-     * operaciones. Si es false, la tarjeta sigue en el flujo viejo (Stripe) hasta el retiro.
+     * operaciones. Si es false, no hay tarjeta que capturar y la pantalla no la muestra.
      */
     readonly available: boolean;
     /** Llave pública para el SDK de Mercado Pago; null si no está disponible. */
