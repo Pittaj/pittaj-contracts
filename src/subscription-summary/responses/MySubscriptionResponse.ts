@@ -8,6 +8,7 @@
  *
  * @module Contracts/SubscriptionSummary
  */
+import type { ScheduledPlanTerms } from '../../plan/cambios.js';
 
 /** Estados de la suscripción (espejo del dominio backend). */
 export const MY_SUBSCRIPTION_STATUSES = [
@@ -131,6 +132,11 @@ export interface AvailablePlan {
      * devoluciones de la gente que menos conviene perder.
      */
     readonly beta: boolean;
+    /**
+     * Cambio de precio o de lo incluido ya programado para un día 1 (backoffice). La pantalla de
+     * Planes lo dice desde que se programa, para que nadie se entere en el cobro. null si no hay.
+     */
+    readonly scheduledChange?: ScheduledPlanTerms | null;
 }
 
 /** Respuesta de GET /api/subscriptions/me. */
