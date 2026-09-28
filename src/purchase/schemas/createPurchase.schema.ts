@@ -28,6 +28,8 @@
  */
 
 import { z } from 'zod';
+import { businessLineRefSchema } from '../../business-line/schemas/createBusinessLine.schema.js';
+import { expenseConceptRefSchema } from '../../expense-concept/schemas/expenseConcept.schema.js';
 import { PURCHASE_LINE_ORIGINS } from '../purchaseLineOrigin.js';
 import { PURCHASE_KINDS } from './getPurchases.schema.js';
 
@@ -104,6 +106,20 @@ export const purchaseLineInputSchema = z
          * ya comprueba en `receive()`.
          */
         isDocumentCharge: z.boolean().optional().default(false),
+
+        /**
+         * Concepto de gasto del renglón (F6.2): decide a qué cuenta de resultados va en una
+         * compra de naturaleza gasto. Nulo = «Otros gastos» (`601-09`). En un renglón de
+         * mercancía o de activo se ignora: su cuenta la decide la naturaleza del documento.
+         */
+        expenseConceptId: expenseConceptRefSchema,
+
+        /**
+         * Línea de negocio **estampada** en el renglón (F1.7). En un gasto la elige quien
+         * captura; si no viene, la resuelve la nube (concepto → sucursal) al guardar. Nulo =
+         * «Sin línea».
+         */
+        businessLineId: businessLineRefSchema,
 
         /**
          * Marca de procedencia (2026-09-22). Quien captura a mano no la manda: la nube pone

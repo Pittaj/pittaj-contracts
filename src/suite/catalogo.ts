@@ -146,6 +146,7 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
             { ruta: 'proveedores', nombre: 'Proveedores' },
             { ruta: 'productos', nombre: 'Productos' },
             { ruta: 'categorias', nombre: 'Categorías' },
+            { ruta: 'conceptos-de-gasto', nombre: 'Conceptos de gasto' },
             { ruta: 'reportes/por-periodo', nombre: 'Compras por Período' },
             { ruta: 'reportes/por-proveedor', nombre: 'Por Proveedor' },
             { ruta: 'reportes/por-producto', nombre: 'Por Producto' },
