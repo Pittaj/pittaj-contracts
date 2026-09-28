@@ -48,6 +48,21 @@ export const supplierIdParamSchema = z.object({
 // COMMANDS
 // ============================================================
 
+/**
+ * Lo que se propone al comprarle **gasto** a este proveedor (F6.3): sucursal, concepto y línea.
+ * Se aplica al capturar y al convertir un CFDI; en cada renglón se puede cambiar. La sucursal es
+ * también la que enruta sus CFDI en el buzón (F7.3). `null` = sin omisión. Plan: docs
+ * `producto/plan-empresas-y-lineas-de-negocio.md`.
+ */
+const uuidONulo = (mensaje: string) =>
+    z.preprocess((v) => (v === '' ? null : v), z.union([z.string().uuid(mensaje), z.null()])).optional();
+
+export const omisionesDeGasto = {
+    defaultLocationId: uuidONulo('La sucursal debe ser un UUID válido'),
+    defaultExpenseConceptId: uuidONulo('El concepto de gasto debe ser un UUID válido'),
+    defaultBusinessLineId: uuidONulo('La línea de negocio debe ser un UUID válido'),
+};
+
 /** POST /api/suppliers — Crear proveedor */
 export const createSupplierSchema = z.object({
     /** UUID generado por el cliente (offline-first). */
@@ -68,6 +83,7 @@ export const createSupplierSchema = z.object({
     creditDays: z.number().int().min(LIMITS.MIN_CREDIT_DAYS).max(LIMITS.MAX_CREDIT_DAYS).optional(),
     /** Moneda de compra por defecto (ej. "MXN"). */
     currency: z.string().max(LIMITS.MAX_CURRENCY_LENGTH).nullable().optional(),
+    ...omisionesDeGasto,
 });
 
 /** PUT /api/suppliers/:id — Actualizar proveedor */
@@ -81,6 +97,7 @@ export const updateSupplierSchema = z.object({
     address: supplierAddressSchema.nullable().optional(),
     creditDays: z.number().int().min(LIMITS.MIN_CREDIT_DAYS).max(LIMITS.MAX_CREDIT_DAYS).optional(),
     currency: z.string().max(LIMITS.MAX_CURRENCY_LENGTH).nullable().optional(),
+    ...omisionesDeGasto,
 });
 
 /** DELETE /api/suppliers/:id (query params) */

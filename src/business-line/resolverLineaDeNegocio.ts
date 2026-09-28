@@ -32,3 +32,26 @@ export interface FuentesDeLineaDeNegocio {
 export function resolverLineaDeNegocio(f: FuentesDeLineaDeNegocio): string | null {
     return f.renglon ?? f.producto ?? f.categoria ?? f.sucursal ?? null;
 }
+
+/**
+ * La línea de un renglón de **gasto** (F6.2, F6.3). Mismo espíritu, otras fuentes:
+ *   1. la del renglón (la que eligió quien capturó, o la que se estampó al guardar);
+ *   2. la del **proveedor** (Cloudflare → SaaS): es una decisión explícita sobre ese proveedor;
+ *   3. la del **concepto** (Gas LP del horno → Panadería): es genérica, vale para cualquiera;
+ *   4. la de la sucursal del documento;
+ *   5. ninguna → «Sin línea».
+ *
+ * El proveedor va antes que el concepto porque es más específico: «Teléfono e internet» no tiene
+ * giro, pero el Telmex de la oficina sí. La nube (lector de compras) y la web (vista previa de la
+ * póliza) usan esta misma función; el escritorio, su gemela.
+ */
+export interface FuentesDeLineaDelGasto {
+    readonly renglon?: string | null;
+    readonly proveedor?: string | null;
+    readonly concepto?: string | null;
+    readonly sucursal?: string | null;
+}
+
+export function resolverLineaDelGasto(f: FuentesDeLineaDelGasto): string | null {
+    return f.renglon ?? f.proveedor ?? f.concepto ?? f.sucursal ?? null;
+}
