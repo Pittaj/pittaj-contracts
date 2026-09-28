@@ -15,3 +15,4 @@ export * from './reposicion.js';
 export * from './comprasAtencion.js';
 export * from './cuentasPorPagar.js';
 export * from './quoteComparison.js';
+export * from './gastos.js';
