@@ -71,7 +71,7 @@ export const receivedCfdiIdParamSchema = z.object({
 });
 
 /**
- * POST /api/received-cfdi/asignar — F7.3, asignar en lote. Una llave ausente no cambia esa
+ * POST /api/received-cfdis/asignar — F7.3, asignar en lote. Una llave ausente no cambia esa
  * dimensión; `null` la deja por asignar.
  */
 export const asignarCfdisSchema = z
