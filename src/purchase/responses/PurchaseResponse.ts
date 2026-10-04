@@ -206,6 +206,13 @@ export interface PurchaseResponse {
     readonly retencionIva: number;
 
     readonly currency: string;
+    /** F6.6 · Moneda y total del recibo original (null si es en pesos). */
+    readonly foreignCurrency?: string | null;
+    readonly foreignTotal?: number | null;
+    /** F6.6 · Pesos por unidad: `totalAmount / foreignTotal`. Derivado, no se guarda. */
+    readonly exchangeRate?: number | null;
+    /** F6.6 · Nombre del comprobante adjunto (PDF) cuando no hay CFDI; null si no tiene. */
+    readonly receiptFileName?: string | null;
     readonly notes: string | null;
 
     readonly subtotalAmount: number;

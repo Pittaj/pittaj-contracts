@@ -181,6 +181,14 @@ export const basePurchaseFields = {
     /** Divisa del documento. */
     currency: z.string().trim().min(1).max(5).optional().default('MXN'),
 
+    /**
+     * F6.6 · El recibo en otra moneda (Cloudflare, USD 25.00). La compra se captura **en pesos**
+     * —lo que se pagó— y aquí va lo que dice el recibo; el tipo de cambio se deriva
+     * (`tipoDeCambioDeLaCompra`). Los dos o ninguno.
+     */
+    foreignCurrency: z.string().trim().regex(/^[A-Za-z]{3}$/, 'Moneda con tres letras: USD, EUR…').nullish(),
+    foreignTotal: z.number().positive('El total del recibo va en positivo').max(99_999_999).nullish(),
+
     notes: z.string().trim().max(500).nullish(),
 
     /** Renglones del documento. Un borrador puede guardarse sin ninguno. */

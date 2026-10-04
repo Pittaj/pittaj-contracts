@@ -38,6 +38,10 @@ export interface SupplierResponse {
     readonly defaultExpenseConceptId: string | null;
     /** Línea de negocio por omisión (F6.3): Cloudflare → SaaS. Gana a la del concepto. */
     readonly defaultBusinessLineId: string | null;
+    /** F6.6 · País de residencia; null = México. */
+    readonly country: string | null;
+    /** F6.6 · Número de identificación fiscal del extranjero (no es RFC). */
+    readonly foreignTaxId: string | null;
     readonly tenantId: string;
     readonly createdAt: Date;
     readonly createdBy: string | null;

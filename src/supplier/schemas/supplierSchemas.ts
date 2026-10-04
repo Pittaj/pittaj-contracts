@@ -61,6 +61,12 @@ export const omisionesDeGasto = {
     defaultLocationId: uuidONulo('La sucursal debe ser un UUID válido'),
     defaultExpenseConceptId: uuidONulo('El concepto de gasto debe ser un UUID válido'),
     defaultBusinessLineId: uuidONulo('La línea de negocio debe ser un UUID válido'),
+    /**
+     * F6.6 · País de residencia (ISO 3166-1 alfa-2, «US»). Null o «MX» = México. Un extranjero se
+     * declara en la DIOT con tipo de tercero 05 y su número de identificación fiscal.
+     */
+    country: z.string().trim().regex(/^[A-Za-z]{2}$/, 'País con dos letras: US, CA, IE…').nullable().optional(),
+    foreignTaxId: z.string().trim().max(40).nullable().optional(),
 };
 
 /** POST /api/suppliers — Crear proveedor */

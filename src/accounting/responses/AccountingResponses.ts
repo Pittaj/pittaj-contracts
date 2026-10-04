@@ -606,6 +606,10 @@ export interface DiotRowResponse {
     /** RFC. `null` cuando el proveedor no lo tiene capturado. */
     readonly taxId: string | null;
     readonly thirdPartyType: DiotThirdPartyType;
+    /** F6.6 · País de residencia del extranjero (tipo 05); null = nacional. */
+    readonly country?: string | null;
+    /** F6.6 · Número de identificación fiscal del extranjero (va en lugar del RFC). */
+    readonly foreignTaxId?: string | null;
     /**
      * Tipo de operación del SAT: `03` servicios · `06` arrendamiento · `85` otros.
      *
