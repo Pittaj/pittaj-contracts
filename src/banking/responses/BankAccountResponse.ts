@@ -19,6 +19,8 @@ export interface BankAccountResponse {
   /** Fecha ISO (YYYY-MM-DD); no se admiten movimientos anteriores. */
   readonly openingDate: string;
   readonly locationId: string | null;
+  /** F7.4 · Línea de negocio de la cuenta. Con la sucursal, decide quién la ve (alcance). */
+  readonly businessLineId?: string | null;
   /** Cuenta contable — campo dormido hasta Contabilidad. */
   readonly ledgerAccountCode: string | null;
   /** Configuración TDC; solo kind=CREDIT_CARD. */

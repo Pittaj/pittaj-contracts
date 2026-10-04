@@ -32,6 +32,12 @@ export interface SupplierResponse {
     readonly creditDays: number;
     /** Moneda de compra por defecto (ej. "MXN"). */
     readonly currency: string | null;
+    /** Sucursal por omisión de sus gastos y de sus CFDI en el buzón (F6.3). */
+    readonly defaultLocationId: string | null;
+    /** Concepto de gasto por omisión (F6.3): CFE → Luz. */
+    readonly defaultExpenseConceptId: string | null;
+    /** Línea de negocio por omisión (F6.3): Cloudflare → SaaS. Gana a la del concepto. */
+    readonly defaultBusinessLineId: string | null;
     readonly tenantId: string;
     readonly createdAt: Date;
     readonly createdBy: string | null;

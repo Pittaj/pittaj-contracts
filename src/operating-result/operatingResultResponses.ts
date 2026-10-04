@@ -66,6 +66,30 @@ export interface OperatingResultDayResponse {
   readonly hasData: boolean;
 }
 
+/**
+ * F1.6 · El periodo de UNA línea de negocio.
+ *
+ * Ventas y costo salen de los renglones (la línea estampada en el ticket y la del producto en
+ * el kardex), así que un ticket con frijol y bolillo reparte su venta entre abarrotes y
+ * panadería. Los gastos siguen a la línea de la cuenta de banco que los pagó (F7.4); lo que
+ * sale de una cuenta sin línea cae en el renglón sin línea.
+ */
+export interface OperatingResultLineResponse {
+  /** null = sin línea (productos sin línea, cuentas sin asignar). */
+  readonly businessLineId: string | null;
+  readonly name: string;
+  readonly netSales: number;
+  readonly grossSales: number;
+  readonly costOfGoods: number;
+  readonly grossProfit: number;
+  readonly expenses: number;
+  readonly operatingProfit: number;
+  /** Tickets que tienen al menos un renglón de la línea: uno mixto cuenta en las dos. */
+  readonly ticketCount: number;
+  /** Null si la línea no vendió (mismo criterio que el del periodo). */
+  readonly grossMarginPct: number | null;
+}
+
 /** El periodo completo con su acumulado. */
 export interface OperatingResultResponse {
   readonly from: string;
@@ -90,4 +114,11 @@ export interface OperatingResultResponse {
   readonly completeThrough: string | null;
 
   readonly currency: string;
+
+  /**
+   * F1.6 · El acumulado del periodo partido por línea de negocio. Vacío si el negocio no usa
+   * líneas. La suma de las líneas da el total, salvo `ticketCount` (un ticket mixto cuenta en
+   * cada línea que toca).
+   */
+  readonly byLine: readonly OperatingResultLineResponse[];
 }

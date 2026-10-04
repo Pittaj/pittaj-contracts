@@ -21,4 +21,9 @@ export interface PosTicketLinePrimitives extends SaleLineBasePrimitives {
   readonly satUnitCode: string | null;
   /** Base imponible (subtotal - descuento, neta de impuesto si venia incluido). null si no aplica. */
   readonly taxBaseAmount: number | null;
+  /**
+   * Línea de negocio estampada al confirmar el ticket (F1.7): producto → categoría → sucursal con
+   * el catálogo de ese momento. Opcional: si no viene, la nube la estampa al guardar.
+   */
+  readonly businessLineId?: string | null;
 }

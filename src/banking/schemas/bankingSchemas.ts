@@ -81,6 +81,8 @@ export const createBankAccountSchema = z.object({
   openingBalance: z.number().min(-LIMITS.MAX_AMOUNT).max(LIMITS.MAX_AMOUNT).optional(),
   openingDate: isoDateSchema,
   locationId: z.string().uuid().nullish(),
+  /** F7.4 · La línea de negocio de la cuenta (alcance): quien no la tiene no ve la cuenta ni sus movimientos. */
+  businessLineId: z.string().uuid().nullish(),
   ledgerAccountCode: z.string().trim().max(20).nullish(),
   creditCard: creditCardConfigSchema.nullish(),
 });
@@ -97,6 +99,8 @@ export const updateBankAccountSchema = z.object({
   openingBalance: z.number().min(-LIMITS.MAX_AMOUNT).max(LIMITS.MAX_AMOUNT).optional(),
   openingDate: isoDateSchema.optional(),
   locationId: z.string().uuid().nullish(),
+  /** F7.4 · La línea de negocio de la cuenta (alcance): quien no la tiene no ve la cuenta ni sus movimientos. */
+  businessLineId: z.string().uuid().nullish(),
   ledgerAccountCode: z.string().trim().max(20).nullish(),
   creditCard: creditCardConfigSchema.nullish(),
 });

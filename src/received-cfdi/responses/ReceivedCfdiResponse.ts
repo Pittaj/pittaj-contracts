@@ -127,6 +127,14 @@ export interface ReceivedCfdiResponse {
      */
     readonly issuerEfosStatus: string | null;
 
+    /**
+     * F7.3 · A qué sucursal y línea se enruta (alcance). Al entrar toman las por omisión de su
+     * proveedor; se cambian en el buzón. null = por asignar: solo lo ve quien no está limitado
+     * en esa dimensión. Opcionales: un escritorio anterior no los manda y su ausencia no borra.
+     */
+    readonly locationId?: string | null;
+    readonly businessLineId?: string | null;
+
     readonly version: number;
     readonly createdAt?: string;
     readonly updatedAt?: string;

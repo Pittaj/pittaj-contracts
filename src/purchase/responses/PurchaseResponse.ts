@@ -92,6 +92,10 @@ export interface PurchaseLineResponse {
      * explica por qué el documento dejó de estar abierto sin llegar a 100 %.
      */
     readonly closed: boolean;
+    /** Concepto de gasto del renglón (F6.2); nulo = «Otros gastos» o renglón de mercancía. */
+    readonly expenseConceptId: string | null;
+    /** Línea de negocio estampada en el renglón (F1.7); nulo = «Sin línea». */
+    readonly businessLineId: string | null;
 
     // --- Marca de procedencia (2026-09-22: todo lo automático se deshace) ---
     /** De dónde salió el producto de este renglón. Nulo en renglones anteriores a la marca. */

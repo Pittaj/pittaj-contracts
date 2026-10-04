@@ -6,3 +6,4 @@
 export * from './schemas/index.js';
 export * from './responses/index.js';
 
+export * from './alcance.js';

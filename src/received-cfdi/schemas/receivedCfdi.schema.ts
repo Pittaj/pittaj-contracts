@@ -49,6 +49,16 @@ export const getReceivedCfdisSchema = z.object({
     dateTo: z.coerce.date().optional(),
     /** Solo los que el emisor canceló en el SAT. Es la lista que hay que revisar. */
     onlyCancelledAtSat: z.coerce.boolean().optional(),
+    /**
+     * F7.3 · La bandeja «Por asignar»: sin sucursal o sin línea. Solo tiene sentido para quien no
+     * está limitado (al limitado el alcance ya se los oculta).
+     */
+    porAsignar: z
+        .union([z.boolean(), z.enum(['true', 'false'])])
+        .transform((v) => v === true || v === 'true')
+        .optional(),
+    locationId: z.string().uuid().optional(),
+    businessLineId: z.string().uuid().optional(),
     page: z.coerce.number().int().min(1).optional(),
     limit: z.coerce.number().int().min(1).max(200).optional(),
 });
@@ -59,3 +69,19 @@ export type GetReceivedCfdisQuery = z.infer<typeof getReceivedCfdisSchema>;
 export const receivedCfdiIdParamSchema = z.object({
     id: z.string().uuid(),
 });
+
+/**
+ * POST /api/received-cfdis/asignar — F7.3, asignar en lote. Una llave ausente no cambia esa
+ * dimensión; `null` la deja por asignar.
+ */
+export const asignarCfdisSchema = z
+    .object({
+        ids: z.array(z.string().uuid()).min(1).max(500),
+        locationId: z.string().uuid().nullable().optional(),
+        businessLineId: z.string().uuid().nullable().optional(),
+    })
+    .refine((v) => v.locationId !== undefined || v.businessLineId !== undefined, {
+        message: 'Di qué asignar: sucursal, línea o las dos',
+    });
+
+export type AsignarCfdisInput = z.infer<typeof asignarCfdisSchema>;

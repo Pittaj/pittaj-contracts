@@ -25,6 +25,12 @@ export const getOperatingResultSchema = z.object({
   to: isoDateSchema,
   /** Acota a una sucursal; sin ella, todas. */
   locationId: z.string().uuid().optional(),
+  /**
+   * F1.6 · Acota a una línea de negocio; `NONE` es «Sin línea». Las ventas y el costo se
+   * suman por renglón (un ticket mixto aporta solo lo suyo) y los gastos siguen a la línea
+   * de su cuenta de banco.
+   */
+  businessLineId: z.union([z.string().uuid(), z.literal('NONE')]).optional(),
 });
 
 export type GetOperatingResultInput = z.infer<typeof getOperatingResultSchema>;
