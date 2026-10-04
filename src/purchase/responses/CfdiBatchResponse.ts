@@ -24,6 +24,11 @@ export const MOTIVOS_DE_ATENCION = [
     'YA_CAPTURADO',
     /** El comprobante ya no está en «sin capturar»: alguien lo vinculó o lo descartó. */
     'NO_ESTA_PENDIENTE',
+    /**
+     * D1 · La compra que saldría no suma el `Total` del CFDI: trae un impuesto que Pittaj no leyó
+     * (o un CFDI en otra moneda sin tipo de cambio). No se convierte; `cuadre.motivo` dice cuánto.
+     */
+    'NO_CUADRA_CON_EL_CFDI',
 ] as const;
 
 export type MotivoDeAtencion = (typeof MOTIVOS_DE_ATENCION)[number];
@@ -119,6 +124,16 @@ export interface CfdiBatchPreviewItem {
 
     /** Vacío = se convierte solo. Con algo dentro = pide una decisión. */
     readonly motivos: readonly MotivoDeAtencion[];
+    /**
+     * D1 · El candado: lo que sumaría la compra contra el `Total` del CFDI (en pesos). Opcional
+     * para no romper a quien no lo lee.
+     */
+    readonly cuadre?: {
+        readonly cuadra: boolean;
+        readonly diferencia: number;
+        readonly totalDeLaCompra: number;
+        readonly motivo: string | null;
+    };
     /** Si el motivo es `YA_CAPTURADO`, la compra que ya lo ampara. */
     readonly compraExistente: { readonly id: string; readonly purchaseNumber: string } | null;
 
