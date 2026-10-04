@@ -84,6 +84,20 @@ export interface CfdiBatchPreviewItem {
     /** El proveedor que corresponde al RFC, si existe. */
     readonly supplierId: string | null;
     readonly supplierName: string | null;
+    /**
+     * El uso que declaró el receptor en el XML (G01 mercancías, G03 gastos en general…). Se enseña
+     * en «Revisar mercancía o gasto» porque es la pista que el SAT ya da (2026-10-04).
+     */
+    readonly usoCfdi: string | null;
+    /**
+     * Lo que el proveedor propone cuando le compras gasto (F6.3): concepto, línea y sucursal. Null
+     * si no hay proveedor dado de alta. Es lo que «del proveedor» enseña en la tabla de revisar.
+     */
+    readonly omisiones: {
+        readonly expenseConceptId: string | null;
+        readonly businessLineId: string | null;
+        readonly locationId: string | null;
+    } | null;
 
     readonly conceptos: number;
     readonly emparejados: number;

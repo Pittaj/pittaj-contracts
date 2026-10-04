@@ -92,6 +92,14 @@ export const createPurchasesFromCfdiBatchSchema = z.object({
                     supplierName: z.string().trim().min(1).max(200),
                     supplierTaxId: z.string().trim().max(20).nullish(),
                     kind: z.enum(['INVENTORY', 'EXPENSE', 'FIXED_ASSET']).optional(),
+                    /**
+                     * Solo en un gasto (2026-10-04): el concepto, la línea y la sucursal elegidos en
+                     * «Revisar mercancía o gasto». Ausentes, valen los del proveedor; la sucursal,
+                     * la del lote.
+                     */
+                    expenseConceptId: z.string().uuid('Concepto inválido').nullish(),
+                    businessLineId: z.string().uuid('Línea inválida').nullish(),
+                    locationId: z.string().uuid('Sucursal inválida').nullish(),
                     conceptos: z.array(cfdiResolvedConceptoSchema).min(1).max(500),
                 })
                 .strict()
