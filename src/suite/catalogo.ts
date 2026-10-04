@@ -70,6 +70,7 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
             { ruta: 'listas-precios', nombre: 'Listas de Precios' },
             { ruta: 'promociones', nombre: 'Promociones' },
             { ruta: 'reportes', nombre: 'Reportes' },
+            { ruta: 'reportes/resultado', nombre: 'Resultado diario' },
             { ruta: 'reportes/export-fiscal', nombre: 'Exportar a facturación' },
             { ruta: 'cajas', nombre: 'Cajas Registradoras' },
             { ruta: 'cajeros', nombre: 'Cajeros' },
