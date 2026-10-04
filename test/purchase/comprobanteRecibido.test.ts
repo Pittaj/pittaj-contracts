@@ -215,3 +215,21 @@ describe('D1 · totalNetoDeLaCompra y cuadre', () => {
         expect(cuadreConElComprobante(100.02, 100).cuadra).toBe(false);
     });
 });
+
+describe('D1 · conciliar contra compras capturadas', () => {
+    it('el flete de 1,160 con 40 de retención cuadra con su CFDI de 1,120', async () => {
+        const { totalDeRenglonesDelComprobante } = await import('../../src/purchase/comprobanteRecibido');
+        expect(totalDeRenglonesDelComprobante({ total: 1120, retencionIva: 40 })).toBe(1160);
+        expect(totalDeRenglonesDelComprobante({ total: 1785, trasladoLocal: 45 })).toBe(1740);
+    });
+
+    it('una factura, tres remisiones: la retención se reparte y suma exacta', async () => {
+        const { repartirImpuestosDelDocumento } = await import('../../src/purchase/comprobanteRecibido');
+        const partes = repartirImpuestosDelDocumento(
+            { retencionIsr: 0, retencionIva: 100, trasladoLocal: 0, retencionLocal: 0 },
+            [1, 1, 1]
+        );
+        expect(partes.map((p) => p.retencionIva)).toEqual([33.34, 33.33, 33.33]);
+        expect(repartirImpuestosDelDocumento({ retencionIsr: 10, retencionIva: 0, trasladoLocal: 0, retencionLocal: 0 }, [500])[0]!.retencionIsr).toBe(10);
+    });
+});

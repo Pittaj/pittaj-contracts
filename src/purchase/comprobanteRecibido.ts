@@ -330,3 +330,52 @@ export function cuadreConElComprobante(totalDeLaCompra: number, totalDelComproba
             'Pittaj no sabe leer algún impuesto de este comprobante; no se convierte para no registrar un total que no es.',
     };
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Conciliar contra compras ya capturadas
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Lo que suman los renglones del comprobante: su `Total` antes de retenciones y de impuestos
+ * locales. Es la cifra que se compara contra los renglones de una compra capturada a mano, que
+ * no sabe de retenciones: un flete de 1,160 con 40 de retención tiene `Total` 1,120, y la compra
+ * de 1,160 cuadra con él.
+ */
+export function totalDeRenglonesDelComprobante(c: Pick<CabeceraDelComprobante, 'total'> & Partial<ImpuestosDelDocumento>): number {
+    return r2(c.total + (c.retencionIsr ?? 0) + (c.retencionIva ?? 0) - (c.trasladoLocal ?? 0) + (c.retencionLocal ?? 0));
+}
+
+/**
+ * Reparte los impuestos del documento entre las compras que ampara un mismo CFDI (ocho
+ * remisiones, una factura), en proporción a `pesos` (lo que cada una aporta). El residuo del
+ * redondeo va a la de mayor peso. Sin esto, cada compra restaba la retención completa.
+ */
+export function repartirImpuestosDelDocumento(
+    d: ImpuestosDelDocumento,
+    pesos: readonly number[]
+): ImpuestosDelDocumento[] {
+    if (pesos.length === 0) return [];
+    const suma = pesos.reduce((a, p) => a + Math.max(0, p), 0);
+    const mayor = indiceDelMayorNumero(pesos);
+    const partir = (monto: number): number[] => {
+        if (pesos.length === 1) return [r2(monto)];
+        const partes = pesos.map((p) => (suma > 0 ? r2((monto * Math.max(0, p)) / suma) : 0));
+        if (suma <= 0) partes[mayor] = r2(monto);
+        const residuo = r2(monto - partes.reduce((a, x) => a + x, 0));
+        partes[mayor] = r2(partes[mayor]! + residuo);
+        return partes;
+    };
+    const isr = partir(d.retencionIsr);
+    const iva = partir(d.retencionIva);
+    const tl = partir(d.trasladoLocal);
+    const rl = partir(d.retencionLocal);
+    return pesos.map((_, k) => ({ retencionIsr: isr[k]!, retencionIva: iva[k]!, trasladoLocal: tl[k]!, retencionLocal: rl[k]! }));
+}
+
+function indiceDelMayorNumero(xs: readonly number[]): number {
+    let i = 0;
+    xs.forEach((x, k) => {
+        if (x > xs[i]!) i = k;
+    });
+    return i;
+}
