@@ -61,6 +61,12 @@ export interface CfdiConceptoInput {
      * `tasaDelRenglonDelCfdi`.
      */
     readonly taxAmount?: number | null;
+    /**
+     * IEPS trasladado del concepto (traslados `003`, por tasa o por cuota): la suma de sus
+     * importes. Opcional por la misma razón. Es costo salvo que la empresa lo acredite; ver
+     * `renglonDelCfdi` en `comprobanteRecibido.ts`.
+     */
+    readonly iepsAmount?: number | null;
 }
 
 /**

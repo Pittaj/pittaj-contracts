@@ -204,6 +204,9 @@ export interface PurchaseResponse {
     readonly trasladoIeps: number;
     readonly retencionIsr: number;
     readonly retencionIva: number;
+    /** D1 · Impuestos locales (`implocal`): el trasladado suma al total, el retenido resta. */
+    readonly trasladoLocal?: number;
+    readonly retencionLocal?: number;
 
     readonly currency: string;
     /** F6.6 · Moneda y total del recibo original (null si es en pesos). */

@@ -67,6 +67,8 @@ export const cfdiConceptoSchema = z
             .default(0),
         /** IVA trasladado del concepto (importe del comprobante). Ver `tasaDelRenglonDelCfdi`. */
         taxAmount: z.number().min(0).nullish(),
+        /** IEPS trasladado del concepto (suma de los traslados 003). Es costo; ver `renglonDelCfdi`. */
+        iepsAmount: z.number().min(0).nullish(),
     })
     .strict();
 

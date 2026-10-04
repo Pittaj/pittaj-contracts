@@ -57,6 +57,11 @@ export interface ReceivedCfdiResponse {
     readonly trasladoIeps: number;
     readonly retencionIsr: number;
     readonly retencionIva: number;
+    /** D1 · `TipoCambio` del CFDI (null en pesos o si no se leyó). */
+    readonly exchangeRate?: number | null;
+    /** D1 · Impuestos locales (`implocal`): trasladados y retenidos. */
+    readonly trasladoLocal?: number;
+    readonly retencionLocal?: number;
 
     readonly status: ReceivedCfdiStatusValue;
     readonly origin: ReceivedCfdiOriginValue;
