@@ -47,6 +47,8 @@ export interface CfdiBatchResolvedConcepto {
     readonly importe: number;
     readonly descuento: number;
     readonly taxRate: number;
+    /** IVA trasladado del concepto, como lo trae el comprobante (ver `tasaDelRenglonDelCfdi`). */
+    readonly taxAmount?: number | null;
 
     readonly productId: string | null;
     /** Con qué se emparejó, para poder explicarlo en la pantalla. */

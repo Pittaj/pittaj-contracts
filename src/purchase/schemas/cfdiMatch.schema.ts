@@ -65,6 +65,8 @@ export const cfdiConceptoSchema = z
             .max(1, { message: ERROR_MESSAGES.TAX_FRACTION })
             .optional()
             .default(0),
+        /** IVA trasladado del concepto (importe del comprobante). Ver `tasaDelRenglonDelCfdi`. */
+        taxAmount: z.number().min(0).nullish(),
     })
     .strict();
 

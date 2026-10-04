@@ -32,6 +32,8 @@ export const SEED_EXPENSE_CONCEPTS: readonly SemillaDeConceptoDeGasto[] = [
     { code: 'MAINTENANCE', name: 'Mantenimiento', ledgerAccountCode: '601-05', offeredAtCash: true, isSystem: false },
     { code: 'ADVERTISING', name: 'Publicidad', ledgerAccountCode: '601-06', offeredAtCash: false, isSystem: false },
     { code: 'FREIGHT', name: 'Fletes y paquetería', ledgerAccountCode: '601-07', offeredAtCash: true, isSystem: false },
+    // Gasolina pagada en efectivo no se deduce: este concepto no se ofrece en la caja (2026-10-04).
+    { code: 'FUEL', name: 'Combustibles', ledgerAccountCode: '601-15', offeredAtCash: false, isSystem: false },
     { code: 'FEES', name: 'Honorarios', ledgerAccountCode: '601-08', offeredAtCash: false, isSystem: false },
     { code: EXPENSE_CONCEPT_OTHER_CODE, name: 'Otros gastos', ledgerAccountCode: '601-09', offeredAtCash: true, isSystem: true },
 ];

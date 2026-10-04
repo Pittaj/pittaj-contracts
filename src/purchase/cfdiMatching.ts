@@ -54,6 +54,29 @@ export interface CfdiConceptoInput {
     readonly descuento: number;
     /** Traslado del concepto como fracción (0.16). 0 = exento o sin traslado. */
     readonly taxRate: number;
+    /**
+     * IVA trasladado del concepto, **el importe que dice el comprobante**. Opcional: lo
+     * mandan las puntas que ya lo leen. Hace falta cuando la base del IVA no es el importe —la
+     * gasolina lleva la cuota de IEPS dentro del precio y el IVA se calcula sin ella—; ver
+     * `tasaDelRenglonDelCfdi`.
+     */
+    readonly taxAmount?: number | null;
+}
+
+/**
+ * La tasa con la que el renglón tiene que reproducir el IVA del comprobante.
+ *
+ * Normalmente es la del CFDI (0.16). Pero si esa tasa sobre el importe no da el IVA que el
+ * concepto dice —gasolina: importe 519.28, IVA 80.72 sobre una base de 504.49—, el renglón
+ * lleva la **tasa efectiva** (80.72 ÷ 519.28 = 0.155444), a seis decimales. Así la compra
+ * suma lo mismo que el comprobante y la póliza acredita el IVA que de verdad se pagó.
+ */
+export function tasaDelRenglonDelCfdi(c: Pick<CfdiConceptoInput, 'importe' | 'descuento' | 'taxRate' | 'taxAmount'>): number {
+    const base = (c.importe ?? 0) - (c.descuento ?? 0);
+    if (c.taxAmount === null || c.taxAmount === undefined || !(base > 0)) return c.taxRate;
+    const conLaTasa = Math.round(base * c.taxRate * 100) / 100;
+    if (Math.abs(conLaTasa - c.taxAmount) <= 0.01) return c.taxRate;
+    return Math.round((c.taxAmount / base) * 1_000_000) / 1_000_000;
 }
 
 /**
