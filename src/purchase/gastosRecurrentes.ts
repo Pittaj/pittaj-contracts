@@ -37,7 +37,7 @@ export type VencimientoRecurrente = (typeof VENCIMIENTOS_RECURRENTES)[number];
 
 const mes = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Mes en formato AAAA-MM');
 
-/** PUT /api/recurring-expenses/:id — alta o edición (el id lo genera el cliente). */
+/** PUT /api/purchases/recurring/:id — alta o edición (el id lo genera el cliente). */
 export const saveRecurringExpenseSchema = z.object({
     name: z.string().trim().min(1, 'Ponle un nombre: «Luz Chiautla»').max(120),
     supplierId: z.string().uuid('Elige el proveedor'),
@@ -62,12 +62,12 @@ export const saveRecurringExpenseSchema = z.object({
 });
 export type SaveRecurringExpenseRequest = z.infer<typeof saveRecurringExpenseSchema>;
 
-/** POST /api/recurring-expenses/periods/:id/omit — «¿Omitir Neon de octubre?». */
+/** POST /api/purchases/recurring/periods/:id/omit — «¿Omitir Neon de octubre?». */
 export const omitRecurringPeriodSchema = z.object({
     reason: z.string().trim().max(200).optional(),
 });
 
-/** POST /api/recurring-expenses/periods/:id/link — «Elegir» cuando el emparejado no adivinó. */
+/** POST /api/purchases/recurring/periods/:id/link — «Elegir» cuando el emparejado no adivinó. */
 export const linkRecurringPeriodSchema = z.object({
     purchaseId: z.string().uuid('Elige el gasto'),
 });

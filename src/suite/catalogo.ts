@@ -145,6 +145,7 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
             { ruta: 'pagos/cxp', nombre: 'Cuentas por Pagar' },
             { ruta: 'pagos/realizados', nombre: 'Pagos Realizados' },
             { ruta: 'pagos/antiguedad', nombre: 'Antigüedad de Saldos' },
+            { ruta: 'pagos/recurrentes', nombre: 'Gastos recurrentes' },
             { ruta: 'proveedores', nombre: 'Proveedores' },
             { ruta: 'productos', nombre: 'Productos' },
             { ruta: 'categorias', nombre: 'Categorías' },
