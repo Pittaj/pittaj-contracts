@@ -5,6 +5,8 @@ export interface ProductTaxInfoPrimitives {
   readonly iepsTaxId?: string | null;
   /** D7c · Clase para retenciones (`CLASES_DE_RETENCION`); null = bienes o servicios en general. */
   readonly retentionClass?: 'HONORARIOS' | 'ARRENDAMIENTO' | 'COMISIONES' | 'FLETES' | 'PERSONAL' | null;
+  /** D7d · Impuesto local trasladado (catálogo, tipo LOCAL); null = no lleva. */
+  readonly localTaxId?: string | null;
   readonly satProductCode: string | null;
   readonly satUnitCode: string | null;
 }

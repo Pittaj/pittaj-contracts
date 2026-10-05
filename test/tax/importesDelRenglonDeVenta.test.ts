@@ -12,7 +12,7 @@ describe('D7b · importes con IVA e IEPS', () => {
             cantidad: 1, factorDeUnidad: 0.6, precioUnitario: 18, tasaIva: 0.16,
             ieps: { factor: 'Cuota', tasaOCuota: 1.6451 }, impuestosIncluidos: true,
         });
-        expect(r).toEqual({ subtotal: 14.53, descuento: 0, base: 14.53, ieps: 0.99, baseIva: 15.52, iva: 2.48, total: 18, unidadesDeCuota: 0.6 });
+        expect(r).toEqual({ subtotal: 14.53, descuento: 0, base: 14.53, ieps: 0.99, baseIva: 15.52, iva: 2.48, local: 0, total: 18, unidadesDeCuota: 0.6 });
         expect(trasladoDeIeps('Cuota', 1.6451, r.base, r.unidadesDeCuota, r.ieps)).toEqual({
             impuesto: '003', tipoFactor: 'Cuota', tasaOCuota: 1.6451, base: 0.6, importe: 0.99,
         });
@@ -22,7 +22,7 @@ describe('D7b · importes con IVA e IEPS', () => {
         const r = importesDelRenglonDeVenta({
             cantidad: 1, precioUnitario: 20, tasaIva: 0.16, ieps: { factor: 'Tasa', tasaOCuota: 0.08 }, impuestosIncluidos: true,
         });
-        expect(r).toEqual({ subtotal: 15.96, descuento: 0, base: 15.96, ieps: 1.28, baseIva: 17.24, iva: 2.76, total: 20, unidadesDeCuota: 0 });
+        expect(r).toEqual({ subtotal: 15.96, descuento: 0, base: 15.96, ieps: 1.28, baseIva: 17.24, iva: 2.76, local: 0, total: 20, unidadesDeCuota: 0 });
     });
 
     it('precio sin impuestos: base 100, IEPS 8 %, IVA 16 % sobre 108', () => {

@@ -3,7 +3,7 @@
  *
  * Réplica del dominio desktop (Pittaj.Domain/Tax):
  * - rate es FRACCIÓN 0-1 (0.16 = 16%), la UI captura % y convierte
- * - invariante: ZERO/EXEMPT/NOT_OBJECT exigen rate 0; IVA exige rate en (0, 1]; IEPS por tasa,
+ * - invariante: ZERO/EXEMPT/NOT_OBJECT exigen rate 0; IVA y LOCAL exigen rate en (0, 1]; IEPS por tasa,
  *   (0, 3] (D7b: tabaco 160 % = 1.6); IEPS por cuota, > 0 (pesos por unidad)
  *
  * @module Contracts/Tax
@@ -13,7 +13,12 @@ import { z } from 'zod';
 
 /** Tipos de impuesto (enum del dominio desktop TaxKind). */
 /** D7a · `NOT_OBJECT` = no objeto de impuesto (`ObjetoImp 01`): el CFDI no lleva nodo de impuestos. */
-export const TAX_KINDS = ['IVA', 'IEPS', 'ZERO', 'EXEMPT', 'NOT_OBJECT'] as const;
+/**
+ * D7d · `LOCAL` = impuesto local trasladado (estatal o municipal: hospedaje, espectáculos…). No es
+ * el impuesto principal del producto: va aparte del IVA (`taxInfo.localTaxId`), no entra en la base
+ * del IVA y viaja en el complemento `implocal` del CFDI.
+ */
+export const TAX_KINDS = ['IVA', 'IEPS', 'ZERO', 'EXEMPT', 'NOT_OBJECT', 'LOCAL'] as const;
 export type TaxKind = (typeof TAX_KINDS)[number];
 
 /** Estados del impuesto (VO TaxStatus). */
@@ -26,7 +31,8 @@ const ERROR_MESSAGES = {
     NAME_TOO_SHORT: 'El nombre debe tener al menos 2 caracteres',
     NAME_TOO_LONG: 'El nombre no puede exceder 50 caracteres',
     RATE_RANGE: 'La tasa debe ser una fracción entre 0 y 1 (0.16 = 16%)',
-    KIND_INVALID: 'Tipo inválido. Use: IVA, IEPS, ZERO, EXEMPT o NOT_OBJECT',
+    KIND_INVALID: 'Tipo inválido. Use: IVA, IEPS, ZERO, EXEMPT, NOT_OBJECT o LOCAL',
+    LOCAL_RATE: 'Un impuesto local requiere una tasa mayor a 0 y hasta 1 (0.03 = 3 %)',
     SAT_FACTOR_TOO_LONG: 'El factor SAT no puede exceder 20 caracteres',
     SAT_CODE_TOO_LONG: 'El código SAT no puede exceder 10 caracteres',
     ZERO_EXEMPT_RATE: 'Tasa 0, Exento y No objeto deben tener tasa 0',
@@ -46,6 +52,9 @@ function validateRateKind(
 ): void {
     if ((data.kind === 'ZERO' || data.kind === 'EXEMPT' || data.kind === 'NOT_OBJECT') && data.rate !== 0) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['rate'], message: ERROR_MESSAGES.ZERO_EXEMPT_RATE });
+    }
+    if (data.kind === 'LOCAL' && (data.rate <= 0 || data.rate > 1)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['rate'], message: ERROR_MESSAGES.LOCAL_RATE });
     }
     if (data.kind === 'IVA' && (data.rate <= 0 || data.rate > 1)) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['rate'], message: ERROR_MESSAGES.IVA_IEPS_RATE });

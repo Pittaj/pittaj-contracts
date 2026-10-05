@@ -32,6 +32,8 @@
  * La gemela del escritorio es `Pittaj.Domain/Tax/RetencionesDeLaVenta.cs`, con los mismos vectores.
  */
 
+import { impuestoLocal, type ImpuestoLocalDelConcepto } from './impuestosLocales.js';
+
 /** Qué se vende, en lo que importa para retener. `null` = bienes o servicios en general. */
 export const CLASES_DE_RETENCION = ['HONORARIOS', 'ARRENDAMIENTO', 'COMISIONES', 'FLETES', 'PERSONAL'] as const;
 export type ClaseDeRetencion = (typeof CLASES_DE_RETENCION)[number];
@@ -60,6 +62,12 @@ export interface TasasDeRetencion {
     /** Fracción sobre la base sin impuestos (0.10, 0.0125). */
     readonly isr: number | null;
     readonly iva: RetencionDeIva | null;
+    /**
+     * D7d · Retención local (cedular estatal sobre honorarios o arrendamiento, por ejemplo). No se
+     * calcula: cada estado la define en su ley de hacienda, así que la captura quien timbra con el
+     * nombre y la tasa de su estado. Va en el complemento `implocal`.
+     */
+    readonly local?: { readonly nombre: string; readonly tasa: number } | null;
     /** Por qué (artículos). Para mostrarlo antes de timbrar. */
     readonly fundamento?: string;
 }
@@ -150,7 +158,17 @@ export function decidirRetenciones(
 
 /** `true` si la decisión no retiene nada. */
 export const sinRetenciones = (d: RetencionesDecididas | null | undefined): boolean =>
-    !d || Object.values(d).every((t) => !t || (t.isr === null && t.iva === null));
+    !d || Object.values(d).every((t) => !t || (t.isr === null && t.iva === null && !t.local));
+
+/** D7d · La retención local del concepto según la decisión (cedular), sobre la base sin impuestos. */
+export function retencionLocalDelConcepto(
+    d: RetencionesDecididas | null | undefined,
+    c: Pick<ConceptoParaRetener, 'clase' | 'base'>,
+): ImpuestoLocalDelConcepto[] {
+    const t = d?.[c.clase ?? SIN_CLASE];
+    if (!t?.local || !(t.local.tasa > 0) || c.base <= 0 || !t.local.nombre.trim()) return [];
+    return [impuestoLocal(t.local.nombre, 'RETENCION', t.local.tasa, c.base)];
+}
 
 /** Una retención de un concepto (o del documento, agrupada). */
 export interface RetencionDelConcepto {
@@ -227,6 +245,9 @@ export function validarRetenciones(d: RetencionesDecididas): string | null {
         if (t.isr !== null && !(t.isr >= 0 && t.isr <= 0.35)) return `La retención de ISR de ${clave} debe estar entre 0 y 35 %.`;
         if (t.iva?.modo === 'TASA' && !(t.iva.tasa >= 0 && t.iva.tasa <= 0.16)) {
             return `La retención de IVA de ${clave} debe estar entre 0 y 16 %.`;
+        }
+        if (t.local && (!(t.local.tasa >= 0 && t.local.tasa <= 0.35) || !t.local.nombre.trim())) {
+            return `La retención local de ${clave} necesita nombre y una tasa entre 0 y 35 %.`;
         }
     }
     return null;

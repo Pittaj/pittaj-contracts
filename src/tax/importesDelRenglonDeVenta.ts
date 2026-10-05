@@ -29,6 +29,11 @@ export interface RenglonDeVentaParaCalcular {
     readonly tasaIva: number;
     /** IEPS del producto; ausente = no lleva. */
     readonly ieps?: { readonly factor: FactorDeIeps; readonly tasaOCuota: number } | null;
+    /**
+     * D7d · Impuesto local trasladado (hospedaje 3 %…) como fracción. Va sobre la base, **no** entra
+     * en la base del IVA, y el precio de etiqueta lo incluye como a los demás.
+     */
+    readonly tasaLocal?: number | null;
     /** El precio ya trae los impuestos (precio de etiqueta). */
     readonly impuestosIncluidos: boolean;
 }
@@ -43,6 +48,8 @@ export interface ImportesDelRenglonDeVenta {
     /** Base + IEPS: la base del IVA. */
     readonly baseIva: number;
     readonly iva: number;
+    /** D7d · Impuesto local trasladado (0 si no lleva). */
+    readonly local: number;
     readonly total: number;
     /** Unidades base sobre las que se cobró la cuota (la «Base» del IEPS por cuota en el CFDI). */
     readonly unidadesDeCuota: number;
@@ -56,29 +63,35 @@ export function importesDelRenglonDeVenta(r: RenglonDeVentaParaCalcular): Import
     const unidades = r.cantidad * (r.factorDeUnidad && r.factorDeUnidad > 0 ? r.factorDeUnidad : 1);
     const v = r.tasaIva;
     const ieps = r.ieps && r.ieps.tasaOCuota > 0 ? r.ieps : null;
+    const l = r.tasaLocal && r.tasaLocal > 0 ? r.tasaLocal : 0;
 
     if (r.impuestosIncluidos) {
         const total = r2(bruto - descuento);
         let base: number;
         let iepsImporte: number;
+        // total = base·(1+i)·(1+v) + base·l   (IEPS por tasa)
+        // total = (base + cuota)·(1+v) + base·l   (IEPS por cuota)
         if (ieps?.factor === 'Tasa') {
-            base = r2(total / ((1 + ieps.tasaOCuota) * (1 + v)));
+            base = r2(total / ((1 + ieps.tasaOCuota) * (1 + v) + l));
             iepsImporte = r2(base * ieps.tasaOCuota);
         } else if (ieps?.factor === 'Cuota') {
             iepsImporte = r2(unidades * ieps.tasaOCuota);
-            base = r2(total / (1 + v) - iepsImporte);
+            base = r2((total - iepsImporte * (1 + v)) / (1 + v + l));
         } else {
-            base = r2(total / (1 + v));
+            base = r2(total / (1 + v + l));
             iepsImporte = 0;
         }
         const baseIva = r2(base + iepsImporte);
+        const local = r2(base * l);
         return {
             subtotal: r2(base + descuento),
             descuento,
             base,
             ieps: iepsImporte,
             baseIva,
-            iva: r2(total - baseIva),
+            // El centavo de redondeo cae en el IVA (o en el local si no hay IVA).
+            iva: v > 0 ? r2(total - baseIva - local) : 0,
+            local: v > 0 ? local : r2(total - baseIva),
             total,
             unidadesDeCuota: ieps?.factor === 'Cuota' ? unidades : 0,
         };
@@ -89,6 +102,7 @@ export function importesDelRenglonDeVenta(r: RenglonDeVentaParaCalcular): Import
     const iepsImporte = !ieps ? 0 : ieps.factor === 'Tasa' ? r2(base * ieps.tasaOCuota) : r2(unidades * ieps.tasaOCuota);
     const baseIva = r2(base + iepsImporte);
     const iva = r2(baseIva * v);
+    const local = r2(base * l);
     return {
         subtotal,
         descuento,
@@ -96,7 +110,8 @@ export function importesDelRenglonDeVenta(r: RenglonDeVentaParaCalcular): Import
         ieps: iepsImporte,
         baseIva,
         iva,
-        total: r2(baseIva + iva),
+        local,
+        total: r2(baseIva + iva + local),
         unidadesDeCuota: ieps?.factor === 'Cuota' ? unidades : 0,
     };
 }

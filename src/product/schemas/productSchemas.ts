@@ -67,6 +67,11 @@ const productTaxInfoSchema = z.object({
      * fletes, personal). Null = bienes o servicios en general.
      */
     retentionClass: z.enum(CLASES_DE_RETENCION).nullable().default(null),
+    /**
+     * D7d · Impuesto local trasladado (un impuesto del catálogo de tipo LOCAL: hospedaje…), además
+     * del IVA. Null = no lleva.
+     */
+    localTaxId: z.string().uuid().nullable().default(null),
     satProductCode: z.string().nullable().default(null),
     satUnitCode: z.string().nullable().default(null),
 });

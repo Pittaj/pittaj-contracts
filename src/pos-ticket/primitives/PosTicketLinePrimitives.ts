@@ -35,6 +35,13 @@ export interface PosTicketLinePrimitives extends SaleLineBasePrimitives {
    */
   readonly retentionClass?: string | null;
   /**
+   * D7d · Impuesto local trasladado del renglón (hospedaje…): nombre, tasa (fracción) e importe.
+   * No entra en la base del IVA. Ausentes = no lleva.
+   */
+  readonly localTaxName?: string | null;
+  readonly localTaxRate?: number | null;
+  readonly localTaxAmount?: number | null;
+  /**
    * Línea de negocio estampada al confirmar el ticket (F1.7): producto → categoría → sucursal con
    * el catálogo de ese momento. Opcional: si no viene, la nube la estampa al guardar.
    */

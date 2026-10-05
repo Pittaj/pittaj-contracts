@@ -147,6 +147,8 @@ export const tasasDeRetencionSchema = z.object({
         ])
         .nullable()
         .default(null),
+    /** D7d · Retención local (cedular): nombre y tasa del estado. */
+    local: z.object({ nombre: z.string().trim().min(1).max(60), tasa: z.number().min(0).max(0.35) }).nullish(),
     fundamento: z.string().max(500).optional(),
 });
 
@@ -165,6 +167,11 @@ export const stampSaleCfdiSchema = z.object({
      * (`decidirRetenciones`); `{}` = timbrar sin retenciones. Opcional: el escritorio viejo no lo manda.
      */
     retenciones: retencionesDecididasSchema.optional(),
+    /**
+     * D7d · Pesos por unidad de la moneda de la venta, cuando la venta no está en MXN (Anexo 20,
+     * `TipoCambio`). Obligatorio en ese caso; se ignora en MXN.
+     */
+    tipoCambio: z.number().positive().max(100_000).optional(),
 });
 
 /**
@@ -229,6 +236,8 @@ export const stampRepSchema = z.object({
     }),
     /** Cuándo se cobró. Si no viene, el backend usa el momento del timbrado. */
     paymentDate: z.string().datetime().optional(),
+    /** D7d · Tipo de cambio del día del pago (`TipoCambioP`), si la venta no está en MXN. */
+    tipoCambio: z.number().positive().max(100_000).optional(),
 });
 
 export type StampRepInput = z.infer<typeof stampRepSchema>;
@@ -254,6 +263,8 @@ export const stampGlobalCfdiSchema = z.object({
     /** `c_Meses`: 01–12 mensual · 13–18 bimestral. */
     meses: z.string().regex(/^(0[1-9]|1[0-8])$/, 'Mes fuera del catálogo c_Meses'),
     anio: z.number().int().min(2020).max(2100),
+    /** D7d · Si las ventas del periodo están en otra moneda, su tipo de cambio. */
+    tipoCambio: z.number().positive().max(100_000).optional(),
 });
 
 export type StampGlobalCfdiInput = z.infer<typeof stampGlobalCfdiSchema>;

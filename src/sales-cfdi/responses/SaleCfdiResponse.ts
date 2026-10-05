@@ -153,4 +153,8 @@ export interface PreviewRetencionesResponse {
     readonly totalDelTicket: number;
     /** Total del CFDI: lo que el cliente te paga; el resto lo entera él al SAT. */
     readonly totalDelCfdi: number;
+    /** D7d · Moneda de la venta. Si no es MXN, el timbrado pide `tipoCambio`. */
+    readonly moneda: string;
+    /** D7d · El último tipo de cambio que usó el negocio para esa moneda (propuesta); null si nunca. */
+    readonly tipoCambioSugerido: number | null;
 }

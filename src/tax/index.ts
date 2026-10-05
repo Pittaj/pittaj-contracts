@@ -8,3 +8,4 @@ export * from './responses/index.js';
 export * from './impuestoDelRenglon.js';
 export * from './importesDelRenglonDeVenta.js';
 export * from './retencionesDeLaVenta.js';
+export * from './impuestosLocales.js';
