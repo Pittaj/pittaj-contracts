@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { businessLineRefSchema } from '../../business-line/schemas/createBusinessLine.schema.js';
 import { PRODUCT_CONSTANTS } from '../constants/index.js';
 import { CLASES_DE_RETENCION } from '../../tax/retencionesDeLaVenta.js';
+import { OBJETOS_IMP_SIN_DESGLOSE } from '../../tax/impuestoDelRenglon.js';
 
 
 const { LIMITS } = PRODUCT_CONSTANTS;
@@ -72,6 +73,11 @@ const productTaxInfoSchema = z.object({
      * del IVA. Null = no lleva.
      */
     localTaxId: z.string().uuid().nullable().default(null),
+    /**
+     * D7e · Objeto de impuesto forzado en el CFDI (`03`, `04` o `05`): el concepto va sin
+     * desglose. Null = el que diga su impuesto.
+     */
+    objetoImp: z.enum(OBJETOS_IMP_SIN_DESGLOSE).nullable().default(null),
     satProductCode: z.string().nullable().default(null),
     satUnitCode: z.string().nullable().default(null),
 });

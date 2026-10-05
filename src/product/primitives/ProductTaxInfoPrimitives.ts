@@ -7,6 +7,8 @@ export interface ProductTaxInfoPrimitives {
   readonly retentionClass?: 'HONORARIOS' | 'ARRENDAMIENTO' | 'COMISIONES' | 'FLETES' | 'PERSONAL' | null;
   /** D7d · Impuesto local trasladado (catálogo, tipo LOCAL); null = no lleva. */
   readonly localTaxId?: string | null;
+  /** D7e · Objeto de impuesto forzado ('03' | '04' | '05'); null = el de su impuesto. */
+  readonly objetoImp?: '03' | '04' | '05' | null;
   readonly satProductCode: string | null;
   readonly satUnitCode: string | null;
 }

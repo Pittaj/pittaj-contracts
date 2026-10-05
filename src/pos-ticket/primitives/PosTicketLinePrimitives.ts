@@ -41,6 +41,8 @@ export interface PosTicketLinePrimitives extends SaleLineBasePrimitives {
   readonly localTaxName?: string | null;
   readonly localTaxRate?: number | null;
   readonly localTaxAmount?: number | null;
+  /** D7e · Objeto de impuesto forzado del producto al vender ('03' | '04' | '05'); null = automático. */
+  readonly objetoImp?: string | null;
   /**
    * Línea de negocio estampada al confirmar el ticket (F1.7): producto → categoría → sucursal con
    * el catálogo de ese momento. Opcional: si no viene, la nube la estampa al guardar.

@@ -47,6 +47,8 @@ export const POSTING_SWEEPS = [
     { key: 'purchase-payments', label: 'Pagos a proveedores (IVA acreditable)' },
     // D7g: lo que tus clientes te retienen en las facturas pasa a impuestos a favor.
     { key: 'sale-withholdings', label: 'Retenciones de tus clientes en facturas' },
+    // D7e: bonificaciones y descuentos sin devolución, con su nota de crédito timbrada.
+    { key: 'sale-bonifications', label: 'Bonificaciones y descuentos a clientes' },
 ] as const;
 
 export type PostingSweepKey = (typeof POSTING_SWEEPS)[number]['key'];

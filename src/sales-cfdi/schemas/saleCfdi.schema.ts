@@ -242,6 +242,31 @@ export const stampRepSchema = z.object({
 
 export type StampRepInput = z.infer<typeof stampRepSchema>;
 
+/**
+ * D7e · `POST /api/sales-cfdi/:ticketId/bonificacion` — nota de crédito por **bonificación o
+ * descuento** sobre una venta facturada, **sin devolución** de mercancía (CFDI de Egreso, relación
+ * `01` «Nota de crédito de los documentos relacionados»).
+ *
+ * `importe` es lo que el cliente deja de deber o se le regresa, **sobre el total del CFDI** (con
+ * impuestos, neto de retenciones). Los impuestos de la nota salen en la misma proporción que los
+ * de la factura: si la venta llevaba IVA 16 % y 0 %, la nota también.
+ */
+export const BONIFICATION_KINDS = ['BONIFICACION', 'DESCUENTO'] as const;
+export type BonificationKindValue = (typeof BONIFICATION_KINDS)[number];
+
+/** Formas de pago admitidas en la nota: las del REP más compensación (17) y condonación (15). */
+export const BONIFICATION_PAYMENT_FORMS = ['01', '02', '03', '04', '05', '06', '15', '17', '28', '29', '31'] as const;
+
+export const stampBonificationSchema = z.object({
+    importe: z.number().positive('El importe debe ser mayor que cero'),
+    tipo: z.enum(BONIFICATION_KINDS).default('BONIFICACION'),
+    /** Cómo se aplica: `17` compensación (baja lo que debe) es lo normal en una venta a crédito. */
+    formaPago: z.enum(BONIFICATION_PAYMENT_FORMS),
+    descripcion: z.string().trim().max(200).optional(),
+});
+
+export type StampBonificationInput = z.infer<typeof stampBonificationSchema>;
+
 /** `POST /api/sales-cfdi/:ticketId/rep/:repId/cancel`. */
 export const cancelRepSchema = z.object({
     motive: z.enum(CANCELLATION_MOTIVES).default(DEFAULT_CANCELLATION_MOTIVE),

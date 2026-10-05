@@ -96,3 +96,13 @@ describe('D7a · el desglose de un abono', () => {
         ]);
     });
 });
+
+describe('D7e · objeto de impuesto forzado', () => {
+    it('solo 03, 04 y 05 se fuerzan', async () => {
+        const { objetoImpForzado } = await import('../../src/tax/impuestoDelRenglon.js');
+        expect(objetoImpForzado('03')).toBe('03');
+        expect(objetoImpForzado(' 05 ')).toBe('05');
+        expect(objetoImpForzado('02')).toBeNull();
+        expect(objetoImpForzado(null)).toBeNull();
+    });
+});

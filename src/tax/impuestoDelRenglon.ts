@@ -27,8 +27,36 @@
  */
 import type { TaxKind } from './schemas/createTax.schema.js';
 
-/** c_ObjetoImp. D7a usa `01` y `02`; `03`–`05` llegan en D7e. */
+/** c_ObjetoImp. */
 export type ObjetoImp = '01' | '02' | '03' | '04' | '05';
+
+/**
+ * D7e · Las claves que el producto puede **forzar**: son objeto del impuesto pero el concepto va
+ * **sin** nodo de impuestos (Anexo 20, «ObjetoImp»: con 01, 03, 04 o 05 no se desglosan).
+ *
+ * - `03` Sí objeto y **no obligado al desglose**: el impuesto se causa y se cobra, pero va dentro
+ *   del precio. El importe del concepto es el precio con impuestos.
+ * - `04` Sí objeto y **no causa** el impuesto (p. ej. los intereses reales de LIVA art. 18-A,
+ *   fr. I, inciso b). El producto debe tener tasa 0: no se cobra IVA.
+ * - `05` Sí objeto, **IVA crédito PODEBI**: estímulo de los Polos de Desarrollo para el Bienestar
+ *   del Istmo (decreto de 2023), un crédito igual al 100 % del IVA. Tampoco se desglosa.
+ *
+ * Sin clave forzada, el objeto sale del impuesto del renglón (`impuestoDelRenglon`).
+ */
+export const OBJETOS_IMP_SIN_DESGLOSE = ['03', '04', '05'] as const;
+export type ObjetoImpSinDesglose = (typeof OBJETOS_IMP_SIN_DESGLOSE)[number];
+
+export const NOMBRE_DE_OBJETO_IMP: Record<ObjetoImpSinDesglose, string> = {
+    '03': 'Sí objeto, no obligado al desglose (el impuesto va en el precio)',
+    '04': 'Sí objeto, no causa impuesto',
+    '05': 'Sí objeto, IVA crédito PODEBI',
+};
+
+/** La clave forzada del renglón si es una de las válidas; si no, null. */
+export function objetoImpForzado(objetoImp: string | null | undefined): ObjetoImpSinDesglose | null {
+    const v = (objetoImp ?? '').trim();
+    return (OBJETOS_IMP_SIN_DESGLOSE as readonly string[]).includes(v) ? (v as ObjetoImpSinDesglose) : null;
+}
 
 /** c_Impuesto que se trasladan en una venta. */
 export type ImpuestoTrasladado = '002' | '003';
