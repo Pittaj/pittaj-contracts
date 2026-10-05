@@ -31,6 +31,10 @@ describe('D4 · empresaDeLaCompra', () => {
         expect(empresaDeLaCompra({ sucursal: null, bodega: PRINCIPAL_TEH, empresas: ['e1', 'e2'] })).toEqual({ ok: true, companyId: 'e1' });
     });
 
+    it('un negocio sin empresas no se bloquea', () => {
+        expect(empresaDeLaCompra({ sucursal: null, bodega: null, empresas: [] })).toEqual({ ok: true, companyId: null });
+    });
+
     it('la elegida no puede contradecir a la sucursal ni ser de otro negocio', () => {
         expect(empresaDeLaCompra({ sucursal: HUE, bodega: GENERAL, elegida: 'e2', empresas: ['e1', 'e2'] })).toMatchObject({ ok: false, campo: 'empresa' });
         expect(empresaDeLaCompra({ sucursal: null, bodega: GENERAL, elegida: 'x', empresas: ['e1', 'e2'] })).toMatchObject({ ok: false, campo: 'empresa' });

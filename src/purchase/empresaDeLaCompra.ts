@@ -10,7 +10,8 @@
  * 2. Si no, la de la sucursal de la bodega, si la bodega es de una sucursal.
  * 3. Si no, la que se eligió.
  * 4. Si no, y el negocio tiene **una sola** empresa, esa: no se pregunta lo que no tiene respuesta.
- * 5. Si no, falta: hay que elegirla.
+ * 5. Si el negocio no tiene ninguna empresa (a medio dar de alta), ninguna: no hay qué elegir.
+ * 6. Si no, falta: hay que elegirla.
  *
  * Y la bodega tiene que ser **de la sucursal elegida o general** (sin sucursal). Huehuetlán no
  * recibe mercancía en la bodega de Tehuacán.
@@ -32,7 +33,8 @@ export interface BodegaDeLaCompra {
 }
 
 export type EmpresaDeLaCompra =
-    | { readonly ok: true; readonly companyId: string }
+    /** `companyId` nulo solo si el negocio no tiene ninguna empresa: no hay nada que elegir. */
+    | { readonly ok: true; readonly companyId: string | null }
     | { readonly ok: false; readonly campo: 'empresa' | 'bodega'; readonly motivo: string };
 
 export function empresaDeLaCompra(e: {
@@ -63,6 +65,8 @@ export function empresaDeLaCompra(e: {
         return { ok: true, companyId: e.elegida };
     }
     if (e.empresas.length === 1) return { ok: true, companyId: e.empresas[0]! };
+    // Sin empresas (un negocio a medio dar de alta) no hay a quién preguntarle: no se bloquea.
+    if (e.empresas.length === 0) return { ok: true, companyId: null };
     return { ok: false, campo: 'empresa', motivo: 'Elige de qué empresa es: sin sucursal, la compra no lo dice.' };
 }
 
