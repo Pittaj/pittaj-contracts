@@ -45,6 +45,8 @@ export const POSTING_SWEEPS = [
     // El espejo del cobro: acredita el IVA de una compra a crédito cuando se paga. No registra
     // el pago —eso lo hace el movimiento bancario—, solo reclasifica el impuesto.
     { key: 'purchase-payments', label: 'Pagos a proveedores (IVA acreditable)' },
+    // D7g: lo que tus clientes te retienen en las facturas pasa a impuestos a favor.
+    { key: 'sale-withholdings', label: 'Retenciones de tus clientes en facturas' },
 ] as const;
 
 export type PostingSweepKey = (typeof POSTING_SWEEPS)[number]['key'];

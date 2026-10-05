@@ -538,7 +538,12 @@ export interface VatReportResponse {
      * corresponde a ningún renglón de la declaración.
      */
     readonly withheld: number;
-    /** Cobrado menos pagado. **Positivo es a cargo**; negativo, saldo a favor. */
+    /**
+     * D7g · IVA que **tus clientes te retuvieron** en el periodo (honorarios, arrendamiento, fletes…).
+     * Este sí se resta: lo enteró el cliente a tu nombre (LIVA art. 1-A y 5-D).
+     */
+    readonly withheldByCustomers: number;
+    /** Cobrado menos pagado menos lo que te retuvieron. **Positivo es a cargo**; negativo, saldo a favor. */
     readonly balance: number;
 
     /** Saldo al corte de lo que se cobrará: IVA de ventas a crédito aún sin cobrar. */
