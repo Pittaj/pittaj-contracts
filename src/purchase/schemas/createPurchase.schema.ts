@@ -201,6 +201,22 @@ export const basePurchaseFields = {
 
     notes: z.string().trim().max(500).nullish(),
 
+    /**
+     * D7f · Retenciones e impuesto local **capturados a mano**, para la compra sin CFDI (honorarios
+     * o renta con recibo en papel). Con CFDI no se aceptan: manda el comprobante (D1). El total de
+     * la compra es lo que se le debe al proveedor: renglones − retenciones + traslado local.
+     * `retencionesDeLaCompra` (tax) las propone con la misma regla de la venta.
+     */
+    retencionesAMano: z
+        .object({
+            retencionIsr: z.number().min(0).max(99_999_999).default(0),
+            retencionIva: z.number().min(0).max(99_999_999).default(0),
+            retencionLocal: z.number().min(0).max(99_999_999).default(0),
+            trasladoLocal: z.number().min(0).max(99_999_999).default(0),
+        })
+        .strict()
+        .nullish(),
+
     /** Renglones del documento. Un borrador puede guardarse sin ninguno. */
     lines: z.array(purchaseLineInputSchema).optional().default([]),
 } as const;

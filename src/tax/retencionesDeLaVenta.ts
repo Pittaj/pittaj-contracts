@@ -252,3 +252,31 @@ export function validarRetenciones(d: RetencionesDecididas): string | null {
     }
     return null;
 }
+
+
+/**
+ * D7f · Las retenciones de una **compra** sin CFDI: el espejo de la venta. Quien compra es el
+ * receptor y retiene; quien vende es el emisor. Misma tabla, mismos artículos.
+ *
+ * `base` es lo pagado sin impuestos; `ivaTrasladado`, el IVA que dice el recibo (⅔ de él).
+ */
+export function retencionesDeLaCompra(input: {
+    readonly comprador: ParteFiscal;
+    readonly proveedor: ParteFiscal;
+    readonly clase: ClaseDeRetencion | null;
+    readonly base: number;
+    readonly ivaTrasladado: number;
+}): { readonly isr: number; readonly iva: number; readonly fundamento: string } {
+    const t = tasasDeRetencion(input.proveedor, input.comprador, input.clase);
+    if (!t || input.base <= 0) return { isr: 0, iva: 0, fundamento: '' };
+    const tasaIva = input.base > 0 ? input.ivaTrasladado / input.base : 0;
+    const rs = retencionesDelConcepto(
+        { [input.clase ?? SIN_CLASE]: t },
+        { clase: input.clase, base: input.base, baseIva: input.base, tasaIva: Math.round(tasaIva * 10_000) / 10_000 },
+    );
+    return {
+        isr: rs.find((r) => r.impuesto === '001')?.importe ?? 0,
+        iva: rs.find((r) => r.impuesto === '002')?.importe ?? 0,
+        fundamento: t.fundamento ?? '',
+    };
+}

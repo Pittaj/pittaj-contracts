@@ -132,3 +132,23 @@ describe('D7c · el escritorio omite los nulos', () => {
         expect(r.HONORARIOS).toEqual({ isr: 0.1, iva: null });
     });
 });
+
+describe('D7f · retenciones de una compra sin CFDI', () => {
+    it('una empresa que paga honorarios a una persona física retiene ISR 10 % e IVA ⅔', async () => {
+        const { retencionesDeLaCompra } = await import('../../src/tax/retencionesDeLaVenta.js');
+        const r = retencionesDeLaCompra({
+            comprador: { rfc: 'ABC010101AB1' }, proveedor: { rfc: 'GOMA800101AB1', regimenFiscal: '612' },
+            clase: 'HONORARIOS', base: 10_000, ivaTrasladado: 1_600,
+        });
+        expect(r).toMatchObject({ isr: 1_000, iva: 1_066.67 });
+        expect(r.fundamento).toContain('LISR art. 106');
+    });
+
+    it('una persona física que paga honorarios no retiene', async () => {
+        const { retencionesDeLaCompra } = await import('../../src/tax/retencionesDeLaVenta.js');
+        expect(retencionesDeLaCompra({
+            comprador: { rfc: 'LOPE900101XY2' }, proveedor: { rfc: 'GOMA800101AB1', regimenFiscal: '612' },
+            clase: 'HONORARIOS', base: 10_000, ivaTrasladado: 1_600,
+        })).toMatchObject({ isr: 0, iva: 0 });
+    });
+});
