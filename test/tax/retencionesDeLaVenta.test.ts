@@ -125,3 +125,10 @@ describe('D7c · ajuste a mano', () => {
         expect(retencionesDecididasSchema.safeParse({ OTRA: { isr: 0.1, iva: null } }).success).toBe(false);
     });
 });
+
+describe('D7c · el escritorio omite los nulos', () => {
+    it('una clase sin `iva` se lee como «no se retiene IVA»', () => {
+        const r = retencionesDecididasSchema.parse({ HONORARIOS: { isr: 0.1 } });
+        expect(r.HONORARIOS).toEqual({ isr: 0.1, iva: null });
+    });
+});

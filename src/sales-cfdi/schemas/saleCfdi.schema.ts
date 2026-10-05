@@ -138,13 +138,15 @@ export type StampReceptorInput = z.infer<typeof stampReceptorSchema>;
  */
 /** D7c · Las tasas de una clase, como las ajusta quien timbra. */
 export const tasasDeRetencionSchema = z.object({
-    isr: z.number().min(0).max(0.35).nullable(),
+    // `default(null)`: un cliente que omite los nulos (el escritorio serializa así) dice «no se retiene».
+    isr: z.number().min(0).max(0.35).nullable().default(null),
     iva: z
         .discriminatedUnion('modo', [
             z.object({ modo: z.literal('DOS_TERCIOS') }),
             z.object({ modo: z.literal('TASA'), tasa: z.number().min(0).max(0.16) }),
         ])
-        .nullable(),
+        .nullable()
+        .default(null),
     fundamento: z.string().max(500).optional(),
 });
 
