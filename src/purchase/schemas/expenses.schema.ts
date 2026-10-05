@@ -32,6 +32,14 @@ export const getExpensesSchema = z.object({
     expenseConceptId: z.union([z.string().uuid(), z.literal(SIN_CONCEPTO)]).optional(),
     /** Folio, proveedor, folio del comprobante. */
     search: z.string().trim().max(100).optional(),
+    /**
+     * D5 · Solo los borradores, **de todos los meses** (`desde`/`hasta` se ignoran). Un CFDI de
+     * agosto convertido en octubre nace en agosto; la pestaña «Borradores» no puede esconderlo.
+     */
+    borradores: z
+        .union([z.boolean(), z.enum(['true', 'false'])])
+        .transform((v) => v === true || v === 'true')
+        .optional(),
     page: z.coerce.number().int().min(1).optional(),
     limit: z.coerce.number().int().min(1).max(200).optional(),
 });

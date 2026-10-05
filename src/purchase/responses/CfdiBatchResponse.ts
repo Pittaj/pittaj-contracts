@@ -169,6 +169,12 @@ export interface CfdiBatchResultItem {
     readonly purchaseId: string | null;
     readonly purchaseNumber: string | null;
     readonly total: number;
+    /**
+     * D5 · La naturaleza con la que nació y el mes en que vive (`YYYY-MM`, el del comprobante): un
+     * gasto se busca en Compras › Gastos de ese mes, no en Órdenes de compra.
+     */
+    readonly kind?: 'INVENTORY' | 'EXPENSE' | 'FIXED_ASSET' | null;
+    readonly mes?: string | null;
     /** Vacío si se creó; si no, por qué se quedó fuera. */
     readonly motivos: readonly MotivoDeAtencion[];
     /** El detalle legible cuando el comprobante falló por algo que no es una decisión del usuario. */
