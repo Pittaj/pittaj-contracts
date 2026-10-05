@@ -20,6 +20,8 @@ export interface RecepcionResponse {
     readonly supplierName: string;
 
     readonly receivedAt: string;
+    /** D3 · Fecha contable de la entrega (`YYYY-MM-DD`). */
+    readonly accountingDate?: string | null;
     /**
      * Remisión o guía del proveedor. Nulo = entró sin papel.
      *

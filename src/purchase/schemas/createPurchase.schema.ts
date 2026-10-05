@@ -32,6 +32,7 @@ import { businessLineRefSchema } from '../../business-line/schemas/createBusines
 import { expenseConceptRefSchema } from '../../expense-concept/schemas/expenseConcept.schema.js';
 import { PURCHASE_LINE_ORIGINS } from '../purchaseLineOrigin.js';
 import { PURCHASE_KINDS } from './getPurchases.schema.js';
+import { fechaCivilEntranteSchema } from '../../shared/fechas.js';
 
 const ERROR_MESSAGES = {
     ID_INVALID_UUID: 'El ID debe ser un UUID válido',
@@ -172,8 +173,11 @@ export const basePurchaseFields = {
     /** UUID del CFDI del proveedor. */
     invoiceUuid: z.string().trim().max(50).nullish(),
 
-    /** Fecha del comprobante. */
-    invoiceDate: z.coerce.date().nullish(),
+    /**
+     * Fecha del comprobante: fecha **civil** `YYYY-MM-DD` (D3), la del reloj del emisor. Se acepta
+     * el ISO de antes y se toma su día; nunca se convierte de zona.
+     */
+    invoiceDate: fechaCivilEntranteSchema,
 
     /** CFDI MétodoPago: "PUE" / "PPD". */
     paymentMethod: z.string().trim().max(5).nullish(),

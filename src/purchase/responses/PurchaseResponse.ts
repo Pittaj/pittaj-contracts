@@ -115,8 +115,10 @@ export interface PurchaseLineResponse {
 export interface PurchaseReceptionResponse {
     readonly id: string;
     readonly purchaseId: string;
-    /** Fecha de la entrega (ISO 8601). */
+    /** Instante de la entrega (ISO 8601). */
     readonly receivedAt: string;
+    /** D3 · Fecha contable de la entrega (`YYYY-MM-DD`). Opcional para respuestas de antes. */
+    readonly accountingDate?: string | null;
     /** Remisión o guía del proveedor (null = no la dio). */
     readonly remittance: string | null;
     /** Bodega donde entró la mercancía (soft ref). */
@@ -179,7 +181,7 @@ export interface PurchaseResponse {
     // --- Datos mínimos del comprobante (CFDI del proveedor) ---
     readonly invoiceFolio: string | null;
     readonly invoiceUuid: string | null;
-    /** Fecha del comprobante (ISO 8601, null = sin capturar). */
+    /** Fecha del comprobante: civil `YYYY-MM-DD` (D3), null = sin capturar. Se muestra sin convertir. */
     readonly invoiceDate: string | null;
 
     /** Días de crédito que dio el proveedor, congelados al crear la compra. */
@@ -225,8 +227,13 @@ export interface PurchaseResponse {
     readonly taxAmount: number;
     readonly totalAmount: number;
 
-    /** Fecha de la última recepción (ISO 8601, null si ninguna). */
+    /** Instante de la última recepción (ISO 8601, null si ninguna). */
     readonly receivedAt: string | null;
+    /**
+     * D3 · Fecha contable de la compra (`YYYY-MM-DD`): la de su última entrega viva. Es la de la
+     * póliza, la lista de gastos y la DIOT. Null mientras no se registre.
+     */
+    readonly accountingDate?: string | null;
     readonly cancellationReason: string | null;
 
     // --- Acuse con plazo (LatAm). Los campos nacen en la migración; la

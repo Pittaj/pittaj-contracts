@@ -34,6 +34,7 @@ export const cfdiFileHeaderSchema = z
         receiverRfc: z.string().trim().max(20).optional().default(''),
         series: z.string().trim().max(30).nullish(),
         folio: z.string().trim().max(40).nullish(),
+        /** D3 · El reloj del comprobante marcado UTC, sin convertir (`relojDelComprobante`). */
         issuedAt: z.string().datetime({ offset: true }).nullish(),
         currency: z.string().trim().max(3).nullish(),
         metodoPago: z.string().trim().max(3).nullish(),

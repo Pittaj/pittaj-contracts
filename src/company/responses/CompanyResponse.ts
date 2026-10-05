@@ -59,6 +59,9 @@ export interface CompanyResponse {
    */
   readonly isDefault: boolean;
 
+  /** D3 · Zona horaria IANA (null = la del centro, `ZONA_POR_OMISION`). */
+  readonly timezone?: string | null;
+
   /**
    * Indica si la empresa está activa.
    */

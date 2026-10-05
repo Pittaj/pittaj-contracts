@@ -11,6 +11,7 @@
  */
 
 import { z } from 'zod';
+import { fechaCivilSchema } from '../../shared/fechas.js';
 
 /** Un renglón de esta entrega: cuánto llegó de qué. */
 export const receivePurchaseLineSchema = z.object({
@@ -28,8 +29,14 @@ export const receivePurchaseSchema = z.object({
     id: z.string().uuid(),
     /** Bodega donde entra (default: la bodega destino de la compra). */
     warehouseId: z.string().uuid().optional(),
-    /** Fecha de la entrega (default: hoy). */
+    /** Instante de la entrega (default: ahora). */
     receivedAt: z.coerce.date().optional(),
+    /**
+     * D3 · Fecha contable (`YYYY-MM-DD`): el día en que la póliza, la lista de gastos y la DIOT
+     * ponen esta entrega. Un gasto se registra con la de su comprobante. Por omisión, el día de
+     * `receivedAt` en la zona de la sucursal.
+     */
+    accountingDate: fechaCivilSchema.optional(),
     /** Remisión o guía del proveedor (muchas veces llega antes que la factura). */
     remittance: z.string().trim().max(100).optional(),
     /** Quién recibió (nombre libre). */

@@ -118,6 +118,9 @@ export interface LocationResponse {
    */
   readonly defaultBusinessLineId?: string | null;
 
+  /** D3 · Zona horaria IANA propia (null = la de su empresa). */
+  readonly timezone?: string | null;
+
   /**
    * Indica si la ubicación está activa.
    */
