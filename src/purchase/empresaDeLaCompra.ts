@@ -7,8 +7,8 @@
  * una sucursal. Ahora la compra guarda su empresa (`purchases.company_id`):
  *
  * 1. Si hay sucursal, la de la sucursal. Manda: una sucursal es de una sola empresa.
- * 2. Si no, la de la sucursal de la bodega, si la bodega es de una sucursal.
- * 3. Si no, la que se eligió.
+ * 2. Si no, la que se eligió (en un gasto global la bodega no la elige nadie, así que no manda).
+ * 3. Si no, la de la sucursal de la bodega, si la bodega es de una sucursal.
  * 4. Si no, y el negocio tiene **una sola** empresa, esa: no se pregunta lo que no tiene respuesta.
  * 5. Si el negocio no tiene ninguna empresa (a medio dar de alta), ninguna: no hay qué elegir.
  * 6. Si no, falta: hay que elegirla.
@@ -53,17 +53,18 @@ export function empresaDeLaCompra(e: {
             motivo: `La bodega ${bodega.name ?? ''} es de otra sucursal: elige una de ${sucursal.name ?? 'la sucursal'} o una general.`.replace('  ', ' '),
         };
     }
-    const deLaSucursal = sucursal?.companyId ?? bodega?.companyId ?? null;
-    if (deLaSucursal) {
-        if (e.elegida && e.elegida !== deLaSucursal) {
+    if (sucursal) {
+        if (e.elegida && e.elegida !== sucursal.companyId) {
             return { ok: false, campo: 'empresa', motivo: 'La sucursal elegida es de otra empresa.' };
         }
-        return { ok: true, companyId: deLaSucursal };
+        return { ok: true, companyId: sucursal.companyId };
     }
+    // Sin sucursal, lo elegido gana a la bodega: en un gasto global la bodega no la elige nadie.
     if (e.elegida) {
         if (!e.empresas.includes(e.elegida)) return { ok: false, campo: 'empresa', motivo: 'Esa empresa no es de este negocio.' };
         return { ok: true, companyId: e.elegida };
     }
+    if (bodega?.companyId) return { ok: true, companyId: bodega.companyId };
     if (e.empresas.length === 1) return { ok: true, companyId: e.empresas[0]! };
     // Sin empresas (un negocio a medio dar de alta) no hay a quién preguntarle: no se bloquea.
     if (e.empresas.length === 0) return { ok: true, companyId: null };

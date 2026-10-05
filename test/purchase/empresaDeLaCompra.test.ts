@@ -27,6 +27,10 @@ describe('D4 · empresaDeLaCompra', () => {
         expect(empresaDeLaCompra({ sucursal: null, bodega: GENERAL, elegida: 'e2', empresas: ['e1', 'e2'] })).toEqual({ ok: true, companyId: 'e2' });
     });
 
+    it('gasto global: la elegida gana a la empresa de la bodega que nadie eligió', () => {
+        expect(empresaDeLaCompra({ sucursal: null, bodega: PRINCIPAL_TEH, elegida: 'e2', empresas: ['e1', 'e2'] })).toEqual({ ok: true, companyId: 'e2' });
+    });
+
     it('sin sucursal, la de la sucursal de la bodega', () => {
         expect(empresaDeLaCompra({ sucursal: null, bodega: PRINCIPAL_TEH, empresas: ['e1', 'e2'] })).toEqual({ ok: true, companyId: 'e1' });
     });
