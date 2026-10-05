@@ -116,7 +116,8 @@ export function impuestoDelRenglon(r: RenglonConImpuesto): ImpuestoDelRenglon {
 
     if (code === '003') {
         const tipo = factor === 'Cuota' ? 'Cuota' : 'Tasa';
-        return { objetoImp: '02', impuesto: '003', tipoFactor: tipo, tasaOCuota: tipo === 'Cuota' ? r.taxPercent : comoFraccion(r.taxPercent) };
+        // El IEPS nunca se guardó como porcentaje y por tasa puede pasar de 1 (tabaco 160 % = 1.6).
+        return { objetoImp: '02', impuesto: '003', tipoFactor: tipo, tasaOCuota: r.taxPercent };
     }
     if (code === '002' || factor === 'Tasa' || factor === 'Cuota') {
         return { objetoImp: '02', impuesto: '002', tipoFactor: 'Tasa', tasaOCuota: comoFraccion(r.taxPercent) };
@@ -198,4 +199,24 @@ export function prorratearTraslados(traslados: readonly TrasladoDelConcepto[], p
         base: r2(t.base * p),
         importe: t.importe === null ? null : r2(t.importe * p),
     }));
+}
+
+/**
+ * D7b · El traslado del IEPS de un renglón que también lleva IVA. Por tasa, su base es la base del
+ * renglón; por cuota, el SAT pide como base **las unidades** sobre las que se cobró la cuota.
+ */
+export function trasladoDeIeps(
+    factor: 'Tasa' | 'Cuota',
+    tasaOCuota: number,
+    base: number,
+    unidadesDeCuota: number,
+    importe: number,
+): TrasladoDelConcepto {
+    return {
+        impuesto: '003',
+        tipoFactor: factor,
+        tasaOCuota,
+        base: factor === 'Cuota' ? Math.round(unidadesDeCuota * 1_000_000) / 1_000_000 : r2(base),
+        importe: r2(importe),
+    };
 }

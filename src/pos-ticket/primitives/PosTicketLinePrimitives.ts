@@ -22,6 +22,14 @@ export interface PosTicketLinePrimitives extends SaleLineBasePrimitives {
   /** Base imponible (subtotal - descuento, neta de impuesto si venia incluido). null si no aplica. */
   readonly taxBaseAmount: number | null;
   /**
+   * D7b · El IEPS del renglón cuando el producto lleva IVA **e** IEPS (`taxCode` es el IVA). Por
+   * tasa, fracción (0.08; tabaco 1.6); por cuota, pesos por unidad base. El IVA (`taxAmount`) ya va
+   * sobre la base más este IEPS. Ausentes = no lleva.
+   */
+  readonly iepsPercent?: number | null;
+  readonly iepsFactor?: 'Tasa' | 'Cuota' | null;
+  readonly iepsAmount?: number | null;
+  /**
    * Línea de negocio estampada al confirmar el ticket (F1.7): producto → categoría → sucursal con
    * el catálogo de ese momento. Opcional: si no viene, la nube la estampa al guardar.
    */

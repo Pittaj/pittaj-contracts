@@ -3,7 +3,8 @@
  *
  * Réplica del dominio desktop (Pittaj.Domain/Tax):
  * - rate es FRACCIÓN 0-1 (0.16 = 16%), la UI captura % y convierte
- * - invariante: ZERO/EXEMPT/NOT_OBJECT exigen rate 0; IVA/IEPS exigen rate en (0, 1]
+ * - invariante: ZERO/EXEMPT/NOT_OBJECT exigen rate 0; IVA exige rate en (0, 1]; IEPS por tasa,
+ *   (0, 3] (D7b: tabaco 160 % = 1.6); IEPS por cuota, > 0 (pesos por unidad)
  *
  * @module Contracts/Tax
  */
@@ -29,19 +30,30 @@ const ERROR_MESSAGES = {
     SAT_FACTOR_TOO_LONG: 'El factor SAT no puede exceder 20 caracteres',
     SAT_CODE_TOO_LONG: 'El código SAT no puede exceder 10 caracteres',
     ZERO_EXEMPT_RATE: 'Tasa 0, Exento y No objeto deben tener tasa 0',
-    IVA_IEPS_RATE: 'IVA e IEPS requieren una tasa mayor a 0 y hasta 1',
+    IVA_IEPS_RATE: 'El IVA requiere una tasa mayor a 0 y hasta 1; el IEPS por tasa, mayor a 0 y hasta 3 (300 %)',
+    CUOTA_RATE: 'Un IEPS por cuota requiere una cuota mayor a 0 (pesos por unidad)',
 } as const;
+
+/** D7b · ¿Es un IEPS por cuota (pesos por unidad, no fracción)? */
+export function esCuota(data: { kind: string; satFactor?: string | null }): boolean {
+    return data.kind === 'IEPS' && (data.satFactor ?? '').trim().toLowerCase() === 'cuota';
+}
 
 /** Invariante del dominio Tax.Validate(rate, kind). */
 function validateRateKind(
-    data: { rate: number; kind: TaxKind },
+    data: { rate: number; kind: TaxKind; satFactor?: string | null },
     ctx: z.RefinementCtx
 ): void {
     if ((data.kind === 'ZERO' || data.kind === 'EXEMPT' || data.kind === 'NOT_OBJECT') && data.rate !== 0) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['rate'], message: ERROR_MESSAGES.ZERO_EXEMPT_RATE });
     }
-    if ((data.kind === 'IVA' || data.kind === 'IEPS') && (data.rate <= 0 || data.rate > 1)) {
+    if (data.kind === 'IVA' && (data.rate <= 0 || data.rate > 1)) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['rate'], message: ERROR_MESSAGES.IVA_IEPS_RATE });
+    }
+    // D7b: el IEPS por tasa puede pasar del 100 % (tabaco 160 % = 1.6) hasta 3 —un 8 capturado en
+    // lugar de 0.08 se sigue rechazando—; por cuota son pesos por unidad, sin tope.
+    if (data.kind === 'IEPS' && (data.rate <= 0 || (!esCuota(data) && data.rate > 3))) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['rate'], message: esCuota(data) ? ERROR_MESSAGES.CUOTA_RATE : ERROR_MESSAGES.IVA_IEPS_RATE });
     }
 }
 
@@ -53,11 +65,14 @@ const baseTaxFields = {
         .min(2, { message: ERROR_MESSAGES.NAME_TOO_SHORT })
         .max(50, { message: ERROR_MESSAGES.NAME_TOO_LONG }),
 
-    /** Tasa como fracción 0-1 (0.16 = 16%), NO porcentaje. */
+    /**
+     * Tasa como fracción 0-1 (0.16 = 16%), NO porcentaje. D7b: en un IEPS por cuota es la cuota en
+     * pesos por unidad y puede pasar de 1.
+     */
     rate: z
         .number()
         .min(0, { message: ERROR_MESSAGES.RATE_RANGE })
-        .max(1, { message: ERROR_MESSAGES.RATE_RANGE }),
+        .max(100_000, { message: ERROR_MESSAGES.RATE_RANGE }),
 
     /** Tipo de impuesto. */
     kind: z.enum(TAX_KINDS, { errorMap: () => ({ message: ERROR_MESSAGES.KIND_INVALID }) }),

@@ -56,6 +56,11 @@ const productInventoryConfigSchema = z.object({
  */
 const productTaxInfoSchema = z.object({
     taxId: z.string().uuid().default('22222222-2222-2222-2222-222222222221'),
+    /**
+     * D7b · IEPS del producto, además de su IVA (`taxId`): un impuesto del catálogo de tipo IEPS,
+     * por tasa o por cuota. Null = no lleva.
+     */
+    iepsTaxId: z.string().uuid().nullable().default(null),
     satProductCode: z.string().nullable().default(null),
     satUnitCode: z.string().nullable().default(null),
 });

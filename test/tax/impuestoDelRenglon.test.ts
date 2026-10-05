@@ -58,6 +58,8 @@ describe('D7a · el ObjetoImp del concepto', () => {
 
     it('IEPS por tasa y por cuota', () => {
         expect(impuestoDelRenglon({ taxCode: '003', taxFactor: 'Tasa', taxPercent: 0.08 }).tasaOCuota).toBe(0.08);
+        // D7b: el tabaco al 160 % es 1.6, no un porcentaje que haya que dividir.
+        expect(impuestoDelRenglon({ taxCode: '003', taxFactor: 'Tasa', taxPercent: 1.6 }).tasaOCuota).toBe(1.6);
         expect(impuestoDelRenglon({ taxCode: '003', taxFactor: 'Cuota', taxPercent: 1.6451 })).toEqual({
             objetoImp: '02', impuesto: '003', tipoFactor: 'Cuota', tasaOCuota: 1.6451,
         });
