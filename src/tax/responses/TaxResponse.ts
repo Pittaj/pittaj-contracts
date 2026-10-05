@@ -23,7 +23,7 @@ export interface TaxResponse {
     /** Tasa como fracción 0-1 (0.16 = 16%). */
     readonly rate: number;
 
-    /** Tipo: IVA | IEPS | ZERO | EXEMPT. */
+    /** Tipo: IVA | IEPS | ZERO | EXEMPT | NOT_OBJECT. */
     readonly kind: TaxKind;
 
     /** Si va incluido en el precio del producto. */
