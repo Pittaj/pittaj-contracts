@@ -26,6 +26,8 @@ export interface PosTicketResponse {
   readonly userId: string;
   /** Snapshot del nombre del operador (el Operator local del desktop no sincroniza). */
   readonly userName: string | null;
+  /** D7h1 · El apartado del que es venta este ticket (la liquidación; mismo id). Null en una venta normal. */
+  readonly layawayId?: string | null;
   /** Dispositivo de origen (anti-rebote: el feed lo expone como originDeviceId). */
   readonly deviceId?: string | null;
   readonly customerId: string | null;
