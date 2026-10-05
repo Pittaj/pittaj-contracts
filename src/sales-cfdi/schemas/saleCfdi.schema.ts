@@ -20,6 +20,7 @@
  */
 
 import { z } from 'zod';
+import { CLASES_DE_RETENCION, SIN_CLASE } from '../../tax/retencionesDeLaVenta.js';
 
 /** Folio fiscal del SAT. En mayúsculas y con guiones, como lo timbra el PAC. */
 const UUID_SAT = /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/i;
@@ -135,7 +136,40 @@ export type StampReceptorInput = z.infer<typeof stampReceptorSchema>;
  * El cuerpo entero es opcional: la web factura sin él y el backend usa el cliente de la venta.
  * **No endurecer esto** — lo manda el escritorio.
  */
+/** D7c · Las tasas de una clase, como las ajusta quien timbra. */
+export const tasasDeRetencionSchema = z.object({
+    isr: z.number().min(0).max(0.35).nullable(),
+    iva: z
+        .discriminatedUnion('modo', [
+            z.object({ modo: z.literal('DOS_TERCIOS') }),
+            z.object({ modo: z.literal('TASA'), tasa: z.number().min(0).max(0.16) }),
+        ])
+        .nullable(),
+    fundamento: z.string().max(500).optional(),
+});
+
+/** D7c · La decisión de retenciones de un CFDI: tasas por clase (`GENERAL` = sin clase). */
+export const retencionesDecididasSchema = z
+    .object({
+        [SIN_CLASE]: tasasDeRetencionSchema.optional(),
+        ...Object.fromEntries(CLASES_DE_RETENCION.map((c) => [c, tasasDeRetencionSchema.optional()])),
+    })
+    .strict();
+
 export const stampSaleCfdiSchema = z.object({
+    receptor: stampReceptorSchema.optional(),
+    /**
+     * D7c · Retenciones ajustadas por quien timbra. Si no viene, el backend las calcula
+     * (`decidirRetenciones`); `{}` = timbrar sin retenciones. Opcional: el escritorio viejo no lo manda.
+     */
+    retenciones: retencionesDecididasSchema.optional(),
+});
+
+/**
+ * D7c · `POST /api/sales-cfdi/:ticketId/retenciones` — qué retenciones llevaría el CFDI, antes de
+ * timbrar. Mismo receptor opcional que el timbrado.
+ */
+export const previewRetencionesSchema = z.object({
     receptor: stampReceptorSchema.optional(),
 });
 

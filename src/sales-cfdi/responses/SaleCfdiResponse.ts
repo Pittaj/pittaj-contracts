@@ -13,6 +13,7 @@ import type {
     CancellationMotiveValue,
     RepPaymentFormValue,
 } from '../schemas/saleCfdi.schema.js';
+import type { RetencionDelConcepto, RetencionesDecididas } from '../../tax/retencionesDeLaVenta.js';
 
 /** Un complemento de pago timbrado sobre la venta. */
 export interface RepResponse {
@@ -138,4 +139,18 @@ export interface GlobalCfdiTicketsResponse {
         readonly soldAt: string;
         readonly total: number;
     }[];
+}
+
+/**
+ * D7c · `POST /api/sales-cfdi/:ticketId/retenciones` — lo que el CFDI llevaría retenido.
+ * `decididas` es lo que se manda de vuelta en `stamp` (ajustado o tal cual).
+ */
+export interface PreviewRetencionesResponse {
+    readonly decididas: RetencionesDecididas;
+    readonly retenciones: readonly RetencionDelConcepto[];
+    readonly totalRetenido: number;
+    /** Total del ticket (lo cobrado). */
+    readonly totalDelTicket: number;
+    /** Total del CFDI: lo que el cliente te paga; el resto lo entera él al SAT. */
+    readonly totalDelCfdi: number;
 }

@@ -30,6 +30,11 @@ export interface PosTicketLinePrimitives extends SaleLineBasePrimitives {
   readonly iepsFactor?: 'Tasa' | 'Cuota' | null;
   readonly iepsAmount?: number | null;
   /**
+   * D7c · La clase de retención del producto al vender (`CLASES_DE_RETENCION`). El CFDI calcula
+   * con ella las retenciones según quién lo recibe. Null = bienes o servicios en general.
+   */
+  readonly retentionClass?: string | null;
+  /**
    * Línea de negocio estampada al confirmar el ticket (F1.7): producto → categoría → sucursal con
    * el catálogo de ese momento. Opcional: si no viene, la nube la estampa al guardar.
    */

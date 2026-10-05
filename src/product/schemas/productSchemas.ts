@@ -12,6 +12,7 @@
 import { z } from 'zod';
 import { businessLineRefSchema } from '../../business-line/schemas/createBusinessLine.schema.js';
 import { PRODUCT_CONSTANTS } from '../constants/index.js';
+import { CLASES_DE_RETENCION } from '../../tax/retencionesDeLaVenta.js';
 
 
 const { LIMITS } = PRODUCT_CONSTANTS;
@@ -61,6 +62,11 @@ const productTaxInfoSchema = z.object({
      * por tasa o por cuota. Null = no lleva.
      */
     iepsTaxId: z.string().uuid().nullable().default(null),
+    /**
+     * D7c · Qué se vende, en lo que importa para retener (honorarios, arrendamiento, comisiones,
+     * fletes, personal). Null = bienes o servicios en general.
+     */
+    retentionClass: z.enum(CLASES_DE_RETENCION).nullable().default(null),
     satProductCode: z.string().nullable().default(null),
     satUnitCode: z.string().nullable().default(null),
 });
