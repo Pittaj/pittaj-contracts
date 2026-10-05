@@ -53,6 +53,22 @@ export interface SaleCfdiStatusResponse {
     /** Lo que queda a deber. `null` si no aplica (venta de contado). */
     readonly pendingBalance: number | null;
     readonly reps: readonly RepResponse[];
+    /** D7e · Notas de crédito por bonificación o descuento de la venta. */
+    readonly bonifications?: readonly BonificationResponse[];
+}
+
+/** D7e · Una nota de crédito por bonificación o descuento (sin devolución). */
+export interface BonificationResponse {
+    readonly id: string;
+    readonly uuid: string | null;
+    readonly status: SaleCfdiStatusValue | string;
+    readonly tipo: string;
+    /** Lo pedido, sobre el total de la factura. */
+    readonly importe: number;
+    /** Total del Egreso timbrado. */
+    readonly total: number | null;
+    readonly stampedAt: string | null;
+    readonly lastError: string | null;
 }
 
 /**
