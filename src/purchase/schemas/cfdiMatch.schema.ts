@@ -153,6 +153,11 @@ export const createPurchaseFromCfdiSchema = z
         /** Bodega destino de la entrada. */
         warehouseId: z.string().uuid({ message: ERROR_MESSAGES.ID_INVALID_UUID }),
         locationId: z.string().uuid().nullish(),
+        /**
+         * D4 · La empresa de la compra, cuando no hay sucursal que la diga (un gasto global). Con
+         * sucursal manda la de la sucursal; con una sola empresa en el negocio, ni hace falta.
+         */
+        companyId: z.string().uuid().nullish(),
 
         /** INVENTORY | EXPENSE | FIXED_ASSET. Por omisión, lo que diga el UsoCFDI. */
         kind: z.enum(PURCHASE_KINDS).optional(),

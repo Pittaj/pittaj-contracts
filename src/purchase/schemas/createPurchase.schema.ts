@@ -157,6 +157,12 @@ export const basePurchaseFields = {
     /** Sucursal de la compra (normalmente la de la bodega destino). */
     locationId: z.string().uuid().nullish(),
 
+    /**
+     * D4 · La empresa de la compra, cuando no hay sucursal que la diga (un gasto global). Con
+     * sucursal manda la de la sucursal; con una sola empresa en el negocio, ni hace falta.
+     */
+    companyId: z.string().uuid().nullish(),
+
     /** Naturaleza: inventario, gasto o activo fijo. */
     kind: z.enum(PURCHASE_KINDS).optional().default('INVENTORY'),
 

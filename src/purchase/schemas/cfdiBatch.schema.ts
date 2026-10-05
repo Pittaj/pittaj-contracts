@@ -100,6 +100,8 @@ export const createPurchasesFromCfdiBatchSchema = z.object({
                     expenseConceptId: z.string().uuid('Concepto inválido').nullish(),
                     businessLineId: z.string().uuid('Línea inválida').nullish(),
                     locationId: z.string().uuid('Sucursal inválida').nullish(),
+                    /** D4 · La empresa de un gasto global (sin sucursal) cuando hay más de una. */
+                    companyId: z.string().uuid('Empresa inválida').nullish(),
                     conceptos: z.array(cfdiResolvedConceptoSchema).min(1).max(500),
                 })
                 .strict()

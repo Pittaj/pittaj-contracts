@@ -164,6 +164,8 @@ export interface PurchaseResponse {
     readonly warehouseId: string;
     /** Sucursal de la compra (null = general). */
     readonly locationId: string | null;
+    /** D4 · La empresa de la compra (de su sucursal, o la elegida en un gasto global). */
+    readonly companyId?: string | null;
     readonly kind: PurchaseKind;
     /** Estado GUARDADO: DRAFT | ACTIVE | CANCELLED. Los ejes van aparte. */
     readonly status: PurchaseStatus;
