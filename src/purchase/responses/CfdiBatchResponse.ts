@@ -57,6 +57,9 @@ export interface CfdiBatchResolvedConcepto {
     readonly iepsAmount?: number | null;
     readonly iepsFactor?: 'Tasa' | 'Cuota' | null;
     readonly iepsTasaOCuota?: number | null;
+    readonly ivaBase?: number | null;
+    readonly ivaFactor?: 'Tasa' | 'Exento' | null;
+    readonly objetoImp?: string | null;
 
     readonly productId: string | null;
     /** Con qué se emparejó, para poder explicarlo en la pantalla. */
