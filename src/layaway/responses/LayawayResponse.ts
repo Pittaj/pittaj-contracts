@@ -36,6 +36,21 @@ export interface LayawayLineResponse {
     readonly impuestos?: ImpuestosDelRenglonDeApartado | null;
 }
 
+/**
+ * D7h · Un abono: el hecho de cada pago. Viaja en el sync en los dos sentidos: sin él la nube no
+ * podía contabilizar ni facturar el anticipo, y el escritorio perdía los suyos al bajar.
+ */
+export interface LayawayPaymentResponse {
+    readonly id: string;
+    readonly amount: number;
+    readonly paymentMethodId: string | null;
+    readonly paymentMethodName: string | null;
+    readonly sessionId: string | null;
+    readonly operatorId: string | null;
+    /** ISO 8601. */
+    readonly occurredAt: string;
+}
+
 /** DTO de respuesta para consultas/sync de apartados. */
 export interface LayawayResponse {
     readonly id: string;
@@ -69,6 +84,8 @@ export interface LayawayResponse {
 
     /** Renglones (tabla hija layaway_lines). */
     readonly lines: LayawayLineResponse[];
+    /** D7h · Los abonos (en orden). Ausente en una nube anterior: el escritorio conserva los suyos. */
+    readonly payments?: LayawayPaymentResponse[];
 
     /** Versión para optimistic locking. */
     readonly version: number;
