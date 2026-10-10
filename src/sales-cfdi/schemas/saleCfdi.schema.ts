@@ -172,6 +172,12 @@ export const stampSaleCfdiSchema = z.object({
      * `TipoCambio`). Obligatorio en ese caso; se ignora en MXN.
      */
     tipoCambio: z.number().positive().max(100_000).optional(),
+    /**
+     * D8 · El cliente es contribuyente de IEPS por estos bienes y pide el impuesto por separado
+     * (LIEPS art. 19, fr. II). Si no viene, lo dice su ficha. Solo aplica a las clases A, D, F, G,
+     * I y J.
+     */
+    desgloseIeps: z.boolean().optional(),
 });
 
 /**

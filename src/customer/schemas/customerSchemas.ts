@@ -51,6 +51,11 @@ const customerFiscalProfileSchema = z.object({
     fiscalRegime: z.string().regex(/^[A-Za-z0-9]{2,5}$/, 'Clave de régimen fiscal del SAT inválida'),
     cfdiUse: z.string().regex(/^[A-Za-z0-9]{2,5}$/, 'Clave de uso del CFDI inválida').default('G03'),
     taxZipCode: z.string().regex(/^\d{5}$/, 'El código postal fiscal debe tener 5 dígitos'),
+    /**
+     * D8 · El cliente es contribuyente de IEPS por los bienes que compra y pide el impuesto por
+     * separado en su factura (LIEPS art. 19, fr. II). Sin esto, el IEPS va dentro del precio.
+     */
+    desgloseIeps: z.boolean().optional(),
 });
 
 // ============================================================

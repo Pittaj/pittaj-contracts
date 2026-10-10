@@ -16,6 +16,8 @@
  * 2. **El IEPS trasladado del concepto es costo**, salvo que la empresa lo acredite (D8). Quien no
  *    enajena esos mismos bienes no puede acreditarlo (LIEPS art. 4), así que para él forma parte
  *    de lo que costó la mercancía o el servicio. Telmex: importe 328.44 + IEPS 6.90 = costo 335.34.
+ *    El acreditable sale del costo pero **no del total**: se le debe al proveedor igual. Va en el
+ *    documento (`iepsAcreditable`), por clase, y la póliza lo lleva a «IEPS acreditable».
  * 3. **El IVA del renglón es el que dice el concepto.** Su base no siempre es el importe: incluye
  *    el IEPS (LIVA art. 12 y art. 18) y la gasolina lleva la cuota de IEPS escondida en el precio.
  *    La tasa del renglón es la nominal si la reproduce; si no, la efectiva a seis decimales.
@@ -59,6 +61,10 @@ export interface RenglonDelCfdi {
     readonly importes: ImportesDelRenglon;
     /** IEPS del concepto que quedó dentro del costo (0 si se acredita o no hay). */
     readonly iepsAlCosto: number;
+    /** D8 · IEPS del concepto que se acredita (0 si es costo o no hay). Va en el documento. */
+    readonly iepsAcreditable: number;
+    /** D8 · La clase (inciso) del IEPS acreditable, o null. */
+    readonly iepsCategoria: string | null;
 }
 
 export interface OpcionesDelComprobante {
@@ -67,6 +73,12 @@ export interface OpcionesDelComprobante {
      * mismos bienes). Por omisión, no: el IEPS es costo.
      */
     readonly iepsAcreditable?: boolean;
+    /**
+     * D8 · La decisión por concepto: si su IEPS se acredita y de qué clase es. Manda sobre
+     * `iepsAcreditable`. La arma quien convierte con `categoriaDelIepsRecibido` (catálogo) e
+     * `iepsEsAcreditable` (lo que causa la empresa).
+     */
+    readonly iepsDelConcepto?: (c: CfdiConceptoInput) => { readonly acreditable: boolean; readonly categoria: string | null };
 }
 
 const r2 = (n: number): number => roundHalfEven(n, 2);
@@ -86,7 +98,10 @@ export function tasaQueReproduce(base: number, iva: number, tasaNominal: number)
 /** Un concepto del CFDI hecho renglón, en la moneda del comprobante. */
 export function renglonDelCfdi(c: CfdiConceptoInput, opciones: OpcionesDelComprobante = {}): RenglonDelCfdi {
     const ieps = r2(c.iepsAmount ?? 0);
-    const iepsAlCosto = opciones.iepsAcreditable ? 0 : ieps;
+    const decision = ieps > 0 && opciones.iepsDelConcepto
+        ? opciones.iepsDelConcepto(c)
+        : { acreditable: Boolean(opciones.iepsAcreditable), categoria: null };
+    const iepsAlCosto = decision.acreditable ? 0 : ieps;
     const descuento = r2(c.descuento ?? 0);
     const subtotalAmount = r2((c.importe ?? 0) + iepsAlCosto);
     const taxBaseAmount = r2(subtotalAmount - descuento);
@@ -109,6 +124,8 @@ export function renglonDelCfdi(c: CfdiConceptoInput, opciones: OpcionesDelCompro
             totalAmount: r2(taxBaseAmount + taxAmount),
         },
         iepsAlCosto,
+        iepsAcreditable: r2(ieps - iepsAlCosto),
+        iepsCategoria: decision.acreditable && ieps > 0 ? decision.categoria : null,
     };
 }
 
@@ -124,6 +141,11 @@ export interface ImpuestosDelDocumento {
     readonly trasladoLocal: number;
     /** Impuestos locales retenidos (`implocal:RetencionesLocales`). */
     readonly retencionLocal: number;
+    /**
+     * D8 · IEPS acreditable de los renglones: fuera del costo, dentro de lo que se le debe al
+     * proveedor. Ausente = 0.
+     */
+    readonly iepsAcreditable?: number;
 }
 
 export const SIN_IMPUESTOS_DEL_DOCUMENTO: ImpuestosDelDocumento = {
@@ -143,7 +165,8 @@ export function totalNetoDeLaCompra(totalDeRenglones: number, d: Partial<Impuest
             (d.retencionIsr ?? 0) -
             (d.retencionIva ?? 0) +
             (d.trasladoLocal ?? 0) -
-            (d.retencionLocal ?? 0)
+            (d.retencionLocal ?? 0) +
+            (d.iepsAcreditable ?? 0)
     );
 }
 
@@ -175,6 +198,8 @@ export interface CompraDelComprobante {
     /** Lo que se registra de la moneda original (6.6), o null si es en pesos. */
     readonly monedaOriginal: { readonly foreignCurrency: string; readonly foreignTotal: number } | null;
     readonly cuadre: CuadreConElComprobante;
+    /** D8 · El IEPS acreditable por clase (inciso), en pesos. Vacío si no hay. */
+    readonly iepsAcreditablePorCategoria: Readonly<Record<string, number>>;
 }
 
 export interface CuadreConElComprobante {
@@ -256,6 +281,7 @@ export function compraDelComprobante(
             total: 0,
             totalDelComprobante: 0,
             monedaOriginal,
+            iepsAcreditablePorCategoria: {},
             cuadre: {
                 cuadra: false,
                 diferencia: 0,
@@ -264,16 +290,26 @@ export function compraDelComprobante(
         };
     }
 
+    const totalDelComprobante = r2(cabecera.total * tc);
+    const ivaDeLaCabecera = r2(cabecera.trasladoIva * tc);
+
+    let renglones = conceptos.map((c) => renglonDelCfdi(enPesos(c, tc), opciones));
+    // D8: el IEPS acreditable va al documento, por clase.
+    const iepsAcreditablePorCategoria: Record<string, number> = {};
+    for (const r of renglones) {
+        if (r.iepsAcreditable > 0) {
+            const k = r.iepsCategoria ?? '?';
+            iepsAcreditablePorCategoria[k] = r2((iepsAcreditablePorCategoria[k] ?? 0) + r.iepsAcreditable);
+        }
+    }
+    const iepsAcreditable = r2(renglones.reduce((a, r) => a + r.iepsAcreditable, 0));
     const impuestosDelDocumento: ImpuestosDelDocumento = {
         retencionIsr: r2(cabecera.retencionIsr * tc),
         retencionIva: r2(cabecera.retencionIva * tc),
         trasladoLocal: r2(cabecera.trasladoLocal * tc),
         retencionLocal: r2(cabecera.retencionLocal * tc),
+        ...(iepsAcreditable > 0 ? { iepsAcreditable } : {}),
     };
-    const totalDelComprobante = r2(cabecera.total * tc);
-    const ivaDeLaCabecera = r2(cabecera.trasladoIva * tc);
-
-    let renglones = conceptos.map((c) => renglonDelCfdi(enPesos(c, tc), opciones));
     const tolerancia = r2(REDONDEO_POR_RENGLON * Math.max(1, renglones.length));
 
     // El redondeo entre lo que suman los conceptos y lo que dice la cabecera va al renglón mayor:
@@ -313,6 +349,7 @@ export function compraDelComprobante(
         totalDelComprobante,
         monedaOriginal,
         cuadre: cuadreConElComprobante(total, totalDelComprobante),
+        iepsAcreditablePorCategoria,
     };
 }
 

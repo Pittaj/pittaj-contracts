@@ -34,6 +34,8 @@ export interface TaxResponse {
 
     /** Código SAT ("002" IVA, "003" IEPS). */
     readonly satCode: string | null;
+    /** D8 · Clase del bien (inciso del art. 2o., fr. I LIEPS) de un IEPS; null en los demás. */
+    readonly iepsCategoria?: string | null;
 
     /** Si es el impuesto predeterminado del tenant. */
     readonly isDefault: boolean;

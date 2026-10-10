@@ -10,6 +10,7 @@
  */
 
 import { z } from 'zod';
+import { CATEGORIAS_DE_IEPS } from '../iepsDeLaLey.js';
 
 /** Tipos de impuesto (enum del dominio desktop TaxKind). */
 /** D7a · `NOT_OBJECT` = no objeto de impuesto (`ObjetoImp 01`): el CFDI no lleva nodo de impuestos. */
@@ -94,6 +95,12 @@ const baseTaxFields = {
 
     /** Código SAT del impuesto: "002" IVA, "003" IEPS (opcional). */
     satCode: z.string().trim().max(10, { message: ERROR_MESSAGES.SAT_CODE_TOO_LONG }).nullish(),
+
+    /**
+     * D8 · La clase del bien (inciso del art. 2o., fr. I LIEPS) de un IEPS. Con ella se decide si el
+     * IEPS se acredita al comprar (art. 4o.) y si se desglosa al vender (art. 19, fr. II).
+     */
+    iepsCategoria: z.enum(CATEGORIAS_DE_IEPS).nullish(),
 };
 
 /**

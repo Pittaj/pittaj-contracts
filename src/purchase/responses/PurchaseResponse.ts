@@ -206,6 +206,10 @@ export interface PurchaseResponse {
     // --- Impuestos desglosados del comprobante (contabilidad) ---
     readonly trasladoIva: number;
     readonly trasladoIeps: number;
+    /** D8 · IEPS que se acredita (fuera del costo, dentro del total). 0 si no hay. */
+    readonly iepsAcreditable?: number;
+    /** D8 · El acreditable por clase (inciso del art. 2o., fr. I LIEPS). */
+    readonly iepsAcreditablePorCategoria?: Readonly<Record<string, number>>;
     readonly retencionIsr: number;
     readonly retencionIva: number;
     /** D1 · Impuestos locales (`implocal`): el trasladado suma al total, el retenido resta. */

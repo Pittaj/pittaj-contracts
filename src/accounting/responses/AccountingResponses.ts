@@ -781,3 +781,42 @@ export interface DepreciationRunResponse {
     /** Cuentas de plantilla creadas al vuelo para poder postear. */
     readonly provisionedAccounts: readonly { readonly code: string; readonly name: string }[];
 }
+
+// ============================================================
+// IEPS (D8)
+// ============================================================
+
+/** Una clase de bienes (inciso del art. 2o., fr. I LIEPS) en la declaración de IEPS del mes. */
+export interface IepsReportClaseResponse {
+    /** Inciso: A, D, F, G, I, J… */
+    readonly categoria: string;
+    readonly nombre: string;
+    /** IEPS trasladado y cobrado en el mes (LIEPS art. 10: se causa al cobrar). */
+    readonly trasladadoCobrado: number;
+    /** IEPS que te trasladaron por bienes de la misma clase y pagaste en el mes (art. 4o.). */
+    readonly acreditable: number;
+    /** Trasladado menos acreditable. Positivo, a cargo; negativo, saldo a favor **de esta clase**. */
+    readonly saldo: number;
+}
+
+/**
+ * Los números de la declaración mensual de IEPS, por clase (LIEPS art. 5o.: el pago mensual es el
+ * causado menos el acreditable de la **misma clase**; art. 4o., fr. IV). Prepara, no declara.
+ *
+ * Las cifras salen de los documentos —tickets, cobros, abonos de apartado y compras— con las mismas
+ * reglas de flujo que la póliza; `libro` trae lo que dice el mayor para cuadrarlas.
+ */
+export interface IepsReportResponse {
+    readonly companyId: string;
+    readonly year: number;
+    readonly month: number;
+    readonly from: string;
+    readonly to: string;
+    readonly clases: readonly IepsReportClaseResponse[];
+    /** Suma de los saldos a cargo (una clase con saldo a favor no compensa a otra). */
+    readonly aCargo: number;
+    /** Lo que dice el mayor del mes: trasladado cobrado (208-02) y acreditable pagado (118-02). */
+    readonly libro: { readonly trasladadoCobrado: number; readonly acreditable: number };
+    /** Avisos: IEPS sin clase, la empresa no causa IEPS, etc. */
+    readonly avisos: readonly string[];
+}

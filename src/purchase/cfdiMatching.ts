@@ -67,6 +67,12 @@ export interface CfdiConceptoInput {
      * `renglonDelCfdi` en `comprobanteRecibido.ts`.
      */
     readonly iepsAmount?: number | null;
+    /**
+     * D8 · El IEPS del concepto: factor y tasa (fracción) o cuota. Con el catálogo de la empresa
+     * dice la clase del bien (el CFDI no trae el inciso), y con ella si se acredita.
+     */
+    readonly iepsFactor?: 'Tasa' | 'Cuota' | null;
+    readonly iepsTasaOCuota?: number | null;
 }
 
 /**

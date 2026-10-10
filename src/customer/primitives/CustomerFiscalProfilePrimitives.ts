@@ -11,4 +11,6 @@ export interface CustomerFiscalProfilePrimitives {
     readonly cfdiUse: string;
     /** Código postal del domicilio fiscal del receptor (5 dígitos). */
     readonly taxZipCode: string;
+    /** D8 · Contribuyente de IEPS que pide el impuesto por separado (LIEPS art. 19, fr. II). */
+    readonly desgloseIeps?: boolean;
 }

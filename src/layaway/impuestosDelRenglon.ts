@@ -33,6 +33,8 @@ export const impuestosDelRenglonDeApartadoSchema = z.object({
     taxIncluded: z.boolean(),
     iepsPercent: z.number().min(0).nullish(),
     iepsFactor: z.enum(['Tasa', 'Cuota']).nullish(),
+    /** D8 · Clase del bien del IEPS (inciso del art. 2o., fr. I LIEPS). */
+    iepsCategoria: z.string().max(2).nullish(),
     satProductCode: z.string().max(20).nullish(),
     satUnitCode: z.string().max(20).nullish(),
     retentionClass: z.string().max(20).nullish(),

@@ -29,6 +29,8 @@ export interface PosTicketLinePrimitives extends SaleLineBasePrimitives {
   readonly iepsPercent?: number | null;
   readonly iepsFactor?: 'Tasa' | 'Cuota' | null;
   readonly iepsAmount?: number | null;
+  /** D8 · Clase del bien del IEPS (inciso del art. 2o., fr. I LIEPS), copiada del catálogo al vender. */
+  readonly iepsCategoria?: string | null;
   /**
    * D7c · La clase de retención del producto al vender (`CLASES_DE_RETENCION`). El CFDI calcula
    * con ella las retenciones según quién lo recibe. Null = bienes o servicios en general.

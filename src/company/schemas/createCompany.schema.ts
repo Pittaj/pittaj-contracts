@@ -14,6 +14,7 @@
  */
 
 import { z } from 'zod';
+import { CATEGORIAS_DE_IEPS } from '../../tax/iepsDeLaLey.js';
 import { zonaHorariaSchema } from '../../shared/fechas.js';
 
 /**
@@ -119,6 +120,8 @@ export const CreateCompanySchema = z.object({
    * es «hoy» y en qué fecha cae una venta, un cobro o una entrega de la empresa.
    */
   timezone: zonaHorariaSchema,
+  /** D8 · Las clases de IEPS (incisos del art. 2o., fr. I LIEPS) por las que la empresa causa IEPS. */
+  iepsCategorias: z.array(z.enum(CATEGORIAS_DE_IEPS)).max(9).optional(),
 });
 
 /**
