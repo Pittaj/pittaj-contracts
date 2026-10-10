@@ -69,6 +69,9 @@ export const cfdiConceptoSchema = z
         taxAmount: z.number().min(0).nullish(),
         /** IEPS trasladado del concepto (suma de los traslados 003). Es costo; ver `renglonDelCfdi`. */
         iepsAmount: z.number().min(0).nullish(),
+        /** D8 · Factor del IEPS del concepto y su tasa (fracción) o cuota: dicen su clase. */
+        iepsFactor: z.enum(['Tasa', 'Cuota']).nullish(),
+        iepsTasaOCuota: z.number().min(0).nullish(),
     })
     .strict();
 

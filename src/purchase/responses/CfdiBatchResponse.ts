@@ -55,6 +55,8 @@ export interface CfdiBatchResolvedConcepto {
     /** IVA trasladado del concepto, como lo trae el comprobante (ver `tasaDelRenglonDelCfdi`). */
     readonly taxAmount?: number | null;
     readonly iepsAmount?: number | null;
+    readonly iepsFactor?: 'Tasa' | 'Cuota' | null;
+    readonly iepsTasaOCuota?: number | null;
 
     readonly productId: string | null;
     /** Con qué se emparejó, para poder explicarlo en la pantalla. */
