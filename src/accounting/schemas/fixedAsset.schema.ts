@@ -172,3 +172,23 @@ export const runDepreciationSchema = z.object({
 });
 
 export type RunDepreciationRequest = z.infer<typeof runDepreciationSchema>;
+
+/** D6 · POST …/fixed-assets/from-purchase/:purchaseId — da de alta la ficha de una compra. */
+export const createFixedAssetFromPurchaseSchema = z
+    .object({
+        /** Si la compra no lo dijo, aquí; si lo dijo, aquí se corrige. */
+        assetType: z.enum(FIXED_ASSET_TYPES).optional(),
+        inServiceDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+        name: z.string().trim().min(2).max(200).optional(),
+        /** Fracción; por omisión, la de la LISR para el tipo. */
+        annualRate: z.number().min(0).max(1).optional(),
+    })
+    .strict();
+export type CreateFixedAssetFromPurchaseRequest = z.infer<typeof createFixedAssetFromPurchaseSchema>;
+
+/**
+ * D6 · POST …/fixed-assets/:id/add-purchase — «Sumar al activo»: el flete o la instalación que
+ * llegaron en otra factura forman parte del MOI (LISR art. 31). Se reclasifica del gasto al activo.
+ */
+export const addPurchaseToFixedAssetSchema = z.object({ purchaseId: z.string().uuid() }).strict();
+export type AddPurchaseToFixedAssetRequest = z.infer<typeof addPurchaseToFixedAssetSchema>;

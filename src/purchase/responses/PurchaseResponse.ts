@@ -240,6 +240,16 @@ export interface PurchaseResponse {
     readonly accountingDate?: string | null;
     readonly cancellationReason: string | null;
 
+    /** D2 · Base e IVA por tasa del comprobante (null = se derivan de los renglones). */
+    readonly basesIva?: Readonly<Record<string, { readonly base: number; readonly iva: number }>> | null;
+    /** D2 · Tipo de operación DIOT elegido (null = el sugerido) y el sugerido. */
+    readonly diotOperacion?: string | null;
+    readonly diotOperacionSugerida?: string;
+    /** D6 · Activo fijo: tipo, inicio de uso y la ficha que ya lo dio de alta (null = sin ficha). */
+    readonly fixedAssetType?: string | null;
+    readonly fixedAssetInServiceDate?: string | null;
+    readonly fixedAssetId?: string | null;
+
     // --- Acuse con plazo (LatAm). Los campos nacen en la migración; la
     // pantalla se pospone a la capa 3. En México no se dibujan. ---
     /** Fecha en que se recibió el comprobante (ISO 8601, null = sin recibir). */

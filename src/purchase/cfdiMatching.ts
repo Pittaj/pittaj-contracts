@@ -73,6 +73,13 @@ export interface CfdiConceptoInput {
      */
     readonly iepsFactor?: 'Tasa' | 'Cuota' | null;
     readonly iepsTasaOCuota?: number | null;
+    /**
+     * D2 · El traslado de IVA del concepto tal como viene: su `Base`, su `TipoFactor` (Tasa o
+     * Exento; null si no trae) y el `ObjetoImp` del concepto. Separan la DIOT por tasa.
+     */
+    readonly ivaBase?: number | null;
+    readonly ivaFactor?: 'Tasa' | 'Exento' | null;
+    readonly objetoImp?: string | null;
 }
 
 /**

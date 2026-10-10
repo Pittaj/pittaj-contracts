@@ -27,6 +27,8 @@
  * @module Contracts/Purchase
  */
 
+import { FIXED_ASSET_TYPES } from '../../accounting/schemas/fixedAsset.schema.js';
+import { fechaCivilSchema } from '../../shared/fechas.js';
 import { z } from 'zod';
 import { businessLineRefSchema } from '../../business-line/schemas/createBusinessLine.schema.js';
 import { expenseConceptRefSchema } from '../../expense-concept/schemas/expenseConcept.schema.js';
@@ -166,6 +168,12 @@ export const basePurchaseFields = {
 
     /** Naturaleza: inventario, gasto o activo fijo. */
     kind: z.enum(PURCHASE_KINDS).optional().default('INVENTORY'),
+
+    /** D2 · Tipo de operación de la DIOT (02, 03, 06, 07, 08, 85, 87). Null = el sugerido. */
+    diotOperacion: z.enum(['02', '03', '06', '07', '08', '85', '87']).nullish(),
+    /** D6 · Si es activo fijo: su tipo y cuándo empieza a usarse. Con eso se propone la ficha. */
+    fixedAssetType: z.enum(FIXED_ASSET_TYPES).nullish(),
+    fixedAssetInServiceDate: fechaCivilSchema.nullish(),
 
     /** Serie-folio del comprobante del proveedor. */
     invoiceFolio: z.string().trim().max(50).nullish(),

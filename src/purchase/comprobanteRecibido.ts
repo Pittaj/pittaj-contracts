@@ -31,6 +31,7 @@
  *    cuánto falta.
  */
 
+import { basesDeIvaDelComprobante, type BasesDeIva } from './diot.js';
 import { roundHalfEven } from './purchaseMath.js';
 import type { CfdiConceptoInput } from './cfdiMatching.js';
 
@@ -200,6 +201,8 @@ export interface CompraDelComprobante {
     readonly cuadre: CuadreConElComprobante;
     /** D8 · El IEPS acreditable por clase (inciso), en pesos. Vacío si no hay. */
     readonly iepsAcreditablePorCategoria: Readonly<Record<string, number>>;
+    /** D2 · Base e IVA por tasa (16, 8, 0, exento, no objeto), en pesos, para la DIOT. */
+    readonly basesDeIva: BasesDeIva;
 }
 
 export interface CuadreConElComprobante {
@@ -225,6 +228,7 @@ function enPesos(c: CfdiConceptoInput, tc: number): CfdiConceptoInput {
         descuento: r2((c.descuento ?? 0) * tc),
         taxAmount: p(c.taxAmount),
         iepsAmount: p(c.iepsAmount),
+        ivaBase: p(c.ivaBase),
     };
 }
 
@@ -282,6 +286,7 @@ export function compraDelComprobante(
             totalDelComprobante: 0,
             monedaOriginal,
             iepsAcreditablePorCategoria: {},
+            basesDeIva: {},
             cuadre: {
                 cuadra: false,
                 diferencia: 0,
@@ -293,7 +298,8 @@ export function compraDelComprobante(
     const totalDelComprobante = r2(cabecera.total * tc);
     const ivaDeLaCabecera = r2(cabecera.trasladoIva * tc);
 
-    let renglones = conceptos.map((c) => renglonDelCfdi(enPesos(c, tc), opciones));
+    const enMxn = conceptos.map((c) => enPesos(c, tc));
+    let renglones = enMxn.map((c) => renglonDelCfdi(c, opciones));
     // D8: el IEPS acreditable va al documento, por clase.
     const iepsAcreditablePorCategoria: Record<string, number> = {};
     for (const r of renglones) {
@@ -350,6 +356,7 @@ export function compraDelComprobante(
         monedaOriginal,
         cuadre: cuadreConElComprobante(total, totalDelComprobante),
         iepsAcreditablePorCategoria,
+        basesDeIva: basesDeIvaDelComprobante(enMxn),
     };
 }
 

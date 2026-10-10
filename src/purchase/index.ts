@@ -19,3 +19,5 @@ export * from './cuentasPorPagar.js';
 export * from './quoteComparison.js';
 export * from './gastos.js';
 export * from './gastosRecurrentes.js';
+export * from './diot.js';
+export * from './activoDesdeCompra.js';
