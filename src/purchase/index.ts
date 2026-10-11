@@ -21,3 +21,4 @@ export * from './gastos.js';
 export * from './gastosRecurrentes.js';
 export * from './diot.js';
 export * from './activoDesdeCompra.js';
+export * from './sugerencias.js';

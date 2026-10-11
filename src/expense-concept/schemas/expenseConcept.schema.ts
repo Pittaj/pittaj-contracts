@@ -22,6 +22,13 @@ import { z } from 'zod';
 import { syncPushRequestSchema, syncPullRequestSchema } from '../../sync/index.js';
 import { businessLineRefSchema } from '../../business-line/schemas/createBusinessLine.schema.js';
 
+/**
+ * Grupo del concepto en «Mostrar todos» (desvío E). Es solo para encontrarlo: la cuenta la decide
+ * `ledgerAccountCode`.
+ */
+export const EXPENSE_CONCEPT_GROUPS = ['OPERACION', 'PERSONAL', 'IMPUESTOS', 'FINANCIEROS', 'NO_DEDUCIBLES'] as const;
+export type ExpenseConceptGroup = (typeof EXPENSE_CONCEPT_GROUPS)[number];
+
 /** Estados del concepto. */
 export const EXPENSE_CONCEPT_STATUSES = ['ACTIVE', 'INACTIVE'] as const;
 export type ExpenseConceptStatus = (typeof EXPENSE_CONCEPT_STATUSES)[number];
@@ -57,6 +64,12 @@ const ledgerAccountCodeSchema = z
     .regex(LEDGER_ACCOUNT_CODE_REGEX, { message: ERROR_MESSAGES.ACCOUNT_FORMAT })
     .refine(esCuentaDeGasto, { message: ERROR_MESSAGES.ACCOUNT_NOT_EXPENSE });
 
+/** Una variante de cuenta: vacía o nula = sin variante. */
+const varianteSchema = z
+    .preprocess((v) => (typeof v === 'string' && v.trim() === '' ? null : v), ledgerAccountCodeSchema.nullable())
+    .optional()
+    .default(null);
+
 const baseExpenseConceptFields = {
     name: z
         .string({ required_error: ERROR_MESSAGES.NAME_REQUIRED })
@@ -68,6 +81,17 @@ const baseExpenseConceptFields = {
     businessLineId: businessLineRefSchema,
     /** Se ofrece en la caja al registrar un gasto de caja (F6.7). */
     offeredAtCash: z.boolean().optional().default(false),
+    /** Grupo en «Mostrar todos» (E1). */
+    group: z.enum(EXPENSE_CONCEPT_GROUPS).optional().default('OPERACION'),
+    /** Sale arriba del combo aunque no se haya usado (E1). */
+    frequent: z.boolean().optional().default(false),
+    /**
+     * Variantes por tipo de proveedor (E1 §3, `cuentaDelConcepto`): persona moral nacional y
+     * extranjero. Vacías = la cuenta por omisión para todos.
+     */
+    ledgerAccountCodeCompany: varianteSchema,
+    ledgerAccountCodeForeignIndividual: varianteSchema,
+    ledgerAccountCodeForeignCompany: varianteSchema,
 };
 
 /** Crear un concepto: id generado en origen. */
