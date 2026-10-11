@@ -101,6 +101,12 @@ describe('ordenarConceptos', () => {
         expect(r.frecuentes).toHaveLength(CONCEPTOS_FRECUENTES_A_LA_VISTA);
         expect(r.frecuentes.at(-1)!.id).toBe('Otros');
     });
+    it('un concepto sin grupo (API anterior al desvío E) sale en Operación, no desaparece', () => {
+        const sinGrupo = { id: 'Renta', name: 'Renta', frequent: false, isSystem: false } as unknown as ConceptoParaElegir;
+        const r = ordenarConceptos([sinGrupo]);
+        expect(r.grupos.map((g) => g.group)).toEqual(['OPERACION']);
+        expect(r.grupos[0]!.conceptos).toHaveLength(1);
+    });
     it('«Mostrar todos» agrupa en el orden del catálogo y omite los grupos vacíos', () => {
         const r = ordenarConceptos([c('Predial', { group: 'IMPUESTOS' }), c('Agua'), c('Abarrotes', { group: 'OPERACION' })]);
         expect(r.grupos.map((g) => g.group)).toEqual(['OPERACION', 'IMPUESTOS']);
