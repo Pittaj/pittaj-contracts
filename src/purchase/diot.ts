@@ -138,11 +138,13 @@ const OPERACION_DEL_CONCEPTO: Readonly<Record<string, OperacionDiot>> = {
     FEES: '03',
     STATIONERY: '02',
     FUEL: '02',
+    GAS: '02',
+    UNIFORMS: '02',
 };
 
 /**
  * El tipo de operación que se sugiere para una compra. Mercancía y activo fijo son bienes (02); un
- * gasto, según su concepto: renta 06, honorarios 03, papelería o combustible 02, lo demás 85. El
+ * gasto, según su concepto: renta 06, honorarios 03, papelería, combustible, gas o uniformes 02, lo demás 85. El
  * proveedor global siempre es 87.
  */
 export function operacionDiotSugerida(input: {

@@ -2,7 +2,7 @@
  * @fileoverview Respuesta de un concepto de gasto.
  * @module Contracts/ExpenseConcept
  */
-import type { ExpenseConceptStatus } from '../schemas/expenseConcept.schema.js';
+import type { ExpenseConceptGroup, ExpenseConceptStatus } from '../schemas/expenseConcept.schema.js';
 import type { SyncPullResponse, SyncPushResponse } from '../../sync/index.js';
 
 export interface ExpenseConceptResponse {
@@ -23,6 +23,19 @@ export interface ExpenseConceptResponse {
      * desactiva y no cambia de cuenta.
      */
     readonly isSystem: boolean;
+    /** Grupo en «Mostrar todos» (E1). */
+    readonly group: ExpenseConceptGroup;
+    /** Frecuente de fábrica o marcado por el negocio: sale arriba del combo (E1). */
+    readonly frequent: boolean;
+    /** Variantes por tipo de proveedor (E1 §3). Ver `cuentaDelConcepto`. */
+    readonly ledgerAccountCodeCompany: string | null;
+    readonly ledgerAccountCodeForeignIndividual: string | null;
+    readonly ledgerAccountCodeForeignCompany: string | null;
+    /**
+     * Veces que el negocio lo usó en los últimos 90 días, para ordenar el combo. Solo en la lista
+     * (no viaja por sync: cada plataforma lo cuenta con sus datos).
+     */
+    readonly recentUses?: number;
     readonly status: ExpenseConceptStatus;
     readonly version: number;
     readonly createdAt?: string;
