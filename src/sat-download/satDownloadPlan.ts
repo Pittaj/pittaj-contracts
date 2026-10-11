@@ -22,10 +22,12 @@
  * nube (API) y el descargador las usan igual, así que deciden lo mismo.
  */
 
+import { ZONA_DEL_SAT } from '../shared/fechas.js';
+
 // ─── Constantes ──────────────────────────────────────────────────────────────
 
 /** Zona del calendario fiscal. El SAT interpreta `FechaInicial`/`FechaFinal` en hora del centro. */
-export const SAT_ZONA_HORARIA = 'America/Mexico_City';
+export const SAT_ZONA_HORARIA = ZONA_DEL_SAT;
 
 /**
  * Un día D se cierra con una descarga exitosa **pedida el día D + 4 o después**.
@@ -154,7 +156,7 @@ export function diasEntre(a: string, b: string): number {
 /**
  * El día del calendario del centro de México en que cae un instante.
  *
- * Se calcula con `Intl` y la zona `America/Mexico_City`, no restando seis horas: si México vuelve a
+ * Se calcula con `Intl` y la zona del SAT (`ZONA_DEL_SAT`), no restando seis horas: si México vuelve a
  * cambiar de horario, la zona lo sabe y una resta fija no.
  */
 export function diaEnMexico(instante: Date): string {

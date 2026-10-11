@@ -24,6 +24,8 @@
  * dejar que el cliente escriba datos fiscales que el servidor ya tiene mejores.
  */
 
+import { FIXED_ASSET_TYPES } from '../../accounting/schemas/fixedAsset.schema.js';
+import { fechaCivilSchema } from '../../shared/fechas.js';
 import { z } from 'zod';
 import { PURCHASE_LINE_ORIGINS } from '../purchaseLineOrigin.js';
 import { PURCHASE_KINDS } from './getPurchases.schema.js';
@@ -65,6 +67,17 @@ export const cfdiConceptoSchema = z
             .max(1, { message: ERROR_MESSAGES.TAX_FRACTION })
             .optional()
             .default(0),
+        /** IVA trasladado del concepto (importe del comprobante). Ver `tasaDelRenglonDelCfdi`. */
+        taxAmount: z.number().min(0).nullish(),
+        /** IEPS trasladado del concepto (suma de los traslados 003). Es costo; ver `renglonDelCfdi`. */
+        iepsAmount: z.number().min(0).nullish(),
+        /** D8 · Factor del IEPS del concepto y su tasa (fracción) o cuota: dicen su clase. */
+        iepsFactor: z.enum(['Tasa', 'Cuota']).nullish(),
+        iepsTasaOCuota: z.number().min(0).nullish(),
+        /** D2 · Base, factor del traslado de IVA y objeto de impuesto: separan la DIOT por tasa. */
+        ivaBase: z.number().min(0).nullish(),
+        ivaFactor: z.enum(['Tasa', 'Exento']).nullish(),
+        objetoImp: z.string().max(2).nullish(),
     })
     .strict();
 
@@ -149,9 +162,20 @@ export const createPurchaseFromCfdiSchema = z
         /** Bodega destino de la entrada. */
         warehouseId: z.string().uuid({ message: ERROR_MESSAGES.ID_INVALID_UUID }),
         locationId: z.string().uuid().nullish(),
+        /**
+         * D4 · La empresa de la compra, cuando no hay sucursal que la diga (un gasto global). Con
+         * sucursal manda la de la sucursal; con una sola empresa en el negocio, ni hace falta.
+         */
+        companyId: z.string().uuid().nullish(),
 
         /** INVENTORY | EXPENSE | FIXED_ASSET. Por omisión, lo que diga el UsoCFDI. */
         kind: z.enum(PURCHASE_KINDS).optional(),
+
+        /** D2 · Tipo de operación de la DIOT (02, 03, 06, 07, 08, 85, 87). Null = el sugerido. */
+        diotOperacion: z.enum(['02', '03', '06', '07', '08', '85', '87']).nullish(),
+        /** D6 · Si es activo fijo: su tipo y cuándo empieza a usarse. Con eso se propone la ficha. */
+        fixedAssetType: z.enum(FIXED_ASSET_TYPES).nullish(),
+        fixedAssetInServiceDate: fechaCivilSchema.nullish(),
 
         /** Margen con el que nacen los productos dados de alta en el lote. */
         marginPercent: z

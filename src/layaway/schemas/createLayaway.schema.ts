@@ -12,6 +12,7 @@
  */
 
 import { z } from 'zod';
+import { impuestosDelRenglonDeApartadoSchema } from '../impuestosDelRenglon.js';
 
 /** Renglón del apartado en el body del comando. */
 export const createLayawayLineSchema = z.object({
@@ -19,6 +20,11 @@ export const createLayawayLineSchema = z.object({
     productName: z.string().min(1, 'El nombre del producto es obligatorio'),
     quantity: z.number().positive('La cantidad debe ser mayor que 0'),
     unitPrice: z.number().min(0, 'El precio no puede ser negativo'),
+    /**
+     * D7h1 · El snapshot fiscal del renglón del ticket del que nace el apartado. Si no viene, la
+     * nube lo toma del catálogo del producto al apartar.
+     */
+    impuestos: impuestosDelRenglonDeApartadoSchema.nullish(),
 });
 
 /** Body de POST /api/layaways. */

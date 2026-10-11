@@ -14,6 +14,7 @@
  */
 
 import { z } from 'zod';
+import { zonaHorariaSchema } from '../../shared/fechas.js';
 import { businessLineRefSchema } from '../../business-line/schemas/createBusinessLine.schema.js';
 
 /**
@@ -261,6 +262,12 @@ export const CreateLocationSchema = z.object({
    * —un gasto, el SaaS— y para las sucursales de un solo giro (el obrador → Panadería).
    */
   defaultBusinessLineId: businessLineRefSchema,
+
+  /**
+   * D3 · Zona horaria IANA de la sucursal (una de `ZONAS_DE_MEXICO` u otra válida). `null` = la de su empresa. Decide qué día
+   * es «hoy» y en qué fecha cae una venta, un cobro o una entrega de la sucursal.
+   */
+  timezone: zonaHorariaSchema,
 });
 
 /**

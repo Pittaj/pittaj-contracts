@@ -10,6 +10,8 @@
  * @since 2025
  */
 import { z } from 'zod';
+import { CATEGORIAS_DE_IEPS } from '../../tax/iepsDeLaLey.js';
+import { zonaHorariaSchema } from '../../shared/fechas.js';
 
 const TAX_ID_REGEX = /^[A-Z0-9-]{8,20}$/i;
 
@@ -20,6 +22,10 @@ export const updateCompanySchema = z.object({
   legalName: z.string().min(2).max(200).trim().nullish(),
   taxId: z.string().regex(TAX_ID_REGEX, 'Tax ID debe ser alfanumérico (8-20 caracteres)').trim().toUpperCase().nullish(),
   isDefault: z.boolean().optional(),
+  /** D3 · `undefined` = no cambia; `null` = la zona del centro. */
+  timezone: zonaHorariaSchema,
+  /** D8 · Las clases de IEPS por las que la empresa causa IEPS (undefined = sin cambio). */
+  iepsCategorias: z.array(z.enum(CATEGORIAS_DE_IEPS)).max(9).optional(),
 });
 
 export type UpdateCompanyRequest = z.infer<typeof updateCompanySchema>;

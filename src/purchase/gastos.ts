@@ -80,6 +80,8 @@ export interface RenglonDeGasto {
     readonly purchaseId: string;
     readonly purchaseNumber: string;
     readonly status: 'DRAFT' | 'ACTIVE';
+    /** D5 · Ausente = gasto. */
+    readonly kind?: 'EXPENSE' | 'FIXED_ASSET';
     readonly fecha: string;
     readonly supplierId: string;
     readonly supplierName: string;
@@ -149,6 +151,7 @@ export function armarListaDeGastos(
             id: d.purchaseId,
             purchaseNumber: d.purchaseNumber,
             status: d.status,
+            kind: d.kind ?? 'EXPENSE',
             fecha: d.fecha,
             supplierId: d.supplierId,
             supplierName: d.supplierName,
@@ -170,8 +173,10 @@ export function armarListaDeGastos(
         a.fecha === b.fecha ? b.purchaseNumber.localeCompare(a.purchaseNumber) : b.fecha.localeCompare(a.fecha)
     );
 
-    const vigentes = items.filter((i) => i.status === 'ACTIVE');
-    const debidos = vigentes.filter((i) => i.saldo > 0.009);
+    // D5: el activo fijo se lista (y se debe) pero no es gasto: se capitaliza.
+    const todosVigentes = items.filter((i) => i.status === 'ACTIVE');
+    const vigentes = todosVigentes.filter((i) => i.kind === 'EXPENSE');
+    const debidos = todosVigentes.filter((i) => i.saldo > 0.009);
     const sinConcepto = vigentes.filter((i) => i.conceptIds.includes(null));
     const vencimientos = debidos
         .map((i) => i.dueDate)
@@ -183,7 +188,8 @@ export function armarListaDeGastos(
         resumen: {
             gastado: r2(vigentes.reduce((s, i) => s + i.importe, 0)),
             documentos: vigentes.length,
-            borradores: items.length - vigentes.length,
+            borradores: items.length - todosVigentes.length,
+            activos: todosVigentes.length - vigentes.length,
             porPagar: r2(debidos.reduce((s, i) => s + i.saldo, 0)),
             documentosPorPagar: debidos.length,
             proximoVencimiento: vencimientos[0] ?? null,
@@ -310,4 +316,15 @@ function avisosDe(filas: readonly ExpenseByConceptRow[], meses: readonly string[
     }
     const suben = avisos.filter((x) => x.tipo === 'SUBE').sort((x, y) => y.cambioPercent - x.cambioPercent).slice(0, 3);
     return [...suben, ...avisos.filter((x) => x.tipo === 'OTROS_BAJA')];
+}
+
+// ─── D5 · Dónde vive cada compra ─────────────────────────────────────
+
+/**
+ * La lista en la que vive una compra según su naturaleza: la mercancía en Órdenes de compra; el
+ * gasto y el activo fijo (hasta que Contabilidad le da ficha) en Gastos. Cuentas por pagar las
+ * junta todas. Se decide al convertir y no cambia de lugar sin que cambie la naturaleza.
+ */
+export function listaDeLaCompra(kind: string | null | undefined): 'ORDENES' | 'GASTOS' {
+    return kind === 'EXPENSE' || kind === 'FIXED_ASSET' ? 'GASTOS' : 'ORDENES';
 }

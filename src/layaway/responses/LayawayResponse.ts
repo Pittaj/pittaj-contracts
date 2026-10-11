@@ -19,6 +19,7 @@
  */
 
 import type { LayawayStatusPrimitive } from '../primitives/layawayPrimitives.js';
+import type { ImpuestosDelRenglonDeApartado } from '../impuestosDelRenglon.js';
 
 /** Renglón de un apartado (entidad hija). Snapshot del precio al apartar. */
 export interface LayawayLineResponse {
@@ -29,8 +30,25 @@ export interface LayawayLineResponse {
     readonly quantity: number;
     /** Precio unitario del producto apartado. */
     readonly unitPrice: number;
-    /** Importe del renglón (quantity × unitPrice). */
+    /** Importe del renglón: el total de venta con su snapshot (D7h1), o quantity × unitPrice. */
     readonly lineTotal: number;
+    /** D7h1 · Snapshot fiscal del renglón (null en apartados anteriores). */
+    readonly impuestos?: ImpuestosDelRenglonDeApartado | null;
+}
+
+/**
+ * D7h · Un abono: el hecho de cada pago. Viaja en el sync en los dos sentidos: sin él la nube no
+ * podía contabilizar ni facturar el anticipo, y el escritorio perdía los suyos al bajar.
+ */
+export interface LayawayPaymentResponse {
+    readonly id: string;
+    readonly amount: number;
+    readonly paymentMethodId: string | null;
+    readonly paymentMethodName: string | null;
+    readonly sessionId: string | null;
+    readonly operatorId: string | null;
+    /** ISO 8601. */
+    readonly occurredAt: string;
 }
 
 /** DTO de respuesta para consultas/sync de apartados. */
@@ -44,6 +62,7 @@ export interface LayawayResponse {
     readonly customerName: string | null;
     /** Estado: OPEN | COMPLETED | CANCELLED | EXPIRED. */
     readonly status: LayawayStatusPrimitive;
+    // D7h1: un apartado COMPLETED ya es venta: su ticket lleva EL MISMO id que el apartado.
     /** Importe total del apartado (suma de los renglones). */
     readonly total: number;
     /** Abonado a la fecha (anticipos acumulados). */
@@ -65,6 +84,8 @@ export interface LayawayResponse {
 
     /** Renglones (tabla hija layaway_lines). */
     readonly lines: LayawayLineResponse[];
+    /** D7h · Los abonos (en orden). Ausente en una nube anterior: el escritorio conserva los suyos. */
+    readonly payments?: LayawayPaymentResponse[];
 
     /** Versión para optimistic locking. */
     readonly version: number;

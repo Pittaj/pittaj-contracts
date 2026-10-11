@@ -14,6 +14,11 @@ export interface ExpenseRowResponse {
     readonly purchaseNumber: string;
     /** Solo borradores y vigentes: una cancelada no es gasto. */
     readonly status: 'DRAFT' | 'ACTIVE';
+    /**
+     * D5 · Un activo fijo vive en Gastos hasta tener su ficha en Contabilidad, con su etiqueta, pero
+     * **no suma como gasto**: se capitaliza y se deprecia.
+     */
+    readonly kind: 'EXPENSE' | 'FIXED_ASSET';
     /** `YYYY-MM-DD` en hora de México: la recepción si la hubo; si no, el comprobante o la captura. */
     readonly fecha: string;
     readonly supplierId: string;
@@ -52,6 +57,10 @@ export interface ExpensesSummary {
     /** Gastos vigentes con al menos un renglón en Otros gastos. */
     readonly sinConcepto: number;
     readonly importeSinConcepto: number;
+    /** D5 · Compras de activo fijo vigentes en el rango (no suman a `gastado`). */
+    readonly activos?: number;
+    /** D5 · Borradores de **todos los meses**: lo que la pestaña «Borradores» enseña. */
+    readonly borradoresTodos?: number;
 }
 
 /** GET /api/purchases/expenses */

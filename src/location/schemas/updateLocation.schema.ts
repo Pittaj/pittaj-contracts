@@ -1,5 +1,6 @@
 /** @fileoverview Schema Zod para actualización de ubicación. */
 import { z } from 'zod';
+import { zonaHorariaSchema } from '../../shared/fechas.js';
 import { businessLineRefSchema } from '../../business-line/schemas/createBusinessLine.schema.js';
 
 export const updateLocationSchema = z.object({
@@ -29,6 +30,8 @@ export const updateLocationSchema = z.object({
   isDefault: z.boolean().optional(),
   /** `undefined` = no cambia; `null` = quitarle la línea. */
   defaultBusinessLineId: businessLineRefSchema,
+  /** D3 · `undefined` = no cambia; `null` = la de su empresa. */
+  timezone: zonaHorariaSchema,
 });
 
 export type UpdateLocationRequest = z.infer<typeof updateLocationSchema>;

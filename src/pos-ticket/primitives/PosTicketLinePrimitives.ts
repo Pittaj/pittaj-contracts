@@ -22,6 +22,30 @@ export interface PosTicketLinePrimitives extends SaleLineBasePrimitives {
   /** Base imponible (subtotal - descuento, neta de impuesto si venia incluido). null si no aplica. */
   readonly taxBaseAmount: number | null;
   /**
+   * D7b · El IEPS del renglón cuando el producto lleva IVA **e** IEPS (`taxCode` es el IVA). Por
+   * tasa, fracción (0.08; tabaco 1.6); por cuota, pesos por unidad base. El IVA (`taxAmount`) ya va
+   * sobre la base más este IEPS. Ausentes = no lleva.
+   */
+  readonly iepsPercent?: number | null;
+  readonly iepsFactor?: 'Tasa' | 'Cuota' | null;
+  readonly iepsAmount?: number | null;
+  /** D8 · Clase del bien del IEPS (inciso del art. 2o., fr. I LIEPS), copiada del catálogo al vender. */
+  readonly iepsCategoria?: string | null;
+  /**
+   * D7c · La clase de retención del producto al vender (`CLASES_DE_RETENCION`). El CFDI calcula
+   * con ella las retenciones según quién lo recibe. Null = bienes o servicios en general.
+   */
+  readonly retentionClass?: string | null;
+  /**
+   * D7d · Impuesto local trasladado del renglón (hospedaje…): nombre, tasa (fracción) e importe.
+   * No entra en la base del IVA. Ausentes = no lleva.
+   */
+  readonly localTaxName?: string | null;
+  readonly localTaxRate?: number | null;
+  readonly localTaxAmount?: number | null;
+  /** D7e · Objeto de impuesto forzado del producto al vender ('03' | '04' | '05'); null = automático. */
+  readonly objetoImp?: string | null;
+  /**
    * Línea de negocio estampada al confirmar el ticket (F1.7): producto → categoría → sucursal con
    * el catálogo de ese momento. Opcional: si no viene, la nube la estampa al guardar.
    */

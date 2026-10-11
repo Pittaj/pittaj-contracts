@@ -183,3 +183,30 @@ describe('Gastos por concepto', () => {
         expect(r.avisos).toEqual([]);
     });
 });
+
+describe('D5 · Cada compra vive en su lista', () => {
+    it('el activo fijo se lista en Gastos con su naturaleza, se debe, pero no suma como gasto', () => {
+        const { items, resumen } = armarListaDeGastos(
+            [
+                renglon({ purchaseId: 'g1', status: 'ACTIVE', total: 116, base: 100, pagado: 0 }),
+                renglon({ purchaseId: 'a1', status: 'ACTIVE', kind: 'FIXED_ASSET', total: 23200, base: 20000, pagado: 0 }),
+            ],
+            {}
+        );
+        expect(items.find((i) => i.id === 'a1')?.kind).toBe('FIXED_ASSET');
+        expect(resumen.gastado).toBe(100);
+        expect(resumen.documentos).toBe(1);
+        expect(resumen.activos).toBe(1);
+        expect(resumen.porPagar).toBe(23316);
+    });
+
+    it('la mercancía vive en Órdenes de compra; el gasto y el activo, en Gastos', async () => {
+        const { listaDeLaCompra } = await import('../../src/purchase/gastos');
+        expect(['INVENTORY', 'EXPENSE', 'FIXED_ASSET', null].map(listaDeLaCompra)).toEqual(['ORDENES', 'GASTOS', 'GASTOS', 'ORDENES']);
+    });
+
+    it('«borradores» llega como texto en la query', () => {
+        expect(getExpensesSchema.parse({ desde: '2026-10', borradores: 'true' }).borradores).toBe(true);
+        expect(getExpensesSchema.parse({ desde: '2026-10' }).borradores).toBeUndefined();
+    });
+});

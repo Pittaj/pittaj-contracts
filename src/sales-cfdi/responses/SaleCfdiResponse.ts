@@ -13,6 +13,7 @@ import type {
     CancellationMotiveValue,
     RepPaymentFormValue,
 } from '../schemas/saleCfdi.schema.js';
+import type { RetencionDelConcepto, RetencionesDecididas } from '../../tax/retencionesDeLaVenta.js';
 
 /** Un complemento de pago timbrado sobre la venta. */
 export interface RepResponse {
@@ -52,6 +53,22 @@ export interface SaleCfdiStatusResponse {
     /** Lo que queda a deber. `null` si no aplica (venta de contado). */
     readonly pendingBalance: number | null;
     readonly reps: readonly RepResponse[];
+    /** D7e · Notas de crédito por bonificación o descuento de la venta. */
+    readonly bonifications?: readonly BonificationResponse[];
+}
+
+/** D7e · Una nota de crédito por bonificación o descuento (sin devolución). */
+export interface BonificationResponse {
+    readonly id: string;
+    readonly uuid: string | null;
+    readonly status: SaleCfdiStatusValue | string;
+    readonly tipo: string;
+    /** Lo pedido, sobre el total de la factura. */
+    readonly importe: number;
+    /** Total del Egreso timbrado. */
+    readonly total: number | null;
+    readonly stampedAt: string | null;
+    readonly lastError: string | null;
 }
 
 /**
@@ -138,4 +155,22 @@ export interface GlobalCfdiTicketsResponse {
         readonly soldAt: string;
         readonly total: number;
     }[];
+}
+
+/**
+ * D7c · `POST /api/sales-cfdi/:ticketId/retenciones` — lo que el CFDI llevaría retenido.
+ * `decididas` es lo que se manda de vuelta en `stamp` (ajustado o tal cual).
+ */
+export interface PreviewRetencionesResponse {
+    readonly decididas: RetencionesDecididas;
+    readonly retenciones: readonly RetencionDelConcepto[];
+    readonly totalRetenido: number;
+    /** Total del ticket (lo cobrado). */
+    readonly totalDelTicket: number;
+    /** Total del CFDI: lo que el cliente te paga; el resto lo entera él al SAT. */
+    readonly totalDelCfdi: number;
+    /** D7d · Moneda de la venta. Si no es MXN, el timbrado pide `tipoCambio`. */
+    readonly moneda: string;
+    /** D7d · El último tipo de cambio que usó el negocio para esa moneda (propuesta); null si nunca. */
+    readonly tipoCambioSugerido: number | null;
 }

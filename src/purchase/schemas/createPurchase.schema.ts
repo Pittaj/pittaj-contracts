@@ -27,11 +27,14 @@
  * @module Contracts/Purchase
  */
 
+import { FIXED_ASSET_TYPES } from '../../accounting/schemas/fixedAsset.schema.js';
+import { fechaCivilSchema } from '../../shared/fechas.js';
 import { z } from 'zod';
 import { businessLineRefSchema } from '../../business-line/schemas/createBusinessLine.schema.js';
 import { expenseConceptRefSchema } from '../../expense-concept/schemas/expenseConcept.schema.js';
 import { PURCHASE_LINE_ORIGINS } from '../purchaseLineOrigin.js';
 import { PURCHASE_KINDS } from './getPurchases.schema.js';
+import { fechaCivilEntranteSchema } from '../../shared/fechas.js';
 
 const ERROR_MESSAGES = {
     ID_INVALID_UUID: 'El ID debe ser un UUID válido',
@@ -157,8 +160,20 @@ export const basePurchaseFields = {
     /** Sucursal de la compra (normalmente la de la bodega destino). */
     locationId: z.string().uuid().nullish(),
 
+    /**
+     * D4 · La empresa de la compra, cuando no hay sucursal que la diga (un gasto global). Con
+     * sucursal manda la de la sucursal; con una sola empresa en el negocio, ni hace falta.
+     */
+    companyId: z.string().uuid().nullish(),
+
     /** Naturaleza: inventario, gasto o activo fijo. */
     kind: z.enum(PURCHASE_KINDS).optional().default('INVENTORY'),
+
+    /** D2 · Tipo de operación de la DIOT (02, 03, 06, 07, 08, 85, 87). Null = el sugerido. */
+    diotOperacion: z.enum(['02', '03', '06', '07', '08', '85', '87']).nullish(),
+    /** D6 · Si es activo fijo: su tipo y cuándo empieza a usarse. Con eso se propone la ficha. */
+    fixedAssetType: z.enum(FIXED_ASSET_TYPES).nullish(),
+    fixedAssetInServiceDate: fechaCivilSchema.nullish(),
 
     /** Serie-folio del comprobante del proveedor. */
     invoiceFolio: z.string().trim().max(50).nullish(),
@@ -166,8 +181,11 @@ export const basePurchaseFields = {
     /** UUID del CFDI del proveedor. */
     invoiceUuid: z.string().trim().max(50).nullish(),
 
-    /** Fecha del comprobante. */
-    invoiceDate: z.coerce.date().nullish(),
+    /**
+     * Fecha del comprobante: fecha **civil** `YYYY-MM-DD` (D3), la del reloj del emisor. Se acepta
+     * el ISO de antes y se toma su día; nunca se convierte de zona.
+     */
+    invoiceDate: fechaCivilEntranteSchema,
 
     /** CFDI MétodoPago: "PUE" / "PPD". */
     paymentMethod: z.string().trim().max(5).nullish(),
@@ -190,6 +208,22 @@ export const basePurchaseFields = {
     foreignTotal: z.number().positive('El total del recibo va en positivo').max(99_999_999).nullish(),
 
     notes: z.string().trim().max(500).nullish(),
+
+    /**
+     * D7f · Retenciones e impuesto local **capturados a mano**, para la compra sin CFDI (honorarios
+     * o renta con recibo en papel). Con CFDI no se aceptan: manda el comprobante (D1). El total de
+     * la compra es lo que se le debe al proveedor: renglones − retenciones + traslado local.
+     * `retencionesDeLaCompra` (tax) las propone con la misma regla de la venta.
+     */
+    retencionesAMano: z
+        .object({
+            retencionIsr: z.number().min(0).max(99_999_999).default(0),
+            retencionIva: z.number().min(0).max(99_999_999).default(0),
+            retencionLocal: z.number().min(0).max(99_999_999).default(0),
+            trasladoLocal: z.number().min(0).max(99_999_999).default(0),
+        })
+        .strict()
+        .nullish(),
 
     /** Renglones del documento. Un borrador puede guardarse sin ninguno. */
     lines: z.array(purchaseLineInputSchema).optional().default([]),

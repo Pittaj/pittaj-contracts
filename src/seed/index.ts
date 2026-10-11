@@ -33,7 +33,9 @@
 export const SEED_TAXES = [
     { name: 'IVA 16%', rate: 0.16, kind: 'IVA', isIncluded: true, satFactor: 'Tasa', satCode: '002', isDefault: true },
     { name: 'Tasa 0', rate: 0, kind: 'ZERO', isIncluded: true, satFactor: 'Tasa', satCode: '002', isDefault: false },
-    { name: 'Exento', rate: 0, kind: 'EXEMPT', isIncluded: true, satFactor: 'Exento', satCode: null, isDefault: false },
+    { name: 'Exento', rate: 0, kind: 'EXEMPT', isIncluded: true, satFactor: 'Exento', satCode: '002', isDefault: false },
+    // D7a: lo que no es acto gravado (cuotas, donativos): `ObjetoImp 01`, sin nodo de impuestos.
+    { name: 'No objeto de impuesto', rate: 0, kind: 'NOT_OBJECT', isIncluded: true, satFactor: null, satCode: null, isDefault: false },
 ] as const;
 
 /**
