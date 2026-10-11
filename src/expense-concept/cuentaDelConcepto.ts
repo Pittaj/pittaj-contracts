@@ -129,7 +129,8 @@ export function ordenarConceptos<T extends ConceptoParaElegir>(conceptos: readon
     const grupos = GRUPOS_DE_CONCEPTO.map(({ group, label }) => ({
         group,
         label,
-        conceptos: conceptos.filter((c) => c.group === group).sort((a, b) => Number(a.isSystem) - Number(b.isSystem) || porNombre(a, b)),
+        // Sin grupo (un concepto de una API anterior al desvío E) cuenta como Operación.
+        conceptos: conceptos.filter((c) => (c.group ?? 'OPERACION') === group).sort((a, b) => Number(a.isSystem) - Number(b.isSystem) || porNombre(a, b)),
     })).filter((g) => g.conceptos.length > 0);
 
     return { frecuentes, grupos };
