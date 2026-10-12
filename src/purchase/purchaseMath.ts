@@ -110,3 +110,18 @@ export function calculateTotals(lines: ReadonlyArray<PurchaseLineAmounts>): Purc
         totalAmount: sum((l) => l.totalAmount),
     };
 }
+
+/**
+ * F6.6 · El tipo de cambio de una compra registrada en pesos con recibo en otra moneda: lo que se
+ * pagó entre lo que dice el recibo, a cuatro decimales (así lo publica el DOF). Null si no aplica.
+ */
+export function tipoDeCambioDeLaCompra(totalEnPesos: number, foreignTotal: number | null | undefined): number | null {
+    if (!foreignTotal || foreignTotal <= 0 || !(totalEnPesos > 0)) return null;
+    return Math.round((totalEnPesos / foreignTotal) * 10_000) / 10_000;
+}
+
+/** F6.6 · ¿Reside fuera de México? País null o «MX» = México. */
+export function esProveedorExtranjero(country: string | null | undefined): boolean {
+    const c = country?.trim().toUpperCase();
+    return Boolean(c) && c !== 'MX';
+}

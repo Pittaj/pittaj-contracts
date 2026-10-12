@@ -20,6 +20,7 @@
  */
 
 import { z } from 'zod';
+import { CLASES_DE_RETENCION, SIN_CLASE } from '../../tax/retencionesDeLaVenta.js';
 
 /** Folio fiscal del SAT. En mayúsculas y con guiones, como lo timbra el PAC. */
 const UUID_SAT = /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/i;
@@ -135,7 +136,55 @@ export type StampReceptorInput = z.infer<typeof stampReceptorSchema>;
  * El cuerpo entero es opcional: la web factura sin él y el backend usa el cliente de la venta.
  * **No endurecer esto** — lo manda el escritorio.
  */
+/** D7c · Las tasas de una clase, como las ajusta quien timbra. */
+export const tasasDeRetencionSchema = z.object({
+    // `default(null)`: un cliente que omite los nulos (el escritorio serializa así) dice «no se retiene».
+    isr: z.number().min(0).max(0.35).nullable().default(null),
+    iva: z
+        .discriminatedUnion('modo', [
+            z.object({ modo: z.literal('DOS_TERCIOS') }),
+            z.object({ modo: z.literal('TASA'), tasa: z.number().min(0).max(0.16) }),
+        ])
+        .nullable()
+        .default(null),
+    /** D7d · Retención local (cedular): nombre y tasa del estado. */
+    local: z.object({ nombre: z.string().trim().min(1).max(60), tasa: z.number().min(0).max(0.35) }).nullish(),
+    fundamento: z.string().max(500).optional(),
+});
+
+/** D7c · La decisión de retenciones de un CFDI: tasas por clase (`GENERAL` = sin clase). */
+export const retencionesDecididasSchema = z
+    .object({
+        [SIN_CLASE]: tasasDeRetencionSchema.optional(),
+        ...Object.fromEntries(CLASES_DE_RETENCION.map((c) => [c, tasasDeRetencionSchema.optional()])),
+    })
+    .strict();
+
 export const stampSaleCfdiSchema = z.object({
+    receptor: stampReceptorSchema.optional(),
+    /**
+     * D7c · Retenciones ajustadas por quien timbra. Si no viene, el backend las calcula
+     * (`decidirRetenciones`); `{}` = timbrar sin retenciones. Opcional: el escritorio viejo no lo manda.
+     */
+    retenciones: retencionesDecididasSchema.optional(),
+    /**
+     * D7d · Pesos por unidad de la moneda de la venta, cuando la venta no está en MXN (Anexo 20,
+     * `TipoCambio`). Obligatorio en ese caso; se ignora en MXN.
+     */
+    tipoCambio: z.number().positive().max(100_000).optional(),
+    /**
+     * D8 · El cliente es contribuyente de IEPS por estos bienes y pide el impuesto por separado
+     * (LIEPS art. 19, fr. II). Si no viene, lo dice su ficha. Solo aplica a las clases A, D, F, G,
+     * I y J.
+     */
+    desgloseIeps: z.boolean().optional(),
+});
+
+/**
+ * D7c · `POST /api/sales-cfdi/:ticketId/retenciones` — qué retenciones llevaría el CFDI, antes de
+ * timbrar. Mismo receptor opcional que el timbrado.
+ */
+export const previewRetencionesSchema = z.object({
     receptor: stampReceptorSchema.optional(),
 });
 
@@ -193,9 +242,36 @@ export const stampRepSchema = z.object({
     }),
     /** Cuándo se cobró. Si no viene, el backend usa el momento del timbrado. */
     paymentDate: z.string().datetime().optional(),
+    /** D7d · Tipo de cambio del día del pago (`TipoCambioP`), si la venta no está en MXN. */
+    tipoCambio: z.number().positive().max(100_000).optional(),
 });
 
 export type StampRepInput = z.infer<typeof stampRepSchema>;
+
+/**
+ * D7e · `POST /api/sales-cfdi/:ticketId/bonificacion` — nota de crédito por **bonificación o
+ * descuento** sobre una venta facturada, **sin devolución** de mercancía (CFDI de Egreso, relación
+ * `01` «Nota de crédito de los documentos relacionados»).
+ *
+ * `importe` es lo que el cliente deja de deber o se le regresa, **sobre el total del CFDI** (con
+ * impuestos, neto de retenciones). Los impuestos de la nota salen en la misma proporción que los
+ * de la factura: si la venta llevaba IVA 16 % y 0 %, la nota también.
+ */
+export const BONIFICATION_KINDS = ['BONIFICACION', 'DESCUENTO'] as const;
+export type BonificationKindValue = (typeof BONIFICATION_KINDS)[number];
+
+/** Formas de pago admitidas en la nota: las del REP más compensación (17) y condonación (15). */
+export const BONIFICATION_PAYMENT_FORMS = ['01', '02', '03', '04', '05', '06', '15', '17', '28', '29', '31'] as const;
+
+export const stampBonificationSchema = z.object({
+    importe: z.number().positive('El importe debe ser mayor que cero'),
+    tipo: z.enum(BONIFICATION_KINDS).default('BONIFICACION'),
+    /** Cómo se aplica: `17` compensación (baja lo que debe) es lo normal en una venta a crédito. */
+    formaPago: z.enum(BONIFICATION_PAYMENT_FORMS),
+    descripcion: z.string().trim().max(200).optional(),
+});
+
+export type StampBonificationInput = z.infer<typeof stampBonificationSchema>;
 
 /** `POST /api/sales-cfdi/:ticketId/rep/:repId/cancel`. */
 export const cancelRepSchema = z.object({
@@ -218,6 +294,8 @@ export const stampGlobalCfdiSchema = z.object({
     /** `c_Meses`: 01–12 mensual · 13–18 bimestral. */
     meses: z.string().regex(/^(0[1-9]|1[0-8])$/, 'Mes fuera del catálogo c_Meses'),
     anio: z.number().int().min(2020).max(2100),
+    /** D7d · Si las ventas del periodo están en otra moneda, su tipo de cambio. */
+    tipoCambio: z.number().positive().max(100_000).optional(),
 });
 
 export type StampGlobalCfdiInput = z.infer<typeof stampGlobalCfdiSchema>;

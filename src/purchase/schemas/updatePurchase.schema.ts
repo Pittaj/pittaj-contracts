@@ -24,3 +24,18 @@ export const updatePurchaseSchema = z
     .strict();
 
 export type UpdatePurchaseRequest = z.infer<typeof updatePurchaseSchema>;
+
+/**
+ * D2/D6 · PATCH /api/purchases/:id/fiscal-classification — cómo se declara la compra: tipo de
+ * operación DIOT y, si es activo fijo, su tipo e inicio de uso. No reabre la compra. Clave
+ * ausente = no cambia; `null` = se quita (la operación vuelve a la sugerida).
+ */
+export const setFiscalClassificationSchema = z
+    .object({
+        version: z.number().int().min(1),
+        diotOperacion: basePurchaseFields.diotOperacion,
+        fixedAssetType: basePurchaseFields.fixedAssetType,
+        fixedAssetInServiceDate: basePurchaseFields.fixedAssetInServiceDate,
+    })
+    .strict();
+export type SetFiscalClassificationRequest = z.infer<typeof setFiscalClassificationSchema>;

@@ -14,6 +14,7 @@
  */
 
 import { z } from 'zod';
+import { accesoWebSchema } from './accesoWeb.schema.js';
 
 /**
  * Regex para validar password fuerte.
@@ -149,6 +150,13 @@ export const CreateUserSchema = z.object({
     .regex(/^[a-zA-Z0-9_-]+$/, 'El username solo puede contener letras, números, guiones y guiones bajos')
     .trim()
     .optional(),
+
+  /**
+   * Acceso a la web: el par salt + clientHash derivado de `password` como en el registro. Con él la
+   * nube le crea la identidad de login (correo verificado, tenant y usuario ya vinculados). Sin él
+   * el usuario existe pero no puede entrar a la web.
+   */
+  acceso: accesoWebSchema.optional(),
 });
 
 /**

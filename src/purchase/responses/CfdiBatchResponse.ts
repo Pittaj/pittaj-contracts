@@ -24,6 +24,11 @@ export const MOTIVOS_DE_ATENCION = [
     'YA_CAPTURADO',
     /** El comprobante ya no está en «sin capturar»: alguien lo vinculó o lo descartó. */
     'NO_ESTA_PENDIENTE',
+    /**
+     * D1 · La compra que saldría no suma el `Total` del CFDI: trae un impuesto que Pittaj no leyó
+     * (o un CFDI en otra moneda sin tipo de cambio). No se convierte; `cuadre.motivo` dice cuánto.
+     */
+    'NO_CUADRA_CON_EL_CFDI',
 ] as const;
 
 export type MotivoDeAtencion = (typeof MOTIVOS_DE_ATENCION)[number];
@@ -47,6 +52,14 @@ export interface CfdiBatchResolvedConcepto {
     readonly importe: number;
     readonly descuento: number;
     readonly taxRate: number;
+    /** IVA trasladado del concepto, como lo trae el comprobante (ver `tasaDelRenglonDelCfdi`). */
+    readonly taxAmount?: number | null;
+    readonly iepsAmount?: number | null;
+    readonly iepsFactor?: 'Tasa' | 'Cuota' | null;
+    readonly iepsTasaOCuota?: number | null;
+    readonly ivaBase?: number | null;
+    readonly ivaFactor?: 'Tasa' | 'Exento' | null;
+    readonly objetoImp?: string | null;
 
     readonly productId: string | null;
     /** Con qué se emparejó, para poder explicarlo en la pantalla. */
@@ -84,6 +97,20 @@ export interface CfdiBatchPreviewItem {
     /** El proveedor que corresponde al RFC, si existe. */
     readonly supplierId: string | null;
     readonly supplierName: string | null;
+    /**
+     * El uso que declaró el receptor en el XML (G01 mercancías, G03 gastos en general…). Se enseña
+     * en «Revisar mercancía o gasto» porque es la pista que el SAT ya da (2026-10-04).
+     */
+    readonly usoCfdi: string | null;
+    /**
+     * Lo que el proveedor propone cuando le compras gasto (F6.3): concepto, línea y sucursal. Null
+     * si no hay proveedor dado de alta. Es lo que «del proveedor» enseña en la tabla de revisar.
+     */
+    readonly omisiones: {
+        readonly expenseConceptId: string | null;
+        readonly businessLineId: string | null;
+        readonly locationId: string | null;
+    } | null;
 
     readonly conceptos: number;
     readonly emparejados: number;
@@ -102,6 +129,16 @@ export interface CfdiBatchPreviewItem {
 
     /** Vacío = se convierte solo. Con algo dentro = pide una decisión. */
     readonly motivos: readonly MotivoDeAtencion[];
+    /**
+     * D1 · El candado: lo que sumaría la compra contra el `Total` del CFDI (en pesos). Opcional
+     * para no romper a quien no lo lee.
+     */
+    readonly cuadre?: {
+        readonly cuadra: boolean;
+        readonly diferencia: number;
+        readonly totalDeLaCompra: number;
+        readonly motivo: string | null;
+    };
     /** Si el motivo es `YA_CAPTURADO`, la compra que ya lo ampara. */
     readonly compraExistente: { readonly id: string; readonly purchaseNumber: string } | null;
 
@@ -137,6 +174,12 @@ export interface CfdiBatchResultItem {
     readonly purchaseId: string | null;
     readonly purchaseNumber: string | null;
     readonly total: number;
+    /**
+     * D5 · La naturaleza con la que nació y el mes en que vive (`YYYY-MM`, el del comprobante): un
+     * gasto se busca en Compras › Gastos de ese mes, no en Órdenes de compra.
+     */
+    readonly kind?: 'INVENTORY' | 'EXPENSE' | 'FIXED_ASSET' | null;
+    readonly mes?: string | null;
     /** Vacío si se creó; si no, por qué se quedó fuera. */
     readonly motivos: readonly MotivoDeAtencion[];
     /** El detalle legible cuando el comprobante falló por algo que no es una decisión del usuario. */

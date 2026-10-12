@@ -25,6 +25,8 @@
  * servidor pone lo que solo él sabe: la memoria del proveedor, el catálogo y los bloqueos.
  */
 
+import { FIXED_ASSET_TYPES } from '../../accounting/schemas/fixedAsset.schema.js';
+import { fechaCivilSchema } from '../../shared/fechas.js';
 import { z } from 'zod';
 import { cfdiConceptoSchema, cfdiResolvedConceptoSchema } from './cfdiMatch.schema.js';
 
@@ -92,6 +94,20 @@ export const createPurchasesFromCfdiBatchSchema = z.object({
                     supplierName: z.string().trim().min(1).max(200),
                     supplierTaxId: z.string().trim().max(20).nullish(),
                     kind: z.enum(['INVENTORY', 'EXPENSE', 'FIXED_ASSET']).optional(),
+                    /** D2/D6 · Operación DIOT; si es activo fijo, su tipo e inicio de uso. */
+                    diotOperacion: z.enum(['02', '03', '06', '07', '08', '85', '87']).nullish(),
+                    fixedAssetType: z.enum(FIXED_ASSET_TYPES).nullish(),
+                    fixedAssetInServiceDate: fechaCivilSchema.nullish(),
+                    /**
+                     * Solo en un gasto (2026-10-04): el concepto, la línea y la sucursal elegidos en
+                     * «Revisar mercancía o gasto». Ausentes, valen los del proveedor; la sucursal,
+                     * la del lote.
+                     */
+                    expenseConceptId: z.string().uuid('Concepto inválido').nullish(),
+                    businessLineId: z.string().uuid('Línea inválida').nullish(),
+                    locationId: z.string().uuid('Sucursal inválida').nullish(),
+                    /** D4 · La empresa de un gasto global (sin sucursal) cuando hay más de una. */
+                    companyId: z.string().uuid('Empresa inválida').nullish(),
                     conceptos: z.array(cfdiResolvedConceptoSchema).min(1).max(500),
                 })
                 .strict()

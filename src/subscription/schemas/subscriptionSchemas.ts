@@ -45,3 +45,20 @@ export type CreateTrialSubscriptionRequest = z.infer<typeof createTrialSubscript
 export type CancelSubscriptionRequest = z.infer<typeof cancelSubscriptionSchema>;
 export type SuspendSubscriptionRequest = z.infer<typeof suspendSubscriptionSchema>;
 export type ListSubscriptionsInput = z.infer<typeof listSubscriptionsSchema>;
+
+/**
+ * Precio especial de una cuenta («A la medida» o un acuerdo). `price: null` lo quita y la cuenta
+ * vuelve al precio de su plan. El motivo es obligatorio al ponerlo: dentro de un año nadie recuerda
+ * por qué esa cuenta paga distinto.
+ */
+export const setSpecialPriceSchema = z
+    .object({
+        price: z.number().min(0).max(1_000_000).nullable(),
+        note: z.string().trim().max(300).optional(),
+    })
+    .refine((v) => v.price === null || (v.note ?? '').length >= 3, {
+        message: 'Anota por qué esta cuenta tiene precio especial',
+        path: ['note'],
+    });
+
+export type SetSpecialPriceInput = z.infer<typeof setSpecialPriceSchema>;

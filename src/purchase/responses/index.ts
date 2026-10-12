@@ -15,3 +15,4 @@ export * from './PurchaseRequestResponse.js';
 export * from './QuoteRequestResponse.js';
 export * from './ComprasOverviewResponse.js';
 export * from './SupplierPaymentResponse.js';
+export * from './ExpensesResponse.js';

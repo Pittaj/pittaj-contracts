@@ -12,6 +12,8 @@
 import { z } from 'zod';
 import { businessLineRefSchema } from '../../business-line/schemas/createBusinessLine.schema.js';
 import { PRODUCT_CONSTANTS } from '../constants/index.js';
+import { CLASES_DE_RETENCION } from '../../tax/retencionesDeLaVenta.js';
+import { OBJETOS_IMP_SIN_DESGLOSE } from '../../tax/impuestoDelRenglon.js';
 
 
 const { LIMITS } = PRODUCT_CONSTANTS;
@@ -43,6 +45,11 @@ const productInventoryConfigSchema = z.object({
     reorderPoint: z.number().min(0).default(0),
     unitOfMeasure: z.enum(['UNIT', 'KG', 'LT', 'MT', 'BOX', 'PACK']).default('UNIT'),
     valuationMethod: z.enum(['FIFO', 'AVERAGE', 'SPECIFIC']).default('AVERAGE'),
+    /** Rastreo (1.18.0). Ver `ProductInventoryConfigPrimitives`. */
+    tracking: z.enum(['NONE', 'LOT', 'SERIAL']).optional(),
+    requiresExpiry: z.boolean().optional(),
+    shelfLifeDays: z.number().int().min(1).max(3650).nullish(),
+    warrantyMonths: z.number().int().min(0).max(240).nullish(),
 });
 
 /**
@@ -51,6 +58,26 @@ const productInventoryConfigSchema = z.object({
  */
 const productTaxInfoSchema = z.object({
     taxId: z.string().uuid().default('22222222-2222-2222-2222-222222222221'),
+    /**
+     * D7b · IEPS del producto, además de su IVA (`taxId`): un impuesto del catálogo de tipo IEPS,
+     * por tasa o por cuota. Null = no lleva.
+     */
+    iepsTaxId: z.string().uuid().nullable().default(null),
+    /**
+     * D7c · Qué se vende, en lo que importa para retener (honorarios, arrendamiento, comisiones,
+     * fletes, personal). Null = bienes o servicios en general.
+     */
+    retentionClass: z.enum(CLASES_DE_RETENCION).nullable().default(null),
+    /**
+     * D7d · Impuesto local trasladado (un impuesto del catálogo de tipo LOCAL: hospedaje…), además
+     * del IVA. Null = no lleva.
+     */
+    localTaxId: z.string().uuid().nullable().default(null),
+    /**
+     * D7e · Objeto de impuesto forzado en el CFDI (`03`, `04` o `05`): el concepto va sin
+     * desglose. Null = el que diga su impuesto.
+     */
+    objetoImp: z.enum(OBJETOS_IMP_SIN_DESGLOSE).nullable().default(null),
     satProductCode: z.string().nullable().default(null),
     satUnitCode: z.string().nullable().default(null),
 });

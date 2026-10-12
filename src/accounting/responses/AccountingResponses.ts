@@ -538,7 +538,12 @@ export interface VatReportResponse {
      * corresponde a ningún renglón de la declaración.
      */
     readonly withheld: number;
-    /** Cobrado menos pagado. **Positivo es a cargo**; negativo, saldo a favor. */
+    /**
+     * D7g · IVA que **tus clientes te retuvieron** en el periodo (honorarios, arrendamiento, fletes…).
+     * Este sí se resta: lo enteró el cliente a tu nombre (LIVA art. 1-A y 5-D).
+     */
+    readonly withheldByCustomers: number;
+    /** Cobrado menos pagado menos lo que te retuvieron. **Positivo es a cargo**; negativo, saldo a favor. */
     readonly balance: number;
 
     /** Saldo al corte de lo que se cobrará: IVA de ventas a crédito aún sin cobrar. */
@@ -600,20 +605,45 @@ export interface NonCreditableVatRowResponse {
  */
 export type DiotThirdPartyType = '04' | '05' | '15';
 
+/** D2 · Las columnas de valor de la DIOT. */
+export interface DiotBasesResponse {
+    readonly iva16: number;
+    readonly iva8: number;
+    readonly tasa0: number;
+    readonly exento: number;
+    readonly noObjeto: number;
+}
+
 /** Un proveedor con lo que se le pagó en el mes. */
 export interface DiotRowResponse {
     readonly supplierName: string;
     /** RFC. `null` cuando el proveedor no lo tiene capturado. */
     readonly taxId: string | null;
     readonly thirdPartyType: DiotThirdPartyType;
+    /** F6.6 · País de residencia del extranjero (tipo 05); null = nacional. */
+    readonly country?: string | null;
+    /** F6.6 · Número de identificación fiscal del extranjero (va en lugar del RFC). */
+    readonly foreignTaxId?: string | null;
     /**
-     * Tipo de operación del SAT: `03` servicios · `06` arrendamiento · `85` otros.
-     *
-     * **Siempre sale `85`, y hay que revisarlo.** El dato para distinguir un arrendamiento de un
-     * servicio no existe en la compra —`kind` solo dice si es inventario o gasto—, y adivinarlo
-     * pondría una clasificación fiscal falsa que nadie verificaría.
+     * D2 · Tipo de operación de la DIOT 2025: `02` enajenación de bienes · `03` servicios
+     * profesionales · `06` uso o goce temporal · `07`/`08` importación · `85` otros · `87`
+     * operaciones globales. Lo elegido en la compra o, si no, el sugerido por lo que se compró y
+     * su concepto de gasto. Un tercero con compras de dos tipos sale en dos renglones.
      */
-    readonly operationType: '85';
+    readonly operationType: string;
+    /**
+     * D2 · Valor de los actos pagados por columna de la DIOT: 16 %, 8 % (estímulo fronterizo),
+     * tasa 0, exento y no objeto. La suma de `iva16 + iva8` es `paidBase`; la de las otras tres,
+     * `paidBaseWithoutVat`.
+     */
+    readonly bases?: DiotBasesResponse;
+    /** D2 · IVA acreditable pagado al 16 % y al 8 %. */
+    readonly vatByRate?: { readonly iva16: number; readonly iva8: number };
+    /**
+     * D2 · Alguna compra de este renglón no trae el desglose del comprobante (capturada a mano o
+     * anterior a D2): su parte sin IVA va a tasa 0 aunque pudiera ser exenta. Revisar.
+     */
+    readonly approximated?: boolean;
     /** Valor de los actos **pagados en el mes** que llevaron IVA. */
     readonly paidBase: number;
     /** IVA acreditable pagado en el mes a ese proveedor. */
@@ -647,6 +677,8 @@ export interface DiotReportResponse {
         readonly creditableVat: number;
         readonly paidBaseWithoutVat: number;
         readonly withheldVat: number;
+        /** D2 · Las mismas columnas que los renglones. */
+        readonly bases?: DiotBasesResponse;
     };
     /**
      * Cuadre contra el libro: el IVA acreditable de la DIOT tiene que ser **el mismo** que el del
@@ -771,4 +803,64 @@ export interface DepreciationRunResponse {
     readonly exceptions: readonly { readonly assetId: string; readonly reason: string }[];
     /** Cuentas de plantilla creadas al vuelo para poder postear. */
     readonly provisionedAccounts: readonly { readonly code: string; readonly name: string }[];
+}
+
+// ============================================================
+// IEPS (D8)
+// ============================================================
+
+/** Una clase de bienes (inciso del art. 2o., fr. I LIEPS) en la declaración de IEPS del mes. */
+export interface IepsReportClaseResponse {
+    /** Inciso: A, D, F, G, I, J… */
+    readonly categoria: string;
+    readonly nombre: string;
+    /** IEPS trasladado y cobrado en el mes (LIEPS art. 10: se causa al cobrar). */
+    readonly trasladadoCobrado: number;
+    /** IEPS que te trasladaron por bienes de la misma clase y pagaste en el mes (art. 4o.). */
+    readonly acreditable: number;
+    /** Trasladado menos acreditable. Positivo, a cargo; negativo, saldo a favor **de esta clase**. */
+    readonly saldo: number;
+}
+
+/**
+ * Los números de la declaración mensual de IEPS, por clase (LIEPS art. 5o.: el pago mensual es el
+ * causado menos el acreditable de la **misma clase**; art. 4o., fr. IV). Prepara, no declara.
+ *
+ * Las cifras salen de los documentos —tickets, cobros, abonos de apartado y compras— con las mismas
+ * reglas de flujo que la póliza; `libro` trae lo que dice el mayor para cuadrarlas.
+ */
+export interface IepsReportResponse {
+    readonly companyId: string;
+    readonly year: number;
+    readonly month: number;
+    readonly from: string;
+    readonly to: string;
+    readonly clases: readonly IepsReportClaseResponse[];
+    /** Suma de los saldos a cargo (una clase con saldo a favor no compensa a otra). */
+    readonly aCargo: number;
+    /** Lo que dice el mayor del mes: trasladado cobrado (208-02) y acreditable pagado (118-02). */
+    readonly libro: { readonly trasladadoCobrado: number; readonly acreditable: number };
+    /** Avisos: IEPS sin clase, la empresa no causa IEPS, etc. */
+    readonly avisos: readonly string[];
+}
+
+/**
+ * D6 · Una compra marcada como activo fijo que todavía no tiene ficha. Es el «borrador» de la
+ * ficha: Contabilidad la da de alta con estos datos propuestos.
+ */
+export interface PendingFixedAssetPurchaseResponse {
+    readonly purchaseId: string;
+    readonly purchaseNumber: string;
+    readonly supplierName: string;
+    readonly invoiceUuid: string | null;
+    /** Fecha contable de la compra (`YYYY-MM-DD`): la de adquisición. */
+    readonly acquisitionDate: string | null;
+    /** El renglón con más base: el nombre propuesto. */
+    readonly name: string;
+    /** MOI propuesto: base sin IVA (con el IEPS que es costo) + impuestos locales. */
+    readonly proposedMoi: number;
+    /** Lo que dijo la compra (null = no lo dijo: hay que elegirlo al dar de alta). */
+    readonly assetType: string | null;
+    readonly inServiceDate: string | null;
+    readonly locationId: string | null;
 }

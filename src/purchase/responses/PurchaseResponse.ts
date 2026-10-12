@@ -92,6 +92,10 @@ export interface PurchaseLineResponse {
      * explica por qué el documento dejó de estar abierto sin llegar a 100 %.
      */
     readonly closed: boolean;
+    /** Concepto de gasto del renglón (F6.2); nulo = «Otros gastos» o renglón de mercancía. */
+    readonly expenseConceptId: string | null;
+    /** Línea de negocio estampada en el renglón (F1.7); nulo = «Sin línea». */
+    readonly businessLineId: string | null;
 
     // --- Marca de procedencia (2026-09-22: todo lo automático se deshace) ---
     /** De dónde salió el producto de este renglón. Nulo en renglones anteriores a la marca. */
@@ -111,8 +115,10 @@ export interface PurchaseLineResponse {
 export interface PurchaseReceptionResponse {
     readonly id: string;
     readonly purchaseId: string;
-    /** Fecha de la entrega (ISO 8601). */
+    /** Instante de la entrega (ISO 8601). */
     readonly receivedAt: string;
+    /** D3 · Fecha contable de la entrega (`YYYY-MM-DD`). Opcional para respuestas de antes. */
+    readonly accountingDate?: string | null;
     /** Remisión o guía del proveedor (null = no la dio). */
     readonly remittance: string | null;
     /** Bodega donde entró la mercancía (soft ref). */
@@ -160,6 +166,8 @@ export interface PurchaseResponse {
     readonly warehouseId: string;
     /** Sucursal de la compra (null = general). */
     readonly locationId: string | null;
+    /** D4 · La empresa de la compra (de su sucursal, o la elegida en un gasto global). */
+    readonly companyId?: string | null;
     readonly kind: PurchaseKind;
     /** Estado GUARDADO: DRAFT | ACTIVE | CANCELLED. Los ejes van aparte. */
     readonly status: PurchaseStatus;
@@ -173,7 +181,7 @@ export interface PurchaseResponse {
     // --- Datos mínimos del comprobante (CFDI del proveedor) ---
     readonly invoiceFolio: string | null;
     readonly invoiceUuid: string | null;
-    /** Fecha del comprobante (ISO 8601, null = sin capturar). */
+    /** Fecha del comprobante: civil `YYYY-MM-DD` (D3), null = sin capturar. Se muestra sin convertir. */
     readonly invoiceDate: string | null;
 
     /** Días de crédito que dio el proveedor, congelados al crear la compra. */
@@ -198,10 +206,24 @@ export interface PurchaseResponse {
     // --- Impuestos desglosados del comprobante (contabilidad) ---
     readonly trasladoIva: number;
     readonly trasladoIeps: number;
+    /** D8 · IEPS que se acredita (fuera del costo, dentro del total). 0 si no hay. */
+    readonly iepsAcreditable?: number;
+    /** D8 · El acreditable por clase (inciso del art. 2o., fr. I LIEPS). */
+    readonly iepsAcreditablePorCategoria?: Readonly<Record<string, number>>;
     readonly retencionIsr: number;
     readonly retencionIva: number;
+    /** D1 · Impuestos locales (`implocal`): el trasladado suma al total, el retenido resta. */
+    readonly trasladoLocal?: number;
+    readonly retencionLocal?: number;
 
     readonly currency: string;
+    /** F6.6 · Moneda y total del recibo original (null si es en pesos). */
+    readonly foreignCurrency?: string | null;
+    readonly foreignTotal?: number | null;
+    /** F6.6 · Pesos por unidad: `totalAmount / foreignTotal`. Derivado, no se guarda. */
+    readonly exchangeRate?: number | null;
+    /** F6.6 · Nombre del comprobante adjunto (PDF) cuando no hay CFDI; null si no tiene. */
+    readonly receiptFileName?: string | null;
     readonly notes: string | null;
 
     readonly subtotalAmount: number;
@@ -209,9 +231,24 @@ export interface PurchaseResponse {
     readonly taxAmount: number;
     readonly totalAmount: number;
 
-    /** Fecha de la última recepción (ISO 8601, null si ninguna). */
+    /** Instante de la última recepción (ISO 8601, null si ninguna). */
     readonly receivedAt: string | null;
+    /**
+     * D3 · Fecha contable de la compra (`YYYY-MM-DD`): la de su última entrega viva. Es la de la
+     * póliza, la lista de gastos y la DIOT. Null mientras no se registre.
+     */
+    readonly accountingDate?: string | null;
     readonly cancellationReason: string | null;
+
+    /** D2 · Base e IVA por tasa del comprobante (null = se derivan de los renglones). */
+    readonly basesIva?: Readonly<Record<string, { readonly base: number; readonly iva: number }>> | null;
+    /** D2 · Tipo de operación DIOT elegido (null = el sugerido) y el sugerido. */
+    readonly diotOperacion?: string | null;
+    readonly diotOperacionSugerida?: string;
+    /** D6 · Activo fijo: tipo, inicio de uso y la ficha que ya lo dio de alta (null = sin ficha). */
+    readonly fixedAssetType?: string | null;
+    readonly fixedAssetInServiceDate?: string | null;
+    readonly fixedAssetId?: string | null;
 
     // --- Acuse con plazo (LatAm). Los campos nacen en la migración; la
     // pantalla se pospone a la capa 3. En México no se dibujan. ---

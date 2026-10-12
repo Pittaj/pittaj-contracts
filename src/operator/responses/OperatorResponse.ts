@@ -58,6 +58,14 @@ export interface OperatorResponse {
     /** Ids de los roles RBAC asignados (tabla hija; '[]' = sin roles). */
     readonly roleIds: readonly string[];
 
+    /**
+     * Alcance del operador (F7): sucursales y líneas que ve en este equipo. Vacío = todas.
+     * El vinculado a un usuario lo hereda de él; el local se limita en su ficha del escritorio.
+     * Opcionales: un escritorio anterior no los manda, y su ausencia NO borra lo guardado.
+     */
+    readonly locationIds?: readonly string[];
+    readonly businessLineIds?: readonly string[];
+
     /** Versión para optimistic locking. */
     readonly version: number;
     /** Fecha de creación (ISO 8601). */

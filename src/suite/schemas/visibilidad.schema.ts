@@ -2,12 +2,13 @@
  * @fileoverview Visibilidad de la suite: qué apps y módulos ve un negocio.
  * @module Contracts/Suite
  *
- * Tres preguntas distintas, tres respuestas distintas, y se aplican en cadena:
+ * Dos preguntas distintas, y se aplican en cadena:
  *
  * - **¿Existe esta app para este negocio?** → visibilidad (esto). Si no, no aparece en ningún
  *   sitio: ni lanzador, ni barra, ni búsqueda; la URL manda al lanzador.
- * - **¿La contrató?** → licencia (`requiredCapability`). Si no, aparece con candado.
  * - **¿Puede esta persona?** → permisos. Si no, ese usuario no la ve.
+ *
+ * No hay una tercera por plan: todas las apps van en todos los planes (desde 2.0.0).
  *
  * Oculto no es candado: lo que no está en la beta no se anuncia.
  *

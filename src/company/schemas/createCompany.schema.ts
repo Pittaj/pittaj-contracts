@@ -14,6 +14,8 @@
  */
 
 import { z } from 'zod';
+import { CATEGORIAS_DE_IEPS } from '../../tax/iepsDeLaLey.js';
+import { zonaHorariaSchema } from '../../shared/fechas.js';
 
 /**
  * Regex para validar Tax ID.
@@ -112,6 +114,14 @@ export const CreateCompanySchema = z.object({
    * @default false
    */
   isDefault: z.boolean().optional().default(false),
+
+  /**
+   * D3 · Zona horaria IANA de la empresa (una de `ZONAS_DE_MEXICO` u otra válida). `null` = la zona del centro (`ZONA_POR_OMISION`). Decide qué día
+   * es «hoy» y en qué fecha cae una venta, un cobro o una entrega de la empresa.
+   */
+  timezone: zonaHorariaSchema,
+  /** D8 · Las clases de IEPS (incisos del art. 2o., fr. I LIEPS) por las que la empresa causa IEPS. */
+  iepsCategorias: z.array(z.enum(CATEGORIAS_DE_IEPS)).max(9).optional(),
 });
 
 /**

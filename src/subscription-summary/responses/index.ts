@@ -5,15 +5,16 @@
 
 export {
     MY_SUBSCRIPTION_STATUSES,
-    BILLING_MODELS,
     type MySubscriptionStatus,
-    type BillingModel,
     type SubscriptionUsage,
     type SubscriptionBilling,
     type SubscriptionLicense,
     type AvailablePlan,
     type MySubscriptionResponse,
     type PendingPlanChange,
+    type NextChargeExtras,
+    type NextChargeExtraStamps,
+    type NextChargePendingCharge,
     type CardSubscriptionResponse,
     type CardSubscriptionInfoResponse,
 } from './MySubscriptionResponse.js';

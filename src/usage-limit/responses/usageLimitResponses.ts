@@ -13,31 +13,57 @@ export type TenantUsageListItem = {
     readonly tenantCode: string;
     /** Estado de la suscripción; null si el tenant aún no tiene fila. */
     readonly subscriptionStatus: string | null;
+    /** Plan contratado; null si el tenant no tiene suscripción. */
+    readonly planCode: string | null;
+    readonly planName: string | null;
+    /** En el programa beta: no se le cobra mientras dure. */
+    readonly isBeta: boolean;
+    /** Operaciones del mes en curso (hora de Ciudad de México). */
+    readonly operationsUsed: number;
+    /** Operaciones que incluye el plan; null si el plan no mide operaciones. */
+    readonly includedOperations: number | null;
+    /**
+     * Lo que se cobraría el próximo día 3 si el mes cerrara hoy: plan + excedente de operaciones
+     * con su tope, con la misma regla que la factura (sin timbres extra ni prorrateos). En prueba,
+     * solo el plan: el primer cobro no lleva excedente. 0 en beta. Si el plan no mide operaciones
+     * («A la medida»), la mensualidad.
+     */
+    readonly estimatedCharge: number;
     /** Sucursales activas. Informativo: no cuestan. */
     readonly activeLocations: number;
     readonly activeUsers: number;
     readonly activeCompanies: number;
-    /** Cajas activas: lo único que mueve el cobro. */
+    /** Cajas activas. Informativo: no cuestan. */
     readonly activeDevices: number;
-    /** Cajas por encima de las incluidas en la mensualidad. */
-    readonly extraDevices: number;
-    /** Mensualidad vigente del tenant (MXN, IVA incluido). */
+    /** Mensualidad vigente del tenant (MXN, IVA incluido): el plan, o su precio especial. */
     readonly basePrice: number;
-    /** Precio de cada caja adicional al mes (MXN, IVA incluido). */
-    readonly pricePerExtraDevice: number;
-    /** basePrice + extraDevices × pricePerExtraDevice. */
-    readonly estimatedMonthly: number;
     readonly currency: 'MXN';
-    /** Timbres CFDI incluidos al mes (override del tenant o default de plataforma). */
+    /**
+     * Timbres CFDI incluidos, con la misma precedencia con la que se timbra: override → prueba o
+     * beta (25 en total) → plan → default de plataforma. Ver `stampsQuotaSource`.
+     */
     readonly includedStamps: number;
     readonly stampsQuotaSource: StampQuotaSource;
-    /**
-     * Timbres consumidos en el periodo. Hoy SIEMPRE null: el timbrado ocurre en
-     * TPV/desktop y todavía no reporta a la nube. Se llenará cuando lo haga.
-     */
+    /** Timbres consumidos este mes; con fuente TRIAL, desde que empezó la prueba o la beta. */
     readonly stampsUsed: number | null;
     /** Motivo del override; null si aplica el default. */
     readonly quotaNotes: string | null;
+    /**
+     * Uso intensivo: el plan que le saldría igual o más barato con lo que hace este mes (p. ej.
+     * Negocio en el tope de $499 → Crecimiento, $499 con 100,000 incluidas). null si su plan le
+     * conviene. Es para proponérselo, no se cambia solo.
+     */
+    readonly suggestedPlan: { readonly code: string; readonly name: string; readonly price: number } | null;
+    /**
+     * Otras cuentas que parecen del mismo dueño: mismo RFC en una empresa, o mismo correo (el de
+     * quien abrió la cuenta o el que paga en Mercado Pago). Para revisar pruebas encadenadas, no
+     * para bloquear: un contador lleva varias cuentas con todo derecho.
+     */
+    readonly sameOwnerAs: readonly {
+        readonly tenantId: string;
+        readonly tenantName: string;
+        readonly via: 'RFC' | 'CORREO';
+    }[];
 };
 
 export type TenantUsageListResponse = {

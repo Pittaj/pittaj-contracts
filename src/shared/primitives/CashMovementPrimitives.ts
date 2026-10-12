@@ -7,4 +7,10 @@ export interface CashMovementPrimitives {
   readonly description: string | null;
   readonly userId: string;
   readonly occurredAt: string;
+  /**
+   * Concepto de gasto (F6.7): qué se pagó del cajón (garrafón, gas, papelería). Solo en una salida
+   * con motivo `EXPENSE`; nulo o ausente = Otros gastos. Opcional para no romper a un cliente
+   * viejo: si un push no trae la llave, la nube conserva el que tenía.
+   */
+  readonly expenseConceptId?: string | null;
 }

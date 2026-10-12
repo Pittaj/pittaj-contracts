@@ -1,15 +1,13 @@
 /**
  * @fileoverview DTO de "Mi Suscripción" para el tenant autenticado.
  *
- * Modelo de negocio: precio único con COBRO POR CAJA — sin planes por niveles
- * y sin cobro por sucursal. La mensualidad (setting billing.base-price, $399
- * MXN IVA incluido) cubre 3 cajas en TODA la cuenta, y de ahí en adelante se
- * cobra por caja. Abrir sucursales no cuesta.
- *
- * Incluye 100 timbres CFDI/mes POR CUENTA (no por sucursal), extras por paquete.
+ * Modelo de negocio vigente (docs `producto/modelo-negocio.md`): se cobra por OPERACIONES al mes,
+ * con timbres CFDI incluidos por plan, y Mercado Pago cobra el día 3. Sin cajas, sin licencias ni
+ * capacidades: todas las apps van en todos los planes (el modelo viejo se retiró en 2.0.0).
  *
  * @module Contracts/SubscriptionSummary
  */
+import type { ScheduledPlanTerms } from '../../plan/cambios.js';
 
 /** Estados de la suscripción (espejo del dominio backend). */
 export const MY_SUBSCRIPTION_STATUSES = [
@@ -28,62 +26,23 @@ export interface SubscriptionUsage {
     readonly companies: number;
     /** Sucursales activas. Informativo: no cuestan. */
     readonly locations: number;
-    /** Cajas activas hoy en toda la cuenta: lo único que se cobra. */
+    /** Cajas activas hoy en toda la cuenta. Informativo: no cuestan. */
     readonly devices: number;
 }
 
-/** Datos de cobro estimado (preliminar hasta integrar pagos). */
+/** La mensualidad de la cuenta. El excedente del mes se estima aparte, con las operaciones. */
 export interface SubscriptionBilling {
-    /** Sucursales activas. Se conserva por compatibilidad; ya no cobra nada. */
-    readonly activeLocations: number;
-    /** Mensualidad, IVA incluido (setting billing.base-price). */
+    /** Precio del plan al mes, IVA incluido (o el precio especial de la cuenta). */
     readonly basePrice: number;
-    /** Cajas cubiertas por la mensualidad. */
-    readonly includedDevices: number;
-    /** Cajas activas por encima de las incluidas. */
-    readonly extraDevices: number;
-    /** Precio de cada caja adicional al mes, IVA incluido. */
-    readonly pricePerExtraDevice: number;
     readonly currency: 'MXN';
-    /** basePrice + extraDevices × pricePerExtraDevice, menos el cupón vigente. */
+    /** Lo que se cobraría el próximo día 3 sin excedente: el plan. */
     readonly estimatedMonthly: number;
-    /** true mientras no exista integración de pagos (precio preliminar). */
-    readonly preliminary: boolean;
 }
 
-/** Modelos de cobro de una licencia. */
-export const BILLING_MODELS = ['PERPETUAL', 'SUBSCRIPTION'] as const;
-export type BillingModel = (typeof BILLING_MODELS)[number];
-
-/**
- * La licencia contratada: qué se compró, no qué puede hacer el usuario.
- *
- * El código nunca pregunta «¿qué plan tiene?» sino «¿tiene esta capacidad?»; este
- * bloque existe para lo único que sí necesita saber el nombre del plan, que es
- * enseñárselo al dueño y decidir qué tarjeta pintar.
- */
+/** El plan contratado, para pintarlo. */
 export interface SubscriptionLicense {
-    /** Código del plan: 'escritorio' | 'conectado' | 'completo'. */
     readonly planCode: string;
     readonly planName: string;
-    /** PERPETUAL se compró una vez; SUBSCRIPTION se renta. */
-    readonly billingModel: BillingModel;
-    /** Cajas que cubre el nivel: 1 en la perpetua, 3 en las de renta. */
-    readonly includedDevices: number;
-    /**
-     * Hasta cuándo recibe funciones nuevas la licencia perpetua (ISO 8601).
-     * null en las de renta: ahí el mantenimiento va dentro de la mensualidad.
-     */
-    readonly maintenanceUntil: string | null;
-    /**
-     * false solo cuando una perpetua tiene el mantenimiento caducado.
-     *
-     * **No corta nada.** Deja de recibir funciones nuevas y lo obligatorio por ley
-     * entra siempre: un punto de venta que no puede timbrar está muerto.
-     */
-    readonly maintenanceActive: boolean;
-    /** Qué apps abre el nivel: 'sync' | 'web' | 'bancos' | 'contabilidad' | 'fiscal'. */
-    readonly capabilities: readonly string[];
 }
 
 /**
@@ -96,18 +55,13 @@ export interface AvailablePlan {
     readonly code: string;
     readonly name: string;
     readonly description: string | null;
-    /** MXN, IVA incluido. Mensual salvo que `billingModel` sea PERPETUAL. */
+    /** Mensualidad, MXN, IVA incluido. */
     readonly price: number;
-    readonly billingModel: BillingModel;
-    readonly includedDevices: number;
-    /** Timbres que se reponen cada mes. 0 en la perpetua. */
+    /** Timbres que se reponen cada mes. */
     readonly monthlyStamps: number;
-    /** Timbres de bienvenida, una sola vez en la vida de la licencia. */
-    readonly oneTimeStamps: number;
-    readonly capabilities: readonly string[];
     /**
-     * Operaciones incluidas al mes (modelo por operaciones, docs `producto/modelo-negocio.md`).
-     * null = el plan no mide operaciones (los tres niveles viejos).
+     * Operaciones incluidas al mes (docs `producto/modelo-negocio.md`). null = no mide
+     * operaciones («A la medida»).
      */
     readonly includedOperations: number | null;
     /** $ por cada 1,000 operaciones extra. 0 si el plan no cobra excedente. */
@@ -133,6 +87,11 @@ export interface AvailablePlan {
      * devoluciones de la gente que menos conviene perder.
      */
     readonly beta: boolean;
+    /**
+     * Cambio de precio o de lo incluido ya programado para un día 1 (backoffice). La pantalla de
+     * Planes lo dice desde que se programa, para que nadie se entere en el cobro. null si no hay.
+     */
+    readonly scheduledChange?: ScheduledPlanTerms | null;
 }
 
 /** Respuesta de GET /api/subscriptions/me. */
@@ -168,6 +127,48 @@ export interface MySubscriptionResponse {
      * que cualquiera.
      */
     readonly betaSince: string | null;
+    /**
+     * Lo que el próximo cobro lleva **además** del plan y del excedente de operaciones: los timbres
+     * extra y los cargos ya anotados (la diferencia de una subida a mitad de mes).
+     *
+     * Sin esto, la pantalla sumaba plan + operaciones y el cargo real traía algo más: el primer
+     * cobro después de la prueba incluye todos los timbres extra aceptados, y el de después de una
+     * subida incluye el prorrateo. Un total que no cuadra con el banco es la forma más rápida de
+     * perder la confianza del cliente.
+     */
+    readonly nextChargeExtras: NextChargeExtras;
+}
+
+/** Cargos del próximo cobro que no son el plan ni el excedente de operaciones. */
+export interface NextChargeExtras {
+    readonly extraStamps: NextChargeExtraStamps;
+    /** Cargos anotados que todavía no entran en una factura, en el orden en que se anotaron. */
+    readonly pendingCharges: readonly NextChargePendingCharge[];
+}
+
+/**
+ * Timbres extra ($ c/u del plan) que entran en el próximo cobro.
+ *
+ * En el primer cobro son **todos** los de la prueba o la beta; después, los del mes que cierra
+ * antes del día 3. `count` 0 = ninguno (el renglón no se pinta).
+ */
+export interface NextChargeExtraStamps {
+    readonly count: number;
+    /** MXN por timbre, IVA incluido (`plans.extra_stamp_price`). */
+    readonly unitPrice: number;
+    /** count × unitPrice, redondeado a centavos: lo mismo que pone la factura. */
+    readonly amount: number;
+    /** Cuándo aceptó la cuenta que se cobraran (ISO); null si nunca hizo falta aceptar. */
+    readonly acceptedAt: string | null;
+    /** Quién lo aceptó, «Nombre Apellido»; null si no se sabe. */
+    readonly acceptedByName: string | null;
+}
+
+export interface NextChargePendingCharge {
+    /** El texto que irá en la factura, p. ej. «Diferencia por subir a Crecimiento (8 días)». */
+    readonly description: string;
+    /** MXN, IVA incluido. */
+    readonly amount: number;
 }
 
 /** Una bajada de nivel programada para el inicio del siguiente periodo. */
@@ -203,7 +204,7 @@ export interface CardSubscriptionResponse {
 export interface CardSubscriptionInfoResponse {
     /**
      * ¿Se cobra con Mercado Pago? Solo si la pasarela está configurada y el plan cobra por
-     * operaciones. Si es false, la tarjeta sigue en el flujo viejo (Stripe) hasta el retiro.
+     * operaciones. Si es false, no hay tarjeta que capturar y la pantalla no la muestra.
      */
     readonly available: boolean;
     /** Llave pública para el SDK de Mercado Pago; null si no está disponible. */

@@ -34,6 +34,7 @@ export const cfdiFileHeaderSchema = z
         receiverRfc: z.string().trim().max(20).optional().default(''),
         series: z.string().trim().max(30).nullish(),
         folio: z.string().trim().max(40).nullish(),
+        /** D3 · El reloj del comprobante marcado UTC, sin convertir (`relojDelComprobante`). */
         issuedAt: z.string().datetime({ offset: true }).nullish(),
         currency: z.string().trim().max(3).nullish(),
         metodoPago: z.string().trim().max(3).nullish(),
@@ -47,6 +48,11 @@ export const cfdiFileHeaderSchema = z
         trasladoIeps: z.number().min(0).optional().default(0),
         retencionIsr: z.number().min(0).optional().default(0),
         retencionIva: z.number().min(0).optional().default(0),
+        /** `TipoCambio` del CFDI; obligatorio en el XML cuando la moneda no es MXN ni XXX (D1). */
+        exchangeRate: z.number().positive().nullish(),
+        /** Impuestos locales del complemento `implocal` (D1): trasladados y retenidos. */
+        trasladoLocal: z.number().min(0).optional().default(0),
+        retencionLocal: z.number().min(0).optional().default(0),
         paymentDocs: z.array(cfdiFilePaymentDocSchema).max(200).optional().default([]),
     })
     .strict();

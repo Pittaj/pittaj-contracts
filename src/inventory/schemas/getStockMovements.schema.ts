@@ -34,6 +34,12 @@ export const getStockMovementsSchema = z.object({
     sourceType: z.enum(STOCK_SOURCE_TYPES).optional(),
     dateFrom: z.coerce.date().optional(),
     dateTo: z.coerce.date().optional(),
+    /** Los movimientos de un documento (`AW-00014`, `TR-00003`…). */
+    sourceDocId: z.string().max(40).optional(),
+    lotId: z.string().uuid().optional(),
+    serialNumber: z.string().trim().max(80).optional(),
+    /** Calcular `balanceAfter` (requiere `productId`; el saldo corrido es por producto). */
+    withBalance: z.coerce.boolean().optional(),
     page: z.coerce.number().int().min(1).optional(),
     limit: z.coerce.number().int().min(1).max(200).optional(),
 });

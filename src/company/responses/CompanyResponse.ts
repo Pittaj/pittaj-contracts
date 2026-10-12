@@ -59,6 +59,11 @@ export interface CompanyResponse {
    */
   readonly isDefault: boolean;
 
+  /** D3 · Zona horaria IANA (null = la del centro, `ZONA_POR_OMISION`). */
+  readonly timezone?: string | null;
+  /** D8 · Las clases de IEPS por las que la empresa causa IEPS (vacío = no es contribuyente de IEPS). */
+  readonly iepsCategorias?: readonly string[];
+
   /**
    * Indica si la empresa está activa.
    */

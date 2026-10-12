@@ -56,3 +56,14 @@ describe('createBusinessLineSchema', () => {
         expect(() => createBusinessLineSchema.parse({ id: PAN, name: 'Pan', companyId: ABA })).toThrow();
     });
 });
+
+describe('resolverLineaDelGasto — el giro de un renglón de gasto', () => {
+    it('renglón > proveedor > concepto > sucursal', async () => {
+        const { resolverLineaDelGasto } = await import('../../src/business-line/index.js');
+        expect(resolverLineaDelGasto({ renglon: SAAS, proveedor: PAN, concepto: ABA, sucursal: ABA })).toBe(SAAS);
+        expect(resolverLineaDelGasto({ proveedor: SAAS, concepto: PAN, sucursal: ABA })).toBe(SAAS);
+        expect(resolverLineaDelGasto({ proveedor: null, concepto: PAN, sucursal: ABA })).toBe(PAN);
+        expect(resolverLineaDelGasto({ sucursal: ABA })).toBe(ABA);
+        expect(resolverLineaDelGasto({})).toBeNull();
+    });
+});

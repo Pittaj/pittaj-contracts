@@ -81,13 +81,20 @@ export const closePosSessionSchema = z.object({
     cashClosureId: z.string().uuid(),
 });
 
-export const addCashMovementSchema = z.object({
-    version: z.number().int().min(1),
-    type: cashMovementTypeEnum,
-    reason: cashMovementReasonEnum,
-    amount: z.number().positive(),
-    description: z.string().max(LIMITS.MAX_MOVEMENT_DESCRIPTION).nullable().optional(),
-});
+export const addCashMovementSchema = z
+    .object({
+        version: z.number().int().min(1),
+        type: cashMovementTypeEnum,
+        reason: cashMovementReasonEnum,
+        amount: z.number().positive(),
+        description: z.string().max(LIMITS.MAX_MOVEMENT_DESCRIPTION).nullable().optional(),
+        /** Concepto de gasto (F6.7). Solo en un gasto de caja; nulo = Otros gastos. */
+        expenseConceptId: z.string().uuid().nullable().optional(),
+    })
+    .refine((m) => !m.expenseConceptId || (m.reason === 'EXPENSE' && m.type === 'CASH_OUT'), {
+        message: 'El concepto de gasto solo va en una salida de caja con motivo «Gasto».',
+        path: ['expenseConceptId'],
+    });
 
 export const updateNotesSchema = z.object({
     version: z.number().int().min(1),
