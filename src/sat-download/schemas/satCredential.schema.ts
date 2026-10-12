@@ -32,6 +32,8 @@ export type RegisterSatCredentialRequest = z.infer<typeof registerSatCredentialS
 export const revokeSatCredentialSchema = z
     .object({
         reason: z.string().trim().max(200).optional(),
+        /** F2 · La empresa cuya e.firma se revoca; sin ella, la por omisión. */
+        companyId: z.string().uuid().optional(),
     })
     .strict();
 export type RevokeSatCredentialRequest = z.infer<typeof revokeSatCredentialSchema>;
