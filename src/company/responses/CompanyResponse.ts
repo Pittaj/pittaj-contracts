@@ -63,6 +63,10 @@ export interface CompanyResponse {
   readonly timezone?: string | null;
   /** D8 · Las clases de IEPS por las que la empresa causa IEPS (vacío = no es contribuyente de IEPS). */
   readonly iepsCategorias?: readonly string[];
+  /** F2 · Régimen fiscal del SAT (c_RegimenFiscal); null si aún no se captura. */
+  readonly taxRegime?: string | null;
+  /** F2 · CP del lugar de expedición de sus CFDI; null si aún no se captura. */
+  readonly expeditionZip?: string | null;
 
   /**
    * Indica si la empresa está activa.

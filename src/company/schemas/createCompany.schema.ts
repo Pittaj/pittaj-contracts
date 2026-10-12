@@ -16,6 +16,7 @@
 import { z } from 'zod';
 import { CATEGORIAS_DE_IEPS } from '../../tax/iepsDeLaLey.js';
 import { zonaHorariaSchema } from '../../shared/fechas.js';
+import { codigoPostalSchema, regimenFiscalSchema } from '../perfilFiscal.js';
 
 /**
  * Regex para validar Tax ID.
@@ -122,6 +123,10 @@ export const CreateCompanySchema = z.object({
   timezone: zonaHorariaSchema,
   /** D8 · Las clases de IEPS (incisos del art. 2o., fr. I LIEPS) por las que la empresa causa IEPS. */
   iepsCategorias: z.array(z.enum(CATEGORIAS_DE_IEPS)).max(9).optional(),
+  /** F2 · Régimen fiscal del SAT con el que timbra la empresa (`undefined` = sin cambio, `null` = limpiar). */
+  taxRegime: regimenFiscalSchema,
+  /** F2 · CP del lugar de expedición de sus CFDI (`undefined` = sin cambio, `null` = limpiar). */
+  expeditionZip: codigoPostalSchema,
 });
 
 /**
