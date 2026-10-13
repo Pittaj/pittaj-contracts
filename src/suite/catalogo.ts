@@ -228,6 +228,7 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
             { ruta: 'configuracion', nombre: 'Configuración de emisión' },
             { ruta: 'descarga', nombre: 'Descarga del SAT' },
             { ruta: 'descarga/historial', nombre: 'Historial de descargas' },
+            { ruta: 'efirma', nombre: 'e.firma' },
             { ruta: 'conciliacion', nombre: 'Conciliación' },
         ],
     },
