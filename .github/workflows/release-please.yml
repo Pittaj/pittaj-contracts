@@ -15,10 +15,11 @@ jobs:
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
     steps:
+      # Modo manifiesto: release-please-config.json y .release-please-manifest.json. El último
+      # release (v1.4.8) ya no está en la historia de main, así que sin el ancla (`bootstrap-sha`)
+      # recorría la historia entera en cada push hasta caerse, y proponía «1.0.0».
       - uses: googleapis/release-please-action@v4
         id: release
-        with:
-          release-type: node
 
   publish:
     needs: release-please

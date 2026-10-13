@@ -1,0 +1,11 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "8f9a6f190ea9b83e375600f05012bf3835edb4c0",
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "package-name": "@pittaj/contracts",
+      "include-component-in-tag": false
+    }
+  }
+}
