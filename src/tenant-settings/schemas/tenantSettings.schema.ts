@@ -3,8 +3,8 @@
  *
  * Espejo del mecanismo desktop (Settings key-value). El primer consumidor
  * es la config fiscal CFDI del emisor (claves cfdi.*):
- * cfdi.issuer.rfc, cfdi.issuer.name, cfdi.issuer.regime,
- * cfdi.expedition.zip, cfdi.series, cfdi.folio
+ * cfdi.series, cfdi.folio. (El emisor —RFC, razón social, régimen, CP— vivía aquí
+ * como cfdi.issuer.*; desde F2 es el perfil fiscal de la empresa, en `companies`.)
  *
  * @module Contracts/TenantSettings
  */

@@ -10,16 +10,16 @@
 /**
  * Qué clase de documento se debe. El saldo se calcula distinto en cada uno y las dos formas son
  * correctas: el ticket registra CON QUÉ se pagó —de ahí sale lo fiado— y el pedido registra CUÁNTO
- * se ha abonado.
+ * se ha abonado. La venta sin caja (F3.1) se debe entera: su saldo es su total menos sus cobros.
  */
-export const RECEIVABLE_DOCUMENT_TYPES = ['TICKET', 'SALES_ORDER'] as const;
+export const RECEIVABLE_DOCUMENT_TYPES = ['TICKET', 'SALES_ORDER', 'DIRECT_SALE'] as const;
 export type ReceivableDocumentType = (typeof RECEIVABLE_DOCUMENT_TYPES)[number];
 
 /** Un documento con saldo. */
 export interface ReceivableResponse {
     readonly documentId: string;
     readonly documentType: ReceivableDocumentType;
-    /** Folio del documento (`TKT-…` o `ORD-…`). */
+    /** Folio del documento (`TKT-…`, `ORD-…` o `VSC-…`). */
     readonly documentNumber: string;
     readonly customerId: string;
     readonly customerName: string | null;

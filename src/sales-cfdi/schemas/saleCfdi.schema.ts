@@ -296,6 +296,11 @@ export const stampGlobalCfdiSchema = z.object({
     anio: z.number().int().min(2020).max(2100),
     /** D7d · Si las ventas del periodo están en otra moneda, su tipo de cambio. */
     tipoCambio: z.number().positive().max(100_000).optional(),
+    /**
+     * F2 · La empresa que la emite: la global es por RFC y junta las ventas de sus sucursales. Se
+     * puede omitir si en el periodo solo vendió una empresa.
+     */
+    companyId: z.string().uuid().optional(),
 });
 
 export type StampGlobalCfdiInput = z.infer<typeof stampGlobalCfdiSchema>;

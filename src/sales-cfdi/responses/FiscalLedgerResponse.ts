@@ -72,6 +72,9 @@ export interface EmittedCfdiItemResponse {
     readonly lastError: string | null;
     readonly hasXml: boolean;
     readonly hasPdf: boolean;
+    /** F2 · La empresa que lo emitió y su RFC (null en lo timbrado antes de guardarlo). */
+    readonly companyId?: string | null;
+    readonly issuerRfc?: string | null;
 
     /**
      * 🔴 Lo que el SAT dice de este comprobante, si ya se le preguntó.

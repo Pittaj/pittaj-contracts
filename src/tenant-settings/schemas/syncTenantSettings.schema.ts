@@ -27,7 +27,7 @@ const ERROR_MESSAGES = {
  * local (base de la comparación LWW en el servidor).
  */
 export const syncSettingsEntrySchema = z.object({
-    /** Clave del setting, ej. "cfdi.issuer.rfc". */
+    /** Clave del setting, ej. "cfdi.series". */
     key: z
         .string()
         .max(100, { message: ERROR_MESSAGES.KEY_TOO_LONG })
