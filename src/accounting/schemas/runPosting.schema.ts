@@ -49,6 +49,8 @@ export const POSTING_SWEEPS = [
     { key: 'sale-withholdings', label: 'Retenciones de tus clientes en facturas' },
     // D7e: bonificaciones y descuentos sin devolución, con su nota de crédito timbrada.
     { key: 'sale-bonifications', label: 'Bonificaciones y descuentos a clientes' },
+    // F3.1: la venta sin caja nace a crédito — Clientes contra Ventas e IVA por cobrar.
+    { key: 'direct-sales', label: 'Ventas sin caja' },
 ] as const;
 
 export type PostingSweepKey = (typeof POSTING_SWEEPS)[number]['key'];
