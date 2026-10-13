@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.36.2](https://github.com/Pittaj/pittaj-contracts/compare/v2.36.1...v2.36.2) (2026-10-13)
+
+
+### Bug Fixes
+
+* **suite:** Fiscal › e.firma en el catálogo de la suite (2.36.1) ([91374d4](https://github.com/Pittaj/pittaj-contracts/commit/91374d44790db8bfde331f378a2b2f80aaaecd11))
+* **suite:** Fiscal › e.firma en el catálogo de la suite (2.36.1) ([f63e5df](https://github.com/Pittaj/pittaj-contracts/commit/f63e5dfb46b3956bb82b62b92c28010d15d0ef82))
+
 ## [1.4.8](https://github.com/Pittaj/pittaj-contracts/compare/v1.4.7...v1.4.8) (2026-04-08)
 
 
