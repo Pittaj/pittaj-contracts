@@ -37,8 +37,8 @@ export interface CustomerPaymentApplicationPrimitives {
      * cobra. Una columna que se llamara `ticketId` y a veces guardara un pedido mentiría sobre a
      * qué se abonó, y esa mentira acaba en un reporte de antigüedad.
      */
-    readonly documentType: 'TICKET' | 'SALES_ORDER';
-    /** Documento que se abona (`posTickets.id` o `salesOrders.id`). */
+    readonly documentType: 'TICKET' | 'SALES_ORDER' | 'DIRECT_SALE';
+    /** Documento que se abona (`posTickets.id`, `salesOrders.id` o `directSales.id`). */
     readonly documentId: string;
     /** Folio del documento, copiado para leer el cobro sin volver a él. */
     readonly documentNumber: string | null;

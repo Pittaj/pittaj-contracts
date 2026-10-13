@@ -58,6 +58,8 @@ export const getReceivedCfdisSchema = z.object({
         .transform((v) => v === true || v === 'true')
         .optional(),
     locationId: z.string().uuid().optional(),
+    /** F2 · Solo los recibidos por esta empresa (su RFC es el receptor). */
+    companyId: z.string().uuid().optional(),
     businessLineId: z.string().uuid().optional(),
     page: z.coerce.number().int().min(1).optional(),
     limit: z.coerce.number().int().min(1).max(200).optional(),

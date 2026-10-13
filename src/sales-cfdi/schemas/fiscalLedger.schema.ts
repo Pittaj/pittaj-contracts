@@ -77,6 +77,8 @@ export const listEmittedCfdiSchema = z.object({
     status: z.enum(SALE_CFDI_STATUSES).optional(),
     /** RFC del receptor, exacto. */
     receiverRfc: z.string().trim().min(12).max(13).optional(),
+    /** F2 · Solo los que emitió esta empresa. */
+    companyId: z.string().uuid().optional(),
     /** Folio fiscal, serie-folio o nombre del receptor. */
     search: z.string().trim().max(120).optional(),
     sortOrder: z.enum(['asc', 'desc']).default('desc'),

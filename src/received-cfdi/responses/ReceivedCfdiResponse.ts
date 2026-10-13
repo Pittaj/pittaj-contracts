@@ -138,6 +138,8 @@ export interface ReceivedCfdiResponse {
      * en esa dimensión. Opcionales: un escritorio anterior no los manda y su ausencia no borra.
      */
     readonly locationId?: string | null;
+    /** F2 · La empresa cuyo RFC es el receptor; null si no es ninguna de las tuyas. */
+    readonly companyId?: string | null;
     readonly businessLineId?: string | null;
 
     readonly version: number;
