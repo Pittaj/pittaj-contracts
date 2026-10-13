@@ -3,6 +3,30 @@
  * @module Contracts/DirectSale
  */
 import type { DirectSaleStatus, ImpuestoDeVentaSinCaja } from './ventaSinCaja.js';
+import type { EstadoDelCfdiDeVentaSinCaja, OrigenDelCfdi } from './cfdi.js';
+
+/** F3.2 · El comprobante de la venta, sin el XML. */
+export interface DirectSaleCfdiResponse {
+    readonly status: EstadoDelCfdiDeVentaSinCaja;
+    readonly origin: OrigenDelCfdi;
+    readonly uuid: string | null;
+    readonly serie: string | null;
+    readonly folio: string | null;
+    readonly metodoPago: string | null;
+    readonly formaPago: string | null;
+    readonly issuerRfc: string | null;
+    readonly receptorRfc: string | null;
+    readonly stampedAt: string | null;
+    /** Por qué falló el último intento de timbrar. */
+    readonly error: string | null;
+}
+
+/** F3.2 · Resultado de timbrar o registrar. */
+export interface DirectSaleCfdiResult {
+    readonly status: 'stamped' | 'already-stamped' | 'registered' | 'failed' | 'blocked';
+    readonly uuid: string | null;
+    readonly message?: string;
+}
 
 export interface DirectSaleLineResponse {
     readonly id: string;
@@ -59,6 +83,8 @@ export interface DirectSaleResponse {
     readonly updatedAt: string;
     readonly cancelledAt: string | null;
     readonly cancelledReason: string | null;
+    /** F3.2 · El CFDI vigente: null si no tiene. El XML se pide aparte (`…/xml`). */
+    readonly cfdi: DirectSaleCfdiResponse | null;
     /** Obligatorio: viaja en el pull del escritorio, que lo lee con `GetProperty("version")`. */
     readonly version: number;
 }
