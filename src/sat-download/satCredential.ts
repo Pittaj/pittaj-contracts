@@ -81,3 +81,30 @@ export function rfcDeCertificado(x500UniqueIdentifier: string): string | null {
 export function esCsd(organizationalUnit: string | null | undefined): boolean {
     return typeof organizationalUnit === 'string' && organizationalUnit.trim().length > 0;
 }
+
+/**
+ * Cuándo avisar que la e.firma se acaba (diseño §5.4). Dura cuatro años y sin ella la descarga se
+ * detiene en silencio: el aviso es lo único que lo evita. Lo usan la pantalla (Fiscal → e.firma) y
+ * el correo al Propietario, para que los dos digan lo mismo el mismo día.
+ */
+export const SAT_AVISOS_DE_VENCIMIENTO_DIAS = [30, 7] as const;
+
+export interface SatAvisoDeVencimiento {
+    /** `PRONTO` a 30 días o menos, `URGENTE` a 7 o menos, `VENCIDA` ya pasada. */
+    readonly nivel: 'PRONTO' | 'URGENTE' | 'VENCIDA';
+    /** Días que le quedan, redondeando hacia arriba (0 si ya venció). */
+    readonly dias: number;
+}
+
+/** El aviso que toca para un certificado que vence en `validTo`, o `null` si aún no toca. */
+export function avisoDeVencimiento(validTo: string | Date, ahora: Date = new Date()): SatAvisoDeVencimiento | null {
+    const fin = typeof validTo === 'string' ? new Date(validTo) : validTo;
+    if (Number.isNaN(fin.getTime())) return null;
+    const restante = fin.getTime() - ahora.getTime();
+    if (restante <= 0) return { nivel: 'VENCIDA', dias: 0 };
+    const dias = Math.ceil(restante / 86_400_000);
+    const [pronto, urgente] = SAT_AVISOS_DE_VENCIMIENTO_DIAS;
+    if (dias <= urgente) return { nivel: 'URGENTE', dias };
+    if (dias <= pronto) return { nivel: 'PRONTO', dias };
+    return null;
+}
