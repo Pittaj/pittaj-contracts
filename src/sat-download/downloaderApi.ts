@@ -14,6 +14,7 @@
 import { z } from 'zod';
 import { cfdiFileHeaderSchema } from '../purchase/schemas/cfdiImport.schema.js';
 import { SAT_IMPORT_METHOD, SAT_SIGNATURE_OPERATIONS } from './satCredential.js';
+import { SELLO_BASE64 } from './selloDeImportacion.js';
 import type { SatDownloadKind, SatDownloadPayload } from './satDownloadPlan.js';
 
 // ─── Estados de una solicitud ───────────────────────────────────────────────
@@ -116,6 +117,8 @@ export const publishImportJobSchema = z
         publicKeyPem: z.string().trim().min(100).max(4_000).startsWith('-----BEGIN PUBLIC KEY-----'),
         method: z.literal(SAT_IMPORT_METHOD),
         expiresAt: z.string().datetime({ offset: true }),
+        /** Firma del HSM sobre `mensajeDelSello` del trabajo: `r‖s` en base64 (ver `selloDeImportacion.ts`). */
+        sealSignature: z.string().regex(SELLO_BASE64),
     })
     .strict();
 export type PublishImportJobRequest = z.infer<typeof publishImportJobSchema>;
