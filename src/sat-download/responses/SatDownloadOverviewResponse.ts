@@ -26,8 +26,8 @@ export interface SatCredentialResponse {
 /**
  * La llave pública con la que el navegador envuelve la e.firma.
  *
- * La publica el descargador (que es quien habla con el KMS); la nube solo la reparte. Caduca: un
- * trabajo de importación de Cloud KMS dura tres días.
+ * La publica el descargador (que es quien habla con el KMS), sellada; la nube solo la reparte.
+ * Caduca: un trabajo de importación de Cloud KMS dura tres días.
  */
 export interface SatImportJobResponse {
     readonly importJobId: string;
@@ -35,6 +35,11 @@ export interface SatImportJobResponse {
     readonly publicKeyPem: string;
     readonly method: string;
     readonly expiresAt: string;
+    /**
+     * La firma del HSM sobre este trabajo (`mensajeDelSello`). La página de carga la verifica con
+     * la llave pública del sello que trae fija, **antes** de cifrar: sin ella no se cifra nada.
+     */
+    readonly sealSignature: string;
 }
 
 /** Cómo va un tipo (recibidos o emitidos). Son hechos: la frase la arma la interfaz. */
