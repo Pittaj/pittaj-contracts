@@ -14,9 +14,17 @@ import { z } from 'zod';
 import type { SatClaimStatus } from './downloaderApi.js';
 import type { SatDownloadKind, SatDownloadPayload } from './satDownloadPlan.js';
 
-/** Tomar un RFC en este equipo (el `X-Device-ID` de la petición). Antes de guardar la e.firma. */
+/**
+ * El equipo, como en el sync: viaja en la petición (cuerpo, o `?deviceId=` en el plan). Si falta, la
+ * nube usa el `X-Device-ID` del encabezado. No es un secreto: lo que protege es que coincida con el
+ * equipo que tomó el RFC, y que tomar pida `fiscal.efirma.manage`.
+ */
+const deviceIdSchema = z.string().trim().min(1).max(100);
+
+/** Tomar un RFC en este equipo. Antes de guardar la e.firma. */
 export const claimSatLocalSchema = z
     .object({
+        deviceId: deviceIdSchema.optional(),
         /** F2 · La empresa cuyo RFC se toma; sin ella, la por omisión. */
         companyId: z.string().uuid().optional(),
         /** Cómo se llama el equipo para las personas («CAJA-MOSTRADOR-01»). */
@@ -81,6 +89,7 @@ export interface SatLocalPlanResponse {
 /** Un paso de un tramo, reportado por el equipo. Lo mismo que `reportClaimSchema`, sin firmas ni credencial. */
 export const reportLocalClaimSchema = z
     .object({
+        deviceId: deviceIdSchema.optional(),
         status: z.enum(['SOLICITADA', 'LISTA', 'DESCARGADA', 'SIN_RESPUESTA', 'RECHAZADA', 'AGOTADA', 'VENCIDA']),
         satRequestId: z.string().trim().max(64).optional(),
         satStatusCode: z.string().trim().max(10).optional(),
