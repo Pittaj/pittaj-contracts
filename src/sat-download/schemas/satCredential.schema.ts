@@ -25,6 +25,12 @@ export const registerSatCredentialSchema = z
         importJobId: z.string().trim().min(1).max(300),
         consentVersion: z.literal(SAT_CONSENT_VERSION),
         consentAccepted: z.literal(true),
+        /**
+         * El RFC lo descarga una computadora del cliente y se está **pasando a la nube** (§11.3): sin
+         * esto la nube rechaza el alta con el nombre del equipo. Ese equipo sigue descargando hasta
+         * que esta credencial se active; entonces la nube lo suelta (`PASO_A_LA_NUBE`).
+         */
+        replaceLocal: z.boolean().optional(),
     })
     .strict();
 export type RegisterSatCredentialRequest = z.infer<typeof registerSatCredentialSchema>;

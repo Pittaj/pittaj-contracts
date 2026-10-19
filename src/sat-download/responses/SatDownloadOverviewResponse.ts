@@ -5,6 +5,7 @@
 
 import type { SatCredentialStatus, SatSignatureOperation } from '../satCredential.js';
 import type { SatDownloadKind, SatDownloadPayload } from '../satDownloadPlan.js';
+import type { SatLocalDownloaderResponse } from '../satLocalDownloader.js';
 
 /** Lo público de la e.firma resguardada. Nada de aquí permite firmar. */
 export interface SatCredentialResponse {
@@ -64,6 +65,11 @@ export interface SatDownloadOverviewResponse {
     readonly coverage: readonly SatDownloadCoverageResponse[];
     /** La próxima corrida programada (ISO 8601). Null sin credencial activa. */
     readonly nextRunAt: string | null;
+    /**
+     * §11 · El equipo del cliente que descarga este RFC con su propia e.firma, si lo hay. Con él no
+     * hay credencial en la nube (o hay una pendiente, si se está pasando a la nube).
+     */
+    readonly localDownloader: SatLocalDownloaderResponse | null;
 }
 
 /** Un renglón de la bitácora de usos. Append-only; es lo que el cliente cruza con lo que esperaba. */
