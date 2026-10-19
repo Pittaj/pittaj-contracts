@@ -7,6 +7,7 @@ export * from './OAuthCallbackResponse.js';
 export * from './OAuthInitiateResponse.js';
 export * from './RefreshTokenResult.js';
 export * from './DeviceLinkResponses.js';
+export * from './AuthHandoffResponses.js';
 export * from './RegisterResponse.js';
 export * from './RequestPasswordResetResult.js';
 export * from './ResendVerificationResponse.js';

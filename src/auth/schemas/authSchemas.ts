@@ -102,3 +102,26 @@ export const redeemDeviceLinkCodeSchema = z.object({
     deviceId: z.string().min(1, 'Falta el identificador del equipo').max(64),
     deviceName: z.string().max(120).optional(),
 });
+
+/**
+ * Para qué sirve un pase. Hoy uno solo: abrir firma.pittaj.com con la sesión de la app. Va
+ * escrito en el pase para que un pase de una cosa no sirva para otra el día que haya dos.
+ */
+export const AUTH_HANDOFF_PURPOSES = ['efirma'] as const;
+export type AuthHandoffPurpose = (typeof AUTH_HANDOFF_PURPOSES)[number];
+
+/**
+ * Pedir un pase de un solo uso para llevar la sesión a otro origen (firma.pittaj.com).
+ *
+ * La identidad sale del token, nunca del cuerpo. La empresa solo preselecciona: la nube vuelve
+ * a decidir de qué empresa es la e.firma por el RFC del certificado.
+ */
+export const createAuthHandoffSchema = z.object({
+    purpose: z.enum(AUTH_HANDOFF_PURPOSES),
+    companyId: z.string().uuid('La empresa no es válida').optional(),
+});
+
+/** Canjear el pase. Público: el pase ES la credencial, y dura dos minutos. */
+export const redeemAuthHandoffSchema = z.object({
+    ticket: z.string().min(32, 'El pase está incompleto').max(128, 'El pase no es válido'),
+});
