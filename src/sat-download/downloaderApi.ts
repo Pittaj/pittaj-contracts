@@ -264,3 +264,58 @@ export interface ReconcileSignaturesResponse {
      */
     readonly unknownKeySignatures: number;
 }
+
+/**
+ * Rebanada 5 · Un renglón de la metadata del SAT (el `.txt` del paquete, separado por `~`).
+ *
+ * La metadata no gasta cupo y trae lo que el XML no dice por sí solo: si el comprobante sigue
+ * vigente o ya se canceló. Con ella la nube marca los cancelados del buzón, rescata por UUID lo que
+ * faltó (recibidos) y alimenta el cruce de lo timbrado (emitidos).
+ */
+export const satMetadataEntrySchema = z
+    .object({
+        uuid: z.string().trim().min(32).max(40),
+        rfcEmisor: z.string().trim().max(13),
+        nombreEmisor: z.string().trim().max(300).nullable(),
+        rfcReceptor: z.string().trim().max(13),
+        nombreReceptor: z.string().trim().max(300).nullable(),
+        /** Como viene del SAT, sin zona: `AAAA-MM-DDTHH:mm:ss` (reloj del emisor). */
+        fechaEmision: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/),
+        monto: z.number(),
+        /** I, E, T, N o P. */
+        efecto: z.string().trim().max(2).nullable(),
+        estatus: z.enum(['Vigente', 'Cancelado']),
+        fechaCancelacion: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/).nullable(),
+    })
+    .strict();
+export type SatMetadataEntry = z.infer<typeof satMetadataEntrySchema>;
+
+/** Hasta 1 000 renglones por llamada; un paquete de metadata trae hasta un millón. */
+export const SAT_METADATA_POR_LOTE = 1000;
+
+export const claimMetadataSchema = z
+    .object({
+        chunkIndex: z.number().int().min(0),
+        chunkCount: z.number().int().min(1).max(2000),
+        rows: z.array(satMetadataEntrySchema).max(SAT_METADATA_POR_LOTE),
+    })
+    .strict()
+    .refine((b) => b.chunkIndex < b.chunkCount, { message: 'chunkIndex fuera de rango' });
+export type ClaimMetadataRequest = z.infer<typeof claimMetadataSchema>;
+
+export interface ClaimMetadataResponse {
+    readonly received: number;
+    /** Recibidos: cuántos del buzón se marcaron cancelados en esta llamada. */
+    readonly cancelled: number;
+    /** Recibidos: cuántos UUID se pidieron por folio (vigentes en el SAT, ausentes del buzón). */
+    readonly rescued: number;
+    /** Emitidos: el mes quedó cruzado (llegaron todos los lotes). */
+    readonly crossed: boolean;
+}
+
+/**
+ * Cuántos UUID se rescatan por folio por RFC y día. Cada uno es una solicitud con su cupo de dos
+ * de por vida y su firma; si faltan más, es otra cosa (una descarga que no está funcionando) y lo
+ * dice la cobertura, no un rescate masivo.
+ */
+export const SAT_RESCATES_POR_DIA = 50;
