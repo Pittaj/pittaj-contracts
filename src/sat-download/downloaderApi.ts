@@ -272,20 +272,23 @@ export interface ReconcileSignaturesResponse {
  * vigente o ya se canceló. Con ella la nube marca los cancelados del buzón, rescata por UUID lo que
  * faltó (recibidos) y alimenta el cruce de lo timbrado (emitidos).
  */
+/** Null o ausente: el cliente del escritorio no escribe las llaves nulas. Sale siempre como null. */
+const opcional = <T extends z.ZodTypeAny>(t: T) => t.nullish().transform((v) => v ?? null);
+
 export const satMetadataEntrySchema = z
     .object({
         uuid: z.string().trim().min(32).max(40),
         rfcEmisor: z.string().trim().max(13),
-        nombreEmisor: z.string().trim().max(300).nullable(),
+        nombreEmisor: opcional(z.string().trim().max(300)),
         rfcReceptor: z.string().trim().max(13),
-        nombreReceptor: z.string().trim().max(300).nullable(),
+        nombreReceptor: opcional(z.string().trim().max(300)),
         /** Como viene del SAT, sin zona: `AAAA-MM-DDTHH:mm:ss` (reloj del emisor). */
         fechaEmision: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/),
         monto: z.number(),
         /** I, E, T, N o P. */
-        efecto: z.string().trim().max(2).nullable(),
+        efecto: opcional(z.string().trim().max(2)),
         estatus: z.enum(['Vigente', 'Cancelado']),
-        fechaCancelacion: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/).nullable(),
+        fechaCancelacion: opcional(z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)),
     })
     .strict();
 export type SatMetadataEntry = z.infer<typeof satMetadataEntrySchema>;
@@ -293,15 +296,27 @@ export type SatMetadataEntry = z.infer<typeof satMetadataEntrySchema>;
 /** Hasta 1 000 renglones por llamada; un paquete de metadata trae hasta un millón. */
 export const SAT_METADATA_POR_LOTE = 1000;
 
-export const claimMetadataSchema = z
+const claimMetadataObject = z
     .object({
         chunkIndex: z.number().int().min(0),
         chunkCount: z.number().int().min(1).max(2000),
         rows: z.array(satMetadataEntrySchema).max(SAT_METADATA_POR_LOTE),
     })
-    .strict()
-    .refine((b) => b.chunkIndex < b.chunkCount, { message: 'chunkIndex fuera de rango' });
+    .strict();
+const loteEnRango = (b: { chunkIndex: number; chunkCount: number }) => b.chunkIndex < b.chunkCount;
+
+export const claimMetadataSchema = claimMetadataObject.refine(loteEnRango, { message: 'chunkIndex fuera de rango' });
 export type ClaimMetadataRequest = z.infer<typeof claimMetadataSchema>;
+
+/**
+ * Rebanada 5b · Lo mismo desde el equipo del cliente (§11): `POST /api/fiscal/sat/local/claims/:id/metadata`.
+ * El equipo viaja como `deviceId` en el cuerpo, como en el reporte de avance.
+ */
+export const localClaimMetadataSchema = claimMetadataObject
+    .extend({ deviceId: z.string().min(1).max(100).optional() })
+    .strict()
+    .refine(loteEnRango, { message: 'chunkIndex fuera de rango' });
+export type LocalClaimMetadataRequest = z.infer<typeof localClaimMetadataSchema>;
 
 export interface ClaimMetadataResponse {
     readonly received: number;
