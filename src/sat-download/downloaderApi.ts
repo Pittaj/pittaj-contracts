@@ -208,3 +208,59 @@ export interface ImportClaimCfdisResponse {
     /** No eran para este RFC, o no traían UUID. No deberían existir; se cuentan para verlos. */
     readonly rejected: number;
 }
+
+/**
+ * Rebanada 4 · La conciliación diaria (docs `descarga-del-sat-en-la-web.md` §5.3).
+ *
+ * El descargador lee del registro de auditoría de Cloud KMS —que escribe Google y él no puede
+ * borrar— las firmas `AsymmetricSign` de las llaves de e.firma de un día, y las manda aquí. La nube
+ * las compara con su bitácora. Lo que sabe el descargador viene de fuera de él; por eso sirve.
+ */
+export const kmsAuditSignatureSchema = z
+    .object({
+        /** `projects/…/cryptoKeys/…/cryptoKeyVersions/N`, como `kmsKeyVersion` de la credencial. */
+        keyVersion: z.string().trim().min(1).max(400),
+        at: z.string().datetime({ offset: true }),
+        /** Quién firmó según Google (`authenticationInfo.principalEmail`). */
+        principal: z.string().trim().max(320).nullable(),
+    })
+    .strict();
+export type KmsAuditSignature = z.infer<typeof kmsAuditSignatureSchema>;
+
+export const reconcileSignaturesSchema = z
+    .object({
+        /** El día revisado, en la hora de México (`AAAA-MM-DD`). */
+        day: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        signatures: z.array(kmsAuditSignatureSchema).max(50_000),
+        /**
+         * La identidad que sí puede firmar: la cuenta de servicio del descargador. Una firma de
+         * cualquier otra es alerta, aunque tenga renglón en la bitácora.
+         */
+        expectedPrincipal: z.string().trim().min(1).max(320),
+    })
+    .strict();
+export type ReconcileSignaturesRequest = z.infer<typeof reconcileSignaturesSchema>;
+
+/** Lo que encontró la conciliación para una e.firma. Vacío = cuadró. */
+export interface SatReconciliationFinding {
+    readonly credentialId: string;
+    readonly rfc: string;
+    /** Firmas en el KMS ese día y renglones en la bitácora. */
+    readonly kmsSignatures: number;
+    readonly logSignatures: number;
+    /** En palabras: van tal cual en el correo al Propietario y en el registro del descargador. */
+    readonly findings: readonly string[];
+}
+
+export interface ReconcileSignaturesResponse {
+    readonly day: string;
+    /** Llaves revisadas (con firmas en el KMS o en la bitácora). */
+    readonly checked: number;
+    /** Solo las que no cuadraron. */
+    readonly alerts: readonly SatReconciliationFinding[];
+    /**
+     * Firmas del KMS de una versión de llave que ninguna e.firma tiene. Es lo más grave que puede
+     * aparecer: no hay a qué negocio avisarle, así que solo lo ve Pittaj.
+     */
+    readonly unknownKeySignatures: number;
+}

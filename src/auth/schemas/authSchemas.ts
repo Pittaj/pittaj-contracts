@@ -119,7 +119,19 @@ export type AuthHandoffPurpose = (typeof AUTH_HANDOFF_PURPOSES)[number];
 export const createAuthHandoffSchema = z.object({
     purpose: z.enum(AUTH_HANDOFF_PURPOSES),
     companyId: z.string().uuid('La empresa no es válida').optional(),
+    /**
+     * Reautenticación (descarga del SAT, rebanada 4): si se entró hace más de diez minutos, el pase
+     * pide la contraseña — su pre-hash, el mismo del login. Quien entra con Google o Microsoft no
+     * la manda: vuelve a entrar con su proveedor. Ver `AUTH_REAUTH_CODES`.
+     */
+    clientHash: z.string().length(64, 'clientHash debe ser un hash hex de 64 caracteres').optional(),
 });
+
+/**
+ * Lo que contesta la nube (403) cuando la acción pide haber entrado hace poco: con contraseña se
+ * pide ahí mismo; sin ella, volver a entrar con el proveedor.
+ */
+export const AUTH_REAUTH_CODES = { conContrasena: 'AUTH_REAUTH_PASSWORD', conProveedor: 'AUTH_REAUTH_LOGIN' } as const;
 
 /** Canjear el pase. Público: el pase ES la credencial, y dura dos minutos. */
 export const redeemAuthHandoffSchema = z.object({
