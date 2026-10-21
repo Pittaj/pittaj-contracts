@@ -70,6 +70,22 @@ export interface SatDownloadOverviewResponse {
      * hay credencial en la nube (o hay una pendiente, si se está pasando a la nube).
      */
     readonly localDownloader: SatLocalDownloaderResponse | null;
+    /**
+     * Rebanada 4 · La última conciliación de la e.firma de la nube contra la auditoría del KMS
+     * (docs §5.3). Null si nunca se ha conciliado (recién cargada, o en una computadora).
+     */
+    readonly lastReconciliation: SatReconciliationSummary | null;
+}
+
+/** Lo que el cliente ve de la conciliación: qué día se revisó y si cuadró. */
+export interface SatReconciliationSummary {
+    /** El día revisado (`AAAA-MM-DD`, hora de México). */
+    readonly day: string;
+    readonly kmsSignatures: number;
+    readonly logSignatures: number;
+    /** Vacío = cuadró. Las mismas frases del correo al Propietario. */
+    readonly findings: readonly string[];
+    readonly checkedAt: string;
 }
 
 /** Un renglón de la bitácora de usos. Append-only; es lo que el cliente cruza con lo que esperaba. */

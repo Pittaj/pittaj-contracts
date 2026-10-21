@@ -113,7 +113,12 @@ export type SatMetadataRow = z.infer<typeof satMetadataRowSchema>;
 export const MAX_FILAS_POR_LOTE = 1000;
 
 /**
- * `POST /api/sales-cfdi/sat-crosscheck/metadata` — el escritorio sube un trozo del mes.
+ * `POST /api/sales-cfdi/sat-crosscheck/metadata` — un trozo del mes, subido a mano por un cliente.
+ *
+ * Desde la rebanada 5 de la descarga del SAT (docs `descarga-del-sat-en-la-web.md`) la metadata de
+ * emitidos **la baja el descargador** —la nube, o la computadora del cliente que tiene la e.firma—,
+ * una vez al mes, y entra al mismo cruce por `/api/internal/sat/claims/:id/metadata`. Esta ruta se
+ * queda para quien suba la metadata por su cuenta.
  *
  * ── 🔴 Por qué hay `uploadId`, `chunkIndex` y `chunkCount`, y no solo filas ──
  *

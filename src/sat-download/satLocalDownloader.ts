@@ -69,6 +69,8 @@ export interface SatLocalClaimWork {
     readonly claimId: string;
     readonly kind: SatDownloadKind;
     readonly payload: SatDownloadPayload;
+    /** Rebanada 5 · El UUID de un rescate (`payload` FOLIO); null en los demás. */
+    readonly folio: string | null;
     /** `YYYY-MM-DDTHH:mm:ss`, hora del centro, tal cual va al SAT. */
     readonly rangeStart: string;
     readonly rangeEnd: string;

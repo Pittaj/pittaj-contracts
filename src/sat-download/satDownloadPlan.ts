@@ -348,6 +348,21 @@ export function tramoDeMetadata(hoy: string): SatTramo {
 }
 
 /**
+ * Rebanada 5 · El mes de emitidos que toca cruzar: el **anterior completo**, en cuanto pasó el plazo
+ * de timbrado de su último día (a partir del día `SAT_DIAS_PARA_CERRAR + 1`). Antes, null.
+ *
+ * Un mes entero y no la ventana móvil de los recibidos: el cruce compara el mes contra lo timbrado
+ * en Pittaj, y un mes a medias daría «solo en Pittaj» de todo lo que faltara.
+ */
+export function mesDeEmitidosPorCruzar(hoy: string): SatTramo | null {
+    const [a, m, d] = hoy.split('-').map(Number) as [number, number, number];
+    if (d <= SAT_DIAS_PARA_CERRAR) return null;
+    const primero = deUtc(Date.UTC(a, m - 2, 1));
+    const ultimo = deUtc(Date.UTC(a, m - 1, 0));
+    return { desde: primero, hasta: ultimo };
+}
+
+/**
  * El día más antiguo que se puede pedir de histórico.
  *
  * El SAT (v1.5) rechaza fechas anteriores a seis años atrás; aquí se ofrece hasta cinco.

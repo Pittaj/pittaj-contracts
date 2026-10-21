@@ -208,3 +208,129 @@ export interface ImportClaimCfdisResponse {
     /** No eran para este RFC, o no traían UUID. No deberían existir; se cuentan para verlos. */
     readonly rejected: number;
 }
+
+/**
+ * Rebanada 4 · La conciliación diaria (docs `descarga-del-sat-en-la-web.md` §5.3).
+ *
+ * El descargador lee del registro de auditoría de Cloud KMS —que escribe Google y él no puede
+ * borrar— las firmas `AsymmetricSign` de las llaves de e.firma de un día, y las manda aquí. La nube
+ * las compara con su bitácora. Lo que sabe el descargador viene de fuera de él; por eso sirve.
+ */
+export const kmsAuditSignatureSchema = z
+    .object({
+        /** `projects/…/cryptoKeys/…/cryptoKeyVersions/N`, como `kmsKeyVersion` de la credencial. */
+        keyVersion: z.string().trim().min(1).max(400),
+        at: z.string().datetime({ offset: true }),
+        /** Quién firmó según Google (`authenticationInfo.principalEmail`). */
+        principal: z.string().trim().max(320).nullable(),
+    })
+    .strict();
+export type KmsAuditSignature = z.infer<typeof kmsAuditSignatureSchema>;
+
+export const reconcileSignaturesSchema = z
+    .object({
+        /** El día revisado, en la hora de México (`AAAA-MM-DD`). */
+        day: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        signatures: z.array(kmsAuditSignatureSchema).max(50_000),
+        /**
+         * La identidad que sí puede firmar: la cuenta de servicio del descargador. Una firma de
+         * cualquier otra es alerta, aunque tenga renglón en la bitácora.
+         */
+        expectedPrincipal: z.string().trim().min(1).max(320),
+    })
+    .strict();
+export type ReconcileSignaturesRequest = z.infer<typeof reconcileSignaturesSchema>;
+
+/** Lo que encontró la conciliación para una e.firma. Vacío = cuadró. */
+export interface SatReconciliationFinding {
+    readonly credentialId: string;
+    readonly rfc: string;
+    /** Firmas en el KMS ese día y renglones en la bitácora. */
+    readonly kmsSignatures: number;
+    readonly logSignatures: number;
+    /** En palabras: van tal cual en el correo al Propietario y en el registro del descargador. */
+    readonly findings: readonly string[];
+}
+
+export interface ReconcileSignaturesResponse {
+    readonly day: string;
+    /** Llaves revisadas (con firmas en el KMS o en la bitácora). */
+    readonly checked: number;
+    /** Solo las que no cuadraron. */
+    readonly alerts: readonly SatReconciliationFinding[];
+    /**
+     * Firmas del KMS de una versión de llave que ninguna e.firma tiene. Es lo más grave que puede
+     * aparecer: no hay a qué negocio avisarle, así que solo lo ve Pittaj.
+     */
+    readonly unknownKeySignatures: number;
+}
+
+/**
+ * Rebanada 5 · Un renglón de la metadata del SAT (el `.txt` del paquete, separado por `~`).
+ *
+ * La metadata no gasta cupo y trae lo que el XML no dice por sí solo: si el comprobante sigue
+ * vigente o ya se canceló. Con ella la nube marca los cancelados del buzón, rescata por UUID lo que
+ * faltó (recibidos) y alimenta el cruce de lo timbrado (emitidos).
+ */
+/** Null o ausente: el cliente del escritorio no escribe las llaves nulas. Sale siempre como null. */
+const opcional = <T extends z.ZodTypeAny>(t: T) => t.nullish().transform((v) => v ?? null);
+
+export const satMetadataEntrySchema = z
+    .object({
+        uuid: z.string().trim().min(32).max(40),
+        rfcEmisor: z.string().trim().max(13),
+        nombreEmisor: opcional(z.string().trim().max(300)),
+        rfcReceptor: z.string().trim().max(13),
+        nombreReceptor: opcional(z.string().trim().max(300)),
+        /** Como viene del SAT, sin zona: `AAAA-MM-DDTHH:mm:ss` (reloj del emisor). */
+        fechaEmision: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/),
+        monto: z.number(),
+        /** I, E, T, N o P. */
+        efecto: opcional(z.string().trim().max(2)),
+        estatus: z.enum(['Vigente', 'Cancelado']),
+        fechaCancelacion: opcional(z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/)),
+    })
+    .strict();
+export type SatMetadataEntry = z.infer<typeof satMetadataEntrySchema>;
+
+/** Hasta 1 000 renglones por llamada; un paquete de metadata trae hasta un millón. */
+export const SAT_METADATA_POR_LOTE = 1000;
+
+const claimMetadataObject = z
+    .object({
+        chunkIndex: z.number().int().min(0),
+        chunkCount: z.number().int().min(1).max(2000),
+        rows: z.array(satMetadataEntrySchema).max(SAT_METADATA_POR_LOTE),
+    })
+    .strict();
+const loteEnRango = (b: { chunkIndex: number; chunkCount: number }) => b.chunkIndex < b.chunkCount;
+
+export const claimMetadataSchema = claimMetadataObject.refine(loteEnRango, { message: 'chunkIndex fuera de rango' });
+export type ClaimMetadataRequest = z.infer<typeof claimMetadataSchema>;
+
+/**
+ * Rebanada 5b · Lo mismo desde el equipo del cliente (§11): `POST /api/fiscal/sat/local/claims/:id/metadata`.
+ * El equipo viaja como `deviceId` en el cuerpo, como en el reporte de avance.
+ */
+export const localClaimMetadataSchema = claimMetadataObject
+    .extend({ deviceId: z.string().min(1).max(100).optional() })
+    .strict()
+    .refine(loteEnRango, { message: 'chunkIndex fuera de rango' });
+export type LocalClaimMetadataRequest = z.infer<typeof localClaimMetadataSchema>;
+
+export interface ClaimMetadataResponse {
+    readonly received: number;
+    /** Recibidos: cuántos del buzón se marcaron cancelados en esta llamada. */
+    readonly cancelled: number;
+    /** Recibidos: cuántos UUID se pidieron por folio (vigentes en el SAT, ausentes del buzón). */
+    readonly rescued: number;
+    /** Emitidos: el mes quedó cruzado (llegaron todos los lotes). */
+    readonly crossed: boolean;
+}
+
+/**
+ * Cuántos UUID se rescatan por folio por RFC y día. Cada uno es una solicitud con su cupo de dos
+ * de por vida y su firma; si faltan más, es otra cosa (una descarga que no está funcionando) y lo
+ * dice la cobertura, no un rescate masivo.
+ */
+export const SAT_RESCATES_POR_DIA = 50;
