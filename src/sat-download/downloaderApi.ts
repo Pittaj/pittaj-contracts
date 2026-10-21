@@ -80,6 +80,13 @@ export interface SatCredentialToDisable {
 export interface SatPendingCredentialsResponse {
     readonly toImport: readonly SatCredentialToImport[];
     readonly toDisable: readonly SatCredentialToDisable[];
+    /**
+     * Revisión adversarial H3 · Las versiones de llave que deben seguir habilitadas (las de las
+     * e.firmas `ACTIVA`). El descargador apaga cualquier otra `efirma-*` habilitada del llavero:
+     * así ninguna llave queda viva sin una e.firma que la respalde, aunque su renglón se haya
+     * borrado por un camino que no dejó lápida. Ausente en una nube anterior: no se barre.
+     */
+    readonly liveKeyVersions?: readonly string[];
 }
 
 /** Una solicitud que el descargador tiene que mover un paso. */
@@ -145,7 +152,10 @@ export type CredentialFailedRequest = z.infer<typeof credentialFailedSchema>;
 
 export const planRunSchema = z
     .object({
-        /** Solo para pruebas: el instante de la corrida. En producción, el reloj de la nube. */
+        /**
+         * Ya no se usa: la nube toma siempre su propio reloj (revisión adversarial H12; el que
+         * llama no decide qué días tocan). Se acepta para no romper a un descargador anterior.
+         */
         now: z.string().datetime({ offset: true }).optional(),
     })
     .strict();
@@ -176,6 +186,15 @@ export const reportClaimSchema = z
     })
     .strict();
 export type ReportClaimRequest = z.infer<typeof reportClaimSchema>;
+
+export interface ReportClaimResponse {
+    /**
+     * Revisión adversarial H11 · `false` si la credencial ya no está `ACTIVA` (se revocó o se
+     * reemplazó a media corrida): el descargador deja de firmar con ella en esa misma corrida, sin
+     * esperar a la siguiente. Ausente en una nube anterior: se trata como `true`.
+     */
+    readonly credentialActive?: boolean;
+}
 
 /**
  * Comprobantes de un paquete, ya leídos por el descargador.
@@ -221,7 +240,11 @@ export const kmsAuditSignatureSchema = z
         /** `projects/…/cryptoKeys/…/cryptoKeyVersions/N`, como `kmsKeyVersion` de la credencial. */
         keyVersion: z.string().trim().min(1).max(400),
         at: z.string().datetime({ offset: true }),
-        /** Quién firmó según Google (`authenticationInfo.principalEmail`). */
+        /**
+         * Quién firmó según Google (`authenticationInfo.principalEmail`). Si la identidad se usó por
+         * suplantación (`serviceAccountDelegationInfo`), el descargador lo escribe como
+         * `<cuenta> vía <quien la suplantó>`: ya no es la identidad esperada y salta la alerta.
+         */
         principal: z.string().trim().max(320).nullable(),
     })
     .strict();
@@ -233,10 +256,11 @@ export const reconcileSignaturesSchema = z
         day: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
         signatures: z.array(kmsAuditSignatureSchema).max(50_000),
         /**
-         * La identidad que sí puede firmar: la cuenta de servicio del descargador. Una firma de
-         * cualquier otra es alerta, aunque tenga renglón en la bitácora.
+         * Ya no se usa (revisión adversarial H1): la identidad que sí puede firmar la decide la nube
+         * con su propia configuración, nunca quien manda la lista. Se acepta para no romper a un
+         * descargador anterior.
          */
-        expectedPrincipal: z.string().trim().min(1).max(320),
+        expectedPrincipal: z.string().trim().min(1).max(320).optional(),
     })
     .strict();
 export type ReconcileSignaturesRequest = z.infer<typeof reconcileSignaturesSchema>;
