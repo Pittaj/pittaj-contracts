@@ -118,6 +118,33 @@ export interface SatRunPlanResponse {
 
 // ─── Lo que el descargador le manda a la nube ───────────────────────────────
 
+const CERTIFICADO_PEM = z.string().trim().min(100).max(6_000).startsWith('-----BEGIN CERTIFICATE-----');
+
+/**
+ * Revisión adversarial H2 · La **atestación del HSM** del trabajo de importación, tal como la da
+ * Cloud KMS (`ImportJob.attestation`): un enunciado firmado por la tarjeta HSM donde nació la llave
+ * de envoltura, con las cadenas de certificados del fabricante (Marvell, antes Cavium) y de Google.
+ *
+ * El sello prueba «esta llave la publicó Pittaj»; la atestación prueba «esta llave nació en un HSM
+ * de Cloud KMS, en ESTE trabajo de importación, y su parte privada no sale de ahí». La página de
+ * carga verifica las dos antes de cifrar la e.firma, con las dos raíces escritas en su código.
+ */
+export const kmsImportJobAttestationSchema = z
+    .object({
+        format: z.literal('CAVIUM_V2_COMPRESSED'),
+        /** El enunciado comprimido con gzip, en base64. */
+        content: z.string().regex(/^[A-Za-z0-9+/]+={0,2}$/).max(16_000),
+        certChains: z
+            .object({
+                caviumCerts: z.array(CERTIFICADO_PEM).min(1).max(6),
+                googleCardCerts: z.array(CERTIFICADO_PEM).min(1).max(6),
+                googlePartitionCerts: z.array(CERTIFICADO_PEM).min(1).max(6),
+            })
+            .strict(),
+    })
+    .strict();
+export type KmsImportJobAttestation = z.infer<typeof kmsImportJobAttestationSchema>;
+
 export const publishImportJobSchema = z
     .object({
         importJobId: z.string().trim().min(1).max(300),
@@ -126,6 +153,8 @@ export const publishImportJobSchema = z
         expiresAt: z.string().datetime({ offset: true }),
         /** Firma del HSM sobre `mensajeDelSello` del trabajo: `r‖s` en base64 (ver `selloDeImportacion.ts`). */
         sealSignature: z.string().regex(SELLO_BASE64),
+        /** H2 · Ausente solo en un descargador anterior; la página de carga no cifra sin ella. */
+        attestation: kmsImportJobAttestationSchema.optional(),
     })
     .strict();
 export type PublishImportJobRequest = z.infer<typeof publishImportJobSchema>;

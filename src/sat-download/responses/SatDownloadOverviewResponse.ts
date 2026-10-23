@@ -6,6 +6,7 @@
 import type { SatCredentialStatus, SatSignatureOperation } from '../satCredential.js';
 import type { SatDownloadKind, SatDownloadPayload } from '../satDownloadPlan.js';
 import type { SatLocalDownloaderResponse } from '../satLocalDownloader.js';
+import type { KmsImportJobAttestation } from '../downloaderApi.js';
 
 /** Lo público de la e.firma resguardada. Nada de aquí permite firmar. */
 export interface SatCredentialResponse {
@@ -41,6 +42,12 @@ export interface SatImportJobResponse {
      * la llave pública del sello que trae fija, **antes** de cifrar: sin ella no se cifra nada.
      */
     readonly sealSignature: string;
+    /**
+     * Revisión adversarial H2 · La atestación del HSM de este trabajo (`kmsImportJobAttestationSchema`).
+     * La página verifica que la llave pública de arriba nació en un HSM de Cloud KMS, en el llavero
+     * de Pittaj. Null en un trabajo publicado por un descargador anterior: no se cifra con él.
+     */
+    readonly attestation: KmsImportJobAttestation | null;
 }
 
 /** Cómo va un tipo (recibidos o emitidos). Son hechos: la frase la arma la interfaz. */
