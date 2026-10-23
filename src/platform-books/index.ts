@@ -110,3 +110,9 @@ export interface GetPlatformBooksLinksResponse {
     readonly page: number;
     readonly limit: number;
 }
+
+/** GET /api/admin/platform-books/options?tenantId= — para elegir el destino. */
+export interface PlatformBooksOptionsResponse {
+    readonly locations: readonly { id: string; name: string; companyName: string; rfc: string | null }[];
+    readonly businessLines: readonly { id: string; name: string }[];
+}
