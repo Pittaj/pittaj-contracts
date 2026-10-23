@@ -28,6 +28,9 @@ describe('leerComprobanteEmitido', () => {
             emisorRfc: 'PIT010101AB1',
             receptorRfc: 'CLI010101AB2',
             usoCfdi: 'G03',
+            receptorNombre: 'CLIENTE',
+            receptorRegimen: '601',
+            receptorCp: '72000',
         });
     });
 });
