@@ -1,0 +1,10 @@
+# Revisión obligatoria (con «Require review from Code Owners» en la protección de main).
+#
+# Revisión adversarial H7: `mensajeDelSello` define los bytes que la página de carga verifica antes
+# de cifrar la e.firma, y los contratos de la descarga del SAT definen qué puede pedir el
+# descargador. Cambiar uno de ellos cambia lo que se firma o en qué se confía: lo revisa una persona.
+/src/sat-download/                           @JoseLuisSandoval
+/src/auth/                                   @JoseLuisSandoval
+/package.json                                @JoseLuisSandoval
+/bun.lock                                    @JoseLuisSandoval
+/.github/                                    @JoseLuisSandoval
