@@ -17,7 +17,8 @@
  */
 import { z } from 'zod';
 
-export const CFDI_DE_VENTA_SIN_CAJA = ['STAMPED', 'FAILED'] as const;
+/** CANCELLED (F3.3): el comprobante se canceló ante el SAT donde se emitió (p. ej. en la cobranza de la plataforma). */
+export const CFDI_DE_VENTA_SIN_CAJA = ['STAMPED', 'FAILED', 'CANCELLED'] as const;
 export type EstadoDelCfdiDeVentaSinCaja = (typeof CFDI_DE_VENTA_SIN_CAJA)[number];
 
 /** De dónde salió el comprobante: timbrado por la nube, o registrado ya timbrado. */
@@ -59,6 +60,10 @@ export interface ComprobanteEmitido {
     readonly emisorRfc: string | null;
     readonly receptorRfc: string | null;
     readonly usoCfdi: string | null;
+    /** F3.3 · Lo que hace falta para dar de alta al cliente con los datos con que se le facturó. */
+    readonly receptorNombre: string | null;
+    readonly receptorRegimen: string | null;
+    readonly receptorCp: string | null;
 }
 
 const desescapar = (v: string) =>
@@ -97,6 +102,9 @@ export function leerComprobanteEmitido(xml: string): ComprobanteEmitido {
         emisorRfc: atributo(emisor, 'Rfc')?.toUpperCase() ?? null,
         receptorRfc: atributo(receptor, 'Rfc')?.toUpperCase() ?? null,
         usoCfdi: atributo(receptor, 'UsoCFDI'),
+        receptorNombre: atributo(receptor, 'Nombre'),
+        receptorRegimen: atributo(receptor, 'RegimenFiscalReceptor'),
+        receptorCp: atributo(receptor, 'DomicilioFiscalReceptor'),
     };
 }
 
