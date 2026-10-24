@@ -1,5 +1,40 @@
 # Changelog
 
+## [2.42.0](https://github.com/Pittaj/pittaj-contracts/compare/v2.41.0...v2.42.0) (2026-10-24)
+
+
+### Features
+
+* **auth:** pase de un solo uso para abrir firma.pittaj.com con la sesión de la app (2.38.0) ([cd824a3](https://github.com/Pittaj/pittaj-contracts/commit/cd824a34094bcef035dce2332c55a7d283626d24))
+* **auth:** pase de un solo uso para abrir otro origen con la sesión de la app (2.38.0) ([de96b75](https://github.com/Pittaj/pittaj-contracts/commit/de96b75577fed0bc58dde157ee92a71a2210ee90))
+* **banking,platform-books:** F3.4 liquidación de pasarela (2.45.0) ([ef21e05](https://github.com/Pittaj/pittaj-contracts/commit/ef21e05ca66f9c12dbf6194c6852f98e43ee1402))
+* **banking,platform-books:** F3.4 liquidación de pasarela (2.46.0) ([5b009a8](https://github.com/Pittaj/pittaj-contracts/commit/5b009a830d86e277a6f7b5b117e428cb008f290a))
+* **platform-books:** F3.3 contrato del puente de la cobranza a los libros (2.44.0) ([7d868d6](https://github.com/Pittaj/pittaj-contracts/commit/7d868d6fe929ec99968494e57267b1097e93cb73))
+* **platform-books:** F3.3 contrato del puente de la cobranza a los libros (2.44.0) ([03ba597](https://github.com/Pittaj/pittaj-contracts/commit/03ba59797370b00d9407a64506e1d294f431c437))
+* **platform-books:** opciones del destino para el backoffice ([36a18e8](https://github.com/Pittaj/pittaj-contracts/commit/36a18e812ccc574909aec2e839ef189df0c74099))
+* **sat-download:** el equipo manda su deviceId en la petición, como en el sync ([07dbf19](https://github.com/Pittaj/pittaj-contracts/commit/07dbf199d5db2aa8e785aef19314deb6227927d3))
+* **sat-download:** la API interna ya no le cree al que llama (2.42.0) ([aa40c77](https://github.com/Pittaj/pittaj-contracts/commit/aa40c77c8a070e7f13cc60a59e3cb570c2be98cc))
+* **sat-download:** la API interna ya no le cree al que llama (2.42.0) ([eda83b1](https://github.com/Pittaj/pittaj-contracts/commit/eda83b17971cd3698253cee1e83419799d3f04f2))
+* **sat-download:** la atestación del HSM del trabajo de importación (2.43.0) ([52c32e3](https://github.com/Pittaj/pittaj-contracts/commit/52c32e38745829f9e0bb2a9f0e1931749458d4ae))
+* **sat-download:** la atestación del HSM del trabajo de importación (2.43.0) ([77b945e](https://github.com/Pittaj/pittaj-contracts/commit/77b945e2ed0591adf75a1c48721076ecf4fd56b7))
+* **sat-download:** la e.firma en una computadora del cliente (2.39.0) ([82e2633](https://github.com/Pittaj/pittaj-contracts/commit/82e26335e5059e7cae432aada4155d637db79208))
+* **sat-download:** la e.firma en una computadora del cliente (2.39.0) ([37d939c](https://github.com/Pittaj/pittaj-contracts/commit/37d939c5b2f5bc7bbabc610f3bf0d044f289bdef))
+* **sat-download:** la metadata y el folio también para el equipo del cliente ([cc5ab97](https://github.com/Pittaj/pittaj-contracts/commit/cc5ab9766a2ac8819c5f454c17db552602f540c4))
+* **sat-download:** la última conciliación en el resumen de la e.firma ([15fc7e8](https://github.com/Pittaj/pittaj-contracts/commit/15fc7e81ce4ba673d4acc277a7567f70873fd619))
+* **sat-download:** metadata del SAT y rescate por folio (2.41.0) ([1ef1305](https://github.com/Pittaj/pittaj-contracts/commit/1ef13058b10b299ff6552004f53ba7640d45fe99))
+* **sat-download:** reautenticación del pase y conciliación con la auditoría del KMS (2.40.0) ([157478b](https://github.com/Pittaj/pittaj-contracts/commit/157478b8125c1f4e4e0138c2539da33b4df16cc8))
+* **sat-download:** reautenticación, conciliación con el KMS, metadata y rescate por folio (2.41.0) ([ded4de9](https://github.com/Pittaj/pittaj-contracts/commit/ded4de961bbfb9d86bd0f563bd99696234e26138))
+* **sat-download:** SatEfirmaScopeResponse, las e.firmas del alcance (H16, 2.45.0) ([d1ecae5](https://github.com/Pittaj/pittaj-contracts/commit/d1ecae53985a02dbcfc42c43487766ccb4a2bfd4))
+* **sat-download:** SatEfirmaScopeResponse, las e.firmas del alcance (H16, 2.45.0) ([dcd4f2c](https://github.com/Pittaj/pittaj-contracts/commit/dcd4f2c595bf86f06d2b01f76fa39dc2872ae15e))
+* **sat-download:** sello del trabajo de importación (2.37.0) ([e6176de](https://github.com/Pittaj/pittaj-contracts/commit/e6176dec20b91357baae888bc5931af78e58bffd))
+* **sat-download:** sello del trabajo de importación (2.37.0) ([2431e19](https://github.com/Pittaj/pittaj-contracts/commit/2431e19fdb3b1a1ea201f1e269d7755e84d63fb6))
+
+
+### Bug Fixes
+
+* **suite:** Fiscal › e.firma en el catálogo de la suite (2.36.1) ([91374d4](https://github.com/Pittaj/pittaj-contracts/commit/91374d44790db8bfde331f378a2b2f80aaaecd11))
+* **suite:** Fiscal › e.firma en el catálogo de la suite (2.36.1) ([f63e5df](https://github.com/Pittaj/pittaj-contracts/commit/f63e5dfb46b3956bb82b62b92c28010d15d0ef82))
+
 ## [1.4.8](https://github.com/Pittaj/pittaj-contracts/compare/v1.4.7...v1.4.8) (2026-04-08)
 
 
