@@ -80,7 +80,46 @@ export interface PlatformBooksConfigResponse {
     /** null = el candado cierra; si no, por qué no se puede conciliar. */
     readonly bloqueo: string | null;
     readonly lastRun: PlatformBooksRunResponse | null;
+    /**
+     * F9.2 · Los destinos con su vigencia, del más viejo al más nuevo. Los campos de arriba
+     * (`tenantId`, `locationId`…) son los del vigente hoy. Si nunca se programó un cambio, hay uno
+     * solo, el de la configuración (`id` = `'CONFIG'`).
+     */
+    readonly destinos: readonly PlatformBooksDestinoResponse[];
 }
+
+/** F9.2 · A dónde va lo de billing desde una fecha. */
+export interface PlatformBooksDestinoResponse {
+    /** `'CONFIG'` mientras sea el de la configuración y no se haya guardado como historia. */
+    readonly id: string;
+    readonly tenantId: string;
+    readonly tenantName: string | null;
+    readonly locationId: string;
+    readonly locationName: string | null;
+    /** El RFC de la empresa de la sucursal: de él depende qué CFDI entran. */
+    readonly rfc: string | null;
+    readonly businessLineId: string | null;
+    readonly pspAccountId: string | null;
+    readonly pspAccountName: string | null;
+    readonly vigenteDesde: string;
+    readonly vigente: boolean;
+    /** Todavía no empieza: se puede quitar. */
+    readonly programado: boolean;
+}
+
+/**
+ * POST /api/admin/platform-books/destinos — F9.2 · Programa el cambio de destino (p. ej. el día que
+ * Pittaj pasa a otro RFC). No puede empezar antes de hoy: lo ya llevado se queda donde está.
+ */
+export const programarDestinoSchema = z.object({
+    tenantId: z.string().uuid(),
+    locationId: z.string().uuid(),
+    businessLineId: z.string().uuid().nullable().default(null),
+    pspAccountId: z.string().uuid().nullable().default(null),
+    vigenteDesde: fechaCivilSchema,
+});
+
+export type ProgramarDestinoBody = z.infer<typeof programarDestinoSchema>;
 
 /** Lo que hizo una pasada del conciliador. */
 export interface PlatformBooksRunResponse {
@@ -131,4 +170,25 @@ export interface PlatformBooksOptionsResponse {
     readonly businessLines: readonly { id: string; name: string }[];
     /** F3.4 · Cuentas `PSP` activas del negocio, para la liquidación. */
     readonly pspAccounts: readonly { id: string; name: string }[];
+}
+
+/**
+ * F8.3 · Abrir los libros de Pittaj desde el backoffice, ya con sesión.
+ *
+ * El operador entra a app.pittaj.com como **el usuario del negocio destino vigente del puente que
+ * tiene su mismo correo** (sin ese usuario no hay pase). En la app manda el alcance de ese usuario
+ * (F7), no los permisos del backoffice. El pase es de un solo uso, dura dos minutos y viaja en el
+ * fragmento de la dirección; la app lo canjea en `POST /api/auth/handoff/sesion`.
+ */
+export const LIBROS_DE_PITTAJ = ['contabilidad', 'bancos', 'fiscal'] as const;
+export type LibroDePittaj = (typeof LIBROS_DE_PITTAJ)[number];
+
+export const paseDeLosLibrosSchema = z.object({ app: z.enum(LIBROS_DE_PITTAJ) });
+
+export interface PaseDeLosLibrosResponse {
+    /** `https://app.pittaj.com/auth/pase#t=…&a=contabilidad`: abrirla canjea el pase. */
+    readonly url: string;
+    readonly expiresAt: string;
+    /** El negocio al que entra (el destino vigente del puente). */
+    readonly tenantName: string | null;
 }
