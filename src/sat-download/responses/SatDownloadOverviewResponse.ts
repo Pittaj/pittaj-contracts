@@ -113,3 +113,14 @@ export interface GetSatSignatureLogResponse {
     readonly page: number;
     readonly limit: number;
 }
+
+/**
+ * GET /api/fiscal/sat/alcance — Revisión adversarial H16 · Sobre qué e.firmas actúa el usuario según
+ * su alcance (F7): la pantalla ofrece solo esas empresas en vez de dejar que la nube conteste 403.
+ */
+export interface SatEfirmaScopeResponse {
+    /** Las empresas activas cuya e.firma puede ver y administrar (la por omisión primero). */
+    readonly companyIds: readonly string[];
+    /** Alcanza todas: puede cambiar lo que es del negocio entero (la hora de la corrida, el histórico). */
+    readonly allCompanies: boolean;
+}
