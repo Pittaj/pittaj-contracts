@@ -430,7 +430,7 @@ export const applyTpvSplitSchema = z
   });
 
 /**
- * POST /api/bank-psp-settlements — F3.4 · Liquidación de una pasarela (Mercado Pago, Clip…).
+ * POST /api/bank-transactions/psp-settlements — F3.4 · Liquidación de una pasarela (Mercado Pago, Clip…).
  *
  * El primer salto del flujo en dos (`bank-reconciliation.md` §6): lo cobrado con tarjeta entra a la
  * cuenta `PSP` **bruto**, y la pasarela se queda con su comisión y el IVA de la comisión. Tres patas
