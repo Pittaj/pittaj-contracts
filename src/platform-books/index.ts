@@ -170,14 +170,20 @@ export interface PlatformBooksOptionsResponse {
     readonly businessLines: readonly { id: string; name: string }[];
     /** F3.4 · Cuentas `PSP` activas del negocio, para la liquidación. */
     readonly pspAccounts: readonly { id: string; name: string }[];
+    /**
+     * F8.4 · Es el negocio técnico de la plataforma (donde viven los operadores): no lleva libros y
+     * no se puede elegir como destino. Viene para que la pantalla diga por qué, en vez de dejar los
+     * selectores vacíos.
+     */
+    readonly esLaPlataforma: boolean;
 }
 
 /**
  * F8.3 · Abrir los libros de Pittaj desde el backoffice, ya con sesión.
  *
- * El operador entra a app.pittaj.com como **el usuario del negocio destino vigente del puente que
- * tiene su mismo correo** (sin ese usuario no hay pase). En la app manda el alcance de ese usuario
- * (F7), no los permisos del backoffice. El pase es de un solo uso, dura dos minutos y viaja en el
+ * El operador entra a app.pittaj.com como **el usuario que vinculó en el negocio destino vigente
+ * (F8.4) o, sin vínculo, el que tiene su mismo correo** (sin ninguno de los dos no hay pase). En la
+ * app manda el alcance de ese usuario (F7), no los permisos del backoffice. El pase es de un solo uso, dura dos minutos y viaja en el
  * fragmento de la dirección; la app lo canjea en `POST /api/auth/handoff/sesion`.
  */
 export const LIBROS_DE_PITTAJ = ['contabilidad', 'bancos', 'fiscal'] as const;
@@ -191,4 +197,30 @@ export interface PaseDeLosLibrosResponse {
     readonly expiresAt: string;
     /** El negocio al que entra (el destino vigente del puente). */
     readonly tenantName: string | null;
+}
+
+/**
+ * F8.4 · El vínculo del operador con su usuario en el negocio de Pittaj.
+ *
+ * El pase de los libros abre la app como un usuario del negocio destino. Sin vínculo se busca el
+ * del mismo correo que el operador; con vínculo, el que el operador demostró ser suyo tecleando su
+ * correo y contraseña una vez. Así funciona aunque el backoffice y el negocio usen correos distintos.
+ * El vínculo es por negocio: si el destino del puente cambia (F9), se vincula el nuevo.
+ */
+export const vincularOperadorSchema = z.object({
+    email: z.string().trim().toLowerCase().email(),
+    /** El pre-hash Argon2id de la contraseña, con la sal de `GET /api/auth/salt?email=`. */
+    clientHash: z.string().min(1),
+});
+export type VincularOperadorBody = z.infer<typeof vincularOperadorSchema>;
+
+/** GET/PUT /api/admin/platform-books/vinculo */
+export interface VinculoDelOperadorResponse {
+    /** El negocio del destino vigente; `null` si el puente todavía no tiene destino. */
+    readonly tenantId: string | null;
+    readonly tenantName: string | null;
+    /** El correo del usuario vinculado en ese negocio; `null` si no hay vínculo. */
+    readonly email: string | null;
+    /** Sin vínculo, si el pase encontraría usuario por el correo del operador. */
+    readonly porCorreo: boolean;
 }
