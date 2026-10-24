@@ -171,3 +171,24 @@ export interface PlatformBooksOptionsResponse {
     /** F3.4 · Cuentas `PSP` activas del negocio, para la liquidación. */
     readonly pspAccounts: readonly { id: string; name: string }[];
 }
+
+/**
+ * F8.3 · Abrir los libros de Pittaj desde el backoffice, ya con sesión.
+ *
+ * El operador entra a app.pittaj.com como **el usuario del negocio destino vigente del puente que
+ * tiene su mismo correo** (sin ese usuario no hay pase). En la app manda el alcance de ese usuario
+ * (F7), no los permisos del backoffice. El pase es de un solo uso, dura dos minutos y viaja en el
+ * fragmento de la dirección; la app lo canjea en `POST /api/auth/handoff/sesion`.
+ */
+export const LIBROS_DE_PITTAJ = ['contabilidad', 'bancos', 'fiscal'] as const;
+export type LibroDePittaj = (typeof LIBROS_DE_PITTAJ)[number];
+
+export const paseDeLosLibrosSchema = z.object({ app: z.enum(LIBROS_DE_PITTAJ) });
+
+export interface PaseDeLosLibrosResponse {
+    /** `https://app.pittaj.com/auth/pase#t=…&a=contabilidad`: abrirla canjea el pase. */
+    readonly url: string;
+    readonly expiresAt: string;
+    /** El negocio al que entra (el destino vigente del puente). */
+    readonly tenantName: string | null;
+}
