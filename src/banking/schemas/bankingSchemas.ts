@@ -429,6 +429,32 @@ export const applyTpvSplitSchema = z
     path: ['commissionAmount'],
   });
 
+/**
+ * POST /api/bank-transactions/psp-settlements — F3.4 · Liquidación de una pasarela (Mercado Pago, Clip…).
+ *
+ * El primer salto del flujo en dos (`bank-reconciliation.md` §6): lo cobrado con tarjeta entra a la
+ * cuenta `PSP` **bruto**, y la pasarela se queda con su comisión y el IVA de la comisión. Tres patas
+ * en la misma transacción: IN bruto (Liquidación TPV, abona la puente de tarjetas `103-02`), OUT
+ * comisión y OUT IVA acreditable. El segundo salto —la dispersión al banco— es un traspaso normal.
+ *
+ * El id lo genera quien captura (sync-ready): reintentar con el mismo id devuelve la misma.
+ */
+export const registerPspSettlementSchema = z
+  .object({
+    id: z.string().uuid(),
+    accountId: z.string().uuid(),
+    date: isoDateSchema,
+    grossAmount: z.number().positive().max(LIMITS.MAX_AMOUNT),
+    commissionAmount: z.number().min(0).max(LIMITS.MAX_AMOUNT),
+    commissionTaxAmount: z.number().min(0).max(LIMITS.MAX_AMOUNT),
+    reference: z.string().trim().max(LIMITS.MAX_REFERENCE_LENGTH).nullish(),
+    notes: z.string().trim().max(LIMITS.MAX_NOTES_LENGTH).nullish(),
+  })
+  .refine((v) => v.commissionAmount + v.commissionTaxAmount < v.grossAmount, {
+    message: 'La comisión y su IVA no pueden igualar o superar lo cobrado',
+    path: ['commissionAmount'],
+  });
+
 /** POST /api/bank-statements/:id/close — Cerrar la conciliación (irreversible). */
 export const closeBankStatementSchema = z.object({
   /** Confirmación explícita: cerrar no se deshace, se corrige con contramovimientos. */

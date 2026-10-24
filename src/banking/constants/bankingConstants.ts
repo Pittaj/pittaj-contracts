@@ -75,6 +75,12 @@ export const BANKING_CONSTANTS = {
     'TRANSFER',
     'REVERSAL',
     'MANUAL',
+    /**
+     * F3.4 · Las tres patas de una liquidación de pasarela (bruto, comisión, IVA de la comisión) en
+     * la cuenta `PSP`. El id es el de la liquidación, que genera quien la captura: con él se agrupan
+     * las tres y un reintento no las duplica.
+     */
+    'PSP_SETTLEMENT',
   ] as const,
 
   /** Tipo de contraparte de un movimiento. */

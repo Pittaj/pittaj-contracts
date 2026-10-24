@@ -7,3 +7,4 @@ export * from './ReconciliationRuleResponse.js';
 export * from './PayableDocumentResponse.js';
 export * from './BankReportResponses.js';
 export * from './ScheduledPaymentResponse.js';
+export * from './PspSettlementResponse.js';
