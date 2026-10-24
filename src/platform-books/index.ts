@@ -80,7 +80,46 @@ export interface PlatformBooksConfigResponse {
     /** null = el candado cierra; si no, por qué no se puede conciliar. */
     readonly bloqueo: string | null;
     readonly lastRun: PlatformBooksRunResponse | null;
+    /**
+     * F9.2 · Los destinos con su vigencia, del más viejo al más nuevo. Los campos de arriba
+     * (`tenantId`, `locationId`…) son los del vigente hoy. Si nunca se programó un cambio, hay uno
+     * solo, el de la configuración (`id` = `'CONFIG'`).
+     */
+    readonly destinos: readonly PlatformBooksDestinoResponse[];
 }
+
+/** F9.2 · A dónde va lo de billing desde una fecha. */
+export interface PlatformBooksDestinoResponse {
+    /** `'CONFIG'` mientras sea el de la configuración y no se haya guardado como historia. */
+    readonly id: string;
+    readonly tenantId: string;
+    readonly tenantName: string | null;
+    readonly locationId: string;
+    readonly locationName: string | null;
+    /** El RFC de la empresa de la sucursal: de él depende qué CFDI entran. */
+    readonly rfc: string | null;
+    readonly businessLineId: string | null;
+    readonly pspAccountId: string | null;
+    readonly pspAccountName: string | null;
+    readonly vigenteDesde: string;
+    readonly vigente: boolean;
+    /** Todavía no empieza: se puede quitar. */
+    readonly programado: boolean;
+}
+
+/**
+ * POST /api/admin/platform-books/destinos — F9.2 · Programa el cambio de destino (p. ej. el día que
+ * Pittaj pasa a otro RFC). No puede empezar antes de hoy: lo ya llevado se queda donde está.
+ */
+export const programarDestinoSchema = z.object({
+    tenantId: z.string().uuid(),
+    locationId: z.string().uuid(),
+    businessLineId: z.string().uuid().nullable().default(null),
+    pspAccountId: z.string().uuid().nullable().default(null),
+    vigenteDesde: fechaCivilSchema,
+});
+
+export type ProgramarDestinoBody = z.infer<typeof programarDestinoSchema>;
 
 /** Lo que hizo una pasada del conciliador. */
 export interface PlatformBooksRunResponse {
