@@ -13,6 +13,9 @@
  * - Cada pago → un **cobro** aplicado a esa venta, con la forma de pago «Pasarela».
  * - CFDI **cancelado** en billing → se cancelan el cobro y la venta (y su CFDI queda CANCELLED).
  * - **Reembolso sin CFDI cancelado** → no se adivina: se reporta, pide nota de crédito.
+ * - F3.4 · Cada cobro con tarjeta → su **liquidación** en la cuenta «Pasarela» de Bancos: entra el
+ *   bruto, sale la comisión de Mercado Pago y su IVA (acreditable). La dispersión al banco es un
+ *   traspaso, y se concilia contra el estado de cuenta como cualquiera.
  *
  * **Candado de RFC:** la empresa de la sucursal destino tiene que tener el mismo RFC con que billing
  * timbra. Si no, el conciliador no escribe nada: meter ingresos de un RFC en el libro de otro es
@@ -22,7 +25,7 @@ import { z } from 'zod';
 import { fechaCivilSchema } from '../shared/fechas.js';
 
 /** De dónde sale lo que se lleva a los libros. */
-export const ORIGENES_DE_LA_PLATAFORMA = ['INVOICE', 'INVOICE_PAYMENT', 'STAMP_PACKAGE'] as const;
+export const ORIGENES_DE_LA_PLATAFORMA = ['INVOICE', 'INVOICE_PAYMENT', 'STAMP_PACKAGE', 'PSP_SETTLEMENT'] as const;
 export type OrigenDeLaPlataforma = (typeof ORIGENES_DE_LA_PLATAFORMA)[number];
 
 /** POSTED = ya está en los libros · FAILED = se reintenta en la siguiente pasada · CANCELLED = se deshizo. */
@@ -38,6 +41,11 @@ export const updatePlatformBooksConfigSchema = z
         locationId: z.string().uuid().nullable(),
         /** La línea de negocio (p. ej. «SaaS»). Sin ella, la de la sucursal. */
         businessLineId: z.string().uuid().nullable(),
+        /**
+         * F3.4 · La cuenta `PSP` de Bancos donde cae lo que cobra Mercado Pago. Sin ella, los cobros
+         * entran igual pero sus liquidaciones (bruto − comisión) no se escriben.
+         */
+        pspAccountId: z.string().uuid().nullable().default(null),
         /** Desde qué fecha se concilia (civil). Lo anterior se quedó fuera a propósito. */
         since: fechaCivilSchema,
         version: z.number().int().positive(),
@@ -62,6 +70,8 @@ export interface PlatformBooksConfigResponse {
     readonly locationId: string | null;
     readonly locationName: string | null;
     readonly businessLineId: string | null;
+    readonly pspAccountId: string | null;
+    readonly pspAccountName: string | null;
     readonly since: string;
     readonly version: number;
     /** El candado: con qué RFC timbra billing y cuál tiene la empresa de la sucursal. */
@@ -86,6 +96,10 @@ export interface PlatformBooksRunResponse {
     readonly sinCfdi: number;
     /** Reembolsadas con el CFDI vigente: piden nota de crédito. */
     readonly reembolsosSinNota: number;
+    /** F3.4 · Liquidaciones escritas en la cuenta de la pasarela. */
+    readonly liquidaciones: number;
+    /** F3.4 · Cobros con tarjeta cuya comisión no se pudo leer de la pasarela (se reintenta). */
+    readonly sinComision: number;
 }
 
 export interface PlatformBooksLinkResponse {
@@ -115,4 +129,6 @@ export interface GetPlatformBooksLinksResponse {
 export interface PlatformBooksOptionsResponse {
     readonly locations: readonly { id: string; name: string; companyName: string; rfc: string | null }[];
     readonly businessLines: readonly { id: string; name: string }[];
+    /** F3.4 · Cuentas `PSP` activas del negocio, para la liquidación. */
+    readonly pspAccounts: readonly { id: string; name: string }[];
 }
