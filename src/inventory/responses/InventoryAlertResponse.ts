@@ -8,6 +8,7 @@ import type {
     InventoryAlertSeverity,
 } from '../schemas/inventoryAlert.schema.js';
 import type { InventorySettings } from '../schemas/inventorySettings.schema.js';
+import type { SyncPullResponse, SyncPushResponse } from '../../sync/index.js';
 
 export interface InventoryAlertResponse {
     /**
@@ -54,10 +55,9 @@ export interface GetInventoryAlertsResponse {
     readonly byKind: Readonly<Partial<Record<InventoryAlertKind, number>>>;
 }
 
+/** GET/PUT /api/inventory-settings. `updatedAt`: la clave más reciente; nula si nunca se guardó. */
 export interface InventorySettingsResponse extends InventorySettings {
     readonly updatedAt: string | null;
-    readonly updatedByName: string | null;
-    readonly version: number;
 }
 
 /** GET /api/inventory/home — el tablero de entrada de la app. Todo derivado. */
@@ -101,4 +101,27 @@ export interface InventoryHomeResponse {
         readonly value: number;
         readonly products: number;
     }[];
+}
+
+/** Un acuse «Revisado» tal como viaja por el sync (`inventory-alert-ack`, I2). */
+export interface InventoryAlertAckResponse {
+    readonly id: string;
+    readonly alertId: string;
+    readonly acknowledgedAt: string;
+    readonly acknowledgedBy: string | null;
+    readonly acknowledgedByName: string | null;
+    readonly snoozeUntil: string | null;
+    readonly note: string | null;
+    readonly deviceId: string | null;
+    readonly createdAt: string;
+    readonly updatedAt: string;
+    readonly version: number;
+}
+
+export type SyncPullInventoryAlertAckResponse = SyncPullResponse<InventoryAlertAckResponse>;
+export type SyncPushInventoryAlertAckResponse = SyncPushResponse;
+
+/** POST /api/inventory-alerts/acknowledge — cuántas quedaron revisadas (las que ya no existen se ignoran). */
+export interface AcknowledgeInventoryAlertsResponse {
+    readonly acknowledged: number;
 }
