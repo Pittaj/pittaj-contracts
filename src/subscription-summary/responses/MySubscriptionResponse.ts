@@ -128,6 +128,11 @@ export interface MySubscriptionResponse {
      */
     readonly betaSince: string | null;
     /**
+     * F8.5 · Desde cuándo es la cuenta interna de Pittaj (ISO), o `null`. Es el negocio donde
+     * Pittaj lleva sus propios libros: no paga, su prueba no vence y no se le habla de cobros.
+     */
+    readonly internalSince: string | null;
+    /**
      * Lo que el próximo cobro lleva **además** del plan y del excedente de operaciones: los timbres
      * extra y los cargos ya anotados (la diferencia de una subida a mitad de mes).
      *
