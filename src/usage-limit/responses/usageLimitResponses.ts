@@ -18,6 +18,8 @@ export type TenantUsageListItem = {
     readonly planName: string | null;
     /** En el programa beta: no se le cobra mientras dure. */
     readonly isBeta: boolean;
+    /** F8.5 · La cuenta interna de Pittaj (el negocio de sus libros): no se le cobra nunca. */
+    readonly isInternal: boolean;
     /** Operaciones del mes en curso (hora de Ciudad de México). */
     readonly operationsUsed: number;
     /** Operaciones que incluye el plan; null si el plan no mide operaciones. */

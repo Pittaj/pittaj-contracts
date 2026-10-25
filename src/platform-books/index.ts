@@ -86,7 +86,17 @@ export interface PlatformBooksConfigResponse {
      * solo, el de la configuración (`id` = `'CONFIG'`).
      */
     readonly destinos: readonly PlatformBooksDestinoResponse[];
+    /**
+     * F8.5 · Si el negocio del destino vigente ya es la cuenta interna de Pittaj (no se le cobra).
+     * `null` sin destino. Si es `false`, la pantalla ofrece marcarlo: si no, billing le cobraría a
+     * Pittaj y el puente escribiría esa factura como una venta de Pittaj a sí mismo.
+     */
+    readonly destinoInterno: boolean | null;
 }
+
+/** F8.5 · PUT /api/admin/platform-books/interno — marca (o desmarca) el negocio vigente como cuenta interna. */
+export const marcarInternoSchema = z.object({ interno: z.boolean() });
+export type MarcarInternoBody = z.infer<typeof marcarInternoSchema>;
 
 /** F9.2 · A dónde va lo de billing desde una fecha. */
 export interface PlatformBooksDestinoResponse {
@@ -223,4 +233,39 @@ export interface VinculoDelOperadorResponse {
     readonly email: string | null;
     /** Sin vínculo, si el pase encontraría usuario por el correo del operador. */
     readonly porCorreo: boolean;
+}
+
+/**
+ * F8.5 · Vincular desde la sesión de la app, sin contraseña (sirve a quien entra con Google o
+ * Microsoft).
+ *
+ * 1. El operador pide en el backoffice una solicitud (`POST /api/admin/platform-books/vinculo/solicitud`):
+ *    sale una dirección de app.pittaj con un token de un solo uso en el fragmento (10 minutos).
+ * 2. En la app, con su sesión, el usuario ve quién lo pide (`POST /api/platform-books/vinculo/consulta`)
+ *    y confirma (`POST /api/platform-books/vinculo/confirmacion`). El vínculo queda con **su** identidad.
+ *
+ * La prueba es la sesión de la app en el negocio destino: solo un usuario de ese negocio puede
+ * confirmarla, y solo para sí mismo.
+ */
+export interface SolicitudDeVinculoResponse {
+    /** `https://app.pittaj.com/vincular-operador#t=…` */
+    readonly url: string;
+    readonly expiresAt: string;
+}
+
+export const tokenDeVinculoSchema = z.object({ token: z.string().min(20).max(200) });
+export type TokenDeVinculoBody = z.infer<typeof tokenDeVinculoSchema>;
+
+export interface ConsultaDeVinculoResponse {
+    /** Quién lo pide: el operador del backoffice. */
+    readonly operadorNombre: string;
+    readonly operadorEmail: string;
+    /** El negocio de los libros de Pittaj, y el usuario de la sesión que confirmaría. */
+    readonly tenantName: string | null;
+    readonly tuEmail: string;
+}
+
+export interface VinculoConfirmadoResponse {
+    readonly tenantName: string | null;
+    readonly operadorEmail: string;
 }
