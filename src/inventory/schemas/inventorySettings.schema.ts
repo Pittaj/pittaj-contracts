@@ -79,6 +79,10 @@ export const inventorySettingsSchema = z.object({
             expiringDays: z.number().int().min(0).max(365).default(30),
             /** Sin movimiento en N días = inventario muerto. 0 = no avisar. */
             noMovementDays: z.number().int().min(0).max(730).default(90),
+            /** (I2) Un traspaso enviado que lleva N días sin recibirse. 0 = no avisar. */
+            transferStaleDays: z.number().int().min(0).max(90).default(3),
+            /** (I2) Un conteo en borrador que lleva N días sin aplicarse. 0 = no avisar. */
+            countStaleDays: z.number().int().min(0).max(90).default(7),
             /** A quién le llegan por correo, además de la campana. Diez: el valor de una clave cabe en 500. */
             emailUserIds: z.array(z.string().uuid()).max(10).default([]),
             /** Resumen diario en vez de uno por alerta. */
