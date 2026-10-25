@@ -56,6 +56,8 @@ export const syncPullCountPlanSchema = syncPullRequestSchema;
 /** POST /api/label-templates/sync/{push,pull} — `entityType: 'label-template'` */
 export const syncPushLabelTemplateSchema = syncPushRequestSchema;
 export const syncPullLabelTemplateSchema = syncPullRequestSchema;
-/** POST /api/inventory-settings/sync/{push,pull} — `entityType: 'inventory-settings'` */
-export const syncPushInventorySettingsSchema = syncPushRequestSchema;
-export const syncPullInventorySettingsSchema = syncPullRequestSchema;
+/** POST /api/inventory-alert-acks/sync/{push,pull} — `entityType: 'inventory-alert-ack'` (I2) */
+export const syncPushInventoryAlertAckSchema = syncPushRequestSchema;
+export const syncPullInventoryAlertAckSchema = syncPullRequestSchema;
+// La configuración de Inventario no tiene sync propio: viaja por el canal de settings
+// (`inventory.*`, ver inventorySettings.schema.ts).

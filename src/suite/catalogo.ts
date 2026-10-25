@@ -109,6 +109,7 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
         nombre: 'Inventario',
         modulos: [
             { ruta: 'inicio', nombre: 'Inicio' },
+            { ruta: 'alertas', nombre: 'Alertas' },
             { ruta: 'existencias', nombre: 'Existencias' },
             { ruta: 'movimientos', nombre: 'Movimientos' },
             { ruta: 'traspasos', nombre: 'Traspasos' },
