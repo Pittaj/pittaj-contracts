@@ -54,10 +54,9 @@ export interface GetInventoryAlertsResponse {
     readonly byKind: Readonly<Partial<Record<InventoryAlertKind, number>>>;
 }
 
+/** GET/PUT /api/inventory-settings. `updatedAt`: la clave más reciente; nula si nunca se guardó. */
 export interface InventorySettingsResponse extends InventorySettings {
     readonly updatedAt: string | null;
-    readonly updatedByName: string | null;
-    readonly version: number;
 }
 
 /** GET /api/inventory/home — el tablero de entrada de la app. Todo derivado. */
