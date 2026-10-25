@@ -67,10 +67,22 @@ export const setAdminPasswordSchema = z.object({
     salt: z.string().min(1).max(64),
 });
 
+/**
+ * Body de PUT /api/admin/auth/password — el operador cambia **su** contraseña. Mismo esquema que el
+ * login: `currentClientHash` es Argon2id(contraseña actual, salt guardado); el nuevo se deriva con un
+ * salt nuevo. Antes «Mi cuenta» usaba `/api/auth/password`, el de los negocios, y no servía.
+ */
+export const changeOwnAdminPasswordSchema = z.object({
+    currentClientHash: z.string().min(1),
+    newClientHash: z.string().min(1),
+    newSalt: z.string().min(1).max(64),
+});
+
 export type GetAdminSaltInput = z.infer<typeof getAdminSaltSchema>;
 export type AdminLoginInput = z.infer<typeof adminLoginSchema>;
 export type AdminRefreshInput = z.infer<typeof adminRefreshSchema>;
 export type SetAdminPasswordInput = z.infer<typeof setAdminPasswordSchema>;
+export type ChangeOwnAdminPasswordInput = z.infer<typeof changeOwnAdminPasswordSchema>;
 
 export type ListAdminUsersInput = z.infer<typeof listAdminUsersSchema>;
 export type CreateAdminUserInput = z.infer<typeof createAdminUserSchema>;
