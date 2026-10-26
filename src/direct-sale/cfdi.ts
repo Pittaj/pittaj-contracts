@@ -49,6 +49,8 @@ export type RegisterDirectSaleCfdiBody = z.infer<typeof registerDirectSaleCfdiSc
 export interface ComprobanteEmitido {
     readonly uuid: string | null;
     readonly fechaTimbrado: string | null;
+    /** D1 · La fecha del comprobante (cuando se emitió), en hora local del emisor, sin zona. */
+    readonly fecha: string | null;
     readonly tipoDeComprobante: string | null;
     readonly version: string | null;
     readonly serie: string | null;
@@ -91,6 +93,7 @@ export function leerComprobanteEmitido(xml: string): ComprobanteEmitido {
     return {
         uuid: atributo(timbre, 'UUID')?.toUpperCase() ?? null,
         fechaTimbrado: atributo(timbre, 'FechaTimbrado'),
+        fecha: atributo(comprobante, 'Fecha'),
         tipoDeComprobante: atributo(comprobante, 'TipoDeComprobante'),
         version: atributo(comprobante, 'Version'),
         serie: atributo(comprobante, 'Serie'),
