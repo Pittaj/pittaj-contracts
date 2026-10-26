@@ -9,6 +9,7 @@ import type {
   CounterpartyTypeValue,
   MatchOriginValue,
   PayableDocumentTypeValue,
+  ReceivableDocumentTypeValue,
   ReconciliationRuleActionValue,
   SummaryTermKindValue,
   TransactionSourceTypeValue,
@@ -401,8 +402,11 @@ export interface ReconciliationActionPrimitives {
  */
 export interface PaymentApplicationPrimitives {
   readonly id: string;
-  /** PURCHASE (compra de inventario) o EXPENSE (gasto). */
-  readonly documentType: PayableDocumentTypeValue;
+  /**
+   * PURCHASE (compra de inventario) o EXPENSE (gasto) en un egreso; CUST_PAYMENT (cobro a
+   * cliente, B2) en un ingreso.
+   */
+  readonly documentType: PayableDocumentTypeValue | ReceivableDocumentTypeValue;
   /** Id del documento en su propia tabla; uuid suelto, sin FK. */
   readonly documentId: string;
   /** Folio visible del documento al momento de aplicar (snapshot). */
