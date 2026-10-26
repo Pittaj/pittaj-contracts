@@ -59,7 +59,7 @@ describe('totalesDeVentaSinCaja', () => {
             { cantidad: 1, precioUnitario: 500, impuesto: 'EXEMPT' },
             { cantidad: 3, precioUnitario: 333.33, descuentoPorcentaje: 10, impuesto: 'IVA', tasaIva: 0.16 },
         ]);
-        expect(t).toEqual({ subtotal: 2499.99, descuento: 100, base: 2399.99, iva: 304, total: 2703.99 });
+        expect(t).toEqual({ subtotal: 2499.99, descuento: 100, base: 2399.99, iva: 304, ieps: 0, isrRetenido: 0, ivaRetenido: 0, total: 2703.99 });
     });
 });
 
