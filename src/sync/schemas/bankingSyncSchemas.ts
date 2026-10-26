@@ -103,7 +103,8 @@ export const bankTransactionSyncSchema = z.object({
     reference: texto(LIMITS.MAX_REFERENCE_LENGTH).nullish(),
     notes: texto(LIMITS.MAX_NOTES_LENGTH).nullish(),
     transferId: z.string().uuid().nullish(),
-    userId: z.string().uuid(),
+    /** Quien capturó. Si el operador del escritorio no tiene id de usuario de la nube, la nube pone el de la sesión. */
+    userId: z.string().uuid().nullish(),
     status: z.enum(BANKING_CONSTANTS.TRANSACTION_STATUSES),
     version: z.number().int().min(1),
 });
