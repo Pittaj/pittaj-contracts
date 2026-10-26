@@ -226,6 +226,7 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
             { ruta: 'revision', nombre: 'Revisión fiscal' },
             { ruta: 'emitidos', nombre: 'Comprobantes emitidos' },
             { ruta: 'complementos', nombre: 'Complementos pendientes' },
+            { ruta: 'emitidos-externos', nombre: 'Facturas de otro sistema' },
             { ruta: 'configuracion', nombre: 'Configuración de emisión' },
             { ruta: 'descarga', nombre: 'Descarga del SAT' },
             { ruta: 'descarga/historial', nombre: 'Historial de descargas' },
