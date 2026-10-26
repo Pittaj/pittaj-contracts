@@ -17,6 +17,7 @@ describe('leerComprobanteEmitido', () => {
         expect(leerComprobanteEmitido(XML)).toEqual({
             uuid: '6F2C1A8E-1234-4ABC-9DEF-0123456789AB',
             fechaTimbrado: '2026-10-01T10:00:05',
+            fecha: '2026-10-01T10:00:00',
             tipoDeComprobante: 'I',
             version: '4.0',
             serie: 'SAAS',
