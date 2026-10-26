@@ -272,6 +272,29 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
  */
 export const APPS_SIEMPRE_VISIBLES: readonly AppId[] = ['org'];
 
+/**
+ * B1 · **Bancos sencillo** (D5 del plan de despachos): los módulos de Bancos que se apagan para
+ * quien solo quiere ver por dónde se fue el dinero, sin conciliar. Queda encendido: Cuentas
+ * (con sus traspasos), Movimientos, Saldos, Por categoría y Categorías.
+ *
+ * - **Flujo de efectivo va con Calendario:** proyecta solo los pagos programados ahí; sin
+ *   Calendario es una línea plana.
+ * - **Conciliación arrastra a Reglas y Comisiones:** las reglas emparejan líneas del estado de
+ *   cuenta, y las comisiones se leen de lo que la conciliación separó.
+ *
+ * Es una lista de claves apagadas, la forma de `Visibilidad.modulos`: el alta (D4) la vuelca tal
+ * cual en el perfil que toque, y el escritorio (frente A) la lee para su menú. Cada pantalla de las
+ * que quedan funciona con estas apagadas: no enlaza ni manda a ninguna.
+ */
+export const MODULOS_APAGADOS_EN_BANCOS_SENCILLO: readonly string[] = [
+    claveDeModulo('bancos', 'por-pagar'),
+    claveDeModulo('bancos', 'calendario'),
+    claveDeModulo('bancos', 'flujo'),
+    claveDeModulo('bancos', 'conciliacion'),
+    claveDeModulo('bancos', 'conciliacion/reglas'),
+    claveDeModulo('bancos', 'reportes/comisiones'),
+];
+
 /** Búsqueda rápida por id de app. */
 export function appDeLaSuite(id: string): AppDeLaSuite | undefined {
     return APPS_DE_LA_SUITE.find((a) => a.id === id);
