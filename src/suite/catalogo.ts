@@ -201,6 +201,7 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
             { ruta: 'catalogo', nombre: 'Catálogo de cuentas' },
             { ruta: 'activos-fijos', nombre: 'Activos fijos' },
             { ruta: 'periodos', nombre: 'Periodos' },
+            { ruta: 'obligaciones', nombre: 'Mis obligaciones' },
             { ruta: 'balanza', nombre: 'Balanza de comprobación' },
             { ruta: 'auxiliar', nombre: 'Auxiliar de cuenta' },
             { ruta: 'estado-resultados', nombre: 'Estado de resultados' },
