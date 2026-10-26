@@ -507,6 +507,57 @@ export const applyPaymentSchema = z.object({
   applications: z.array(paymentApplicationSchema).max(APPLY.MAX_APPLICATIONS),
 });
 
+// ============================================================
+// B2 · COBROS DE CLIENTES DESDE EL BANCO
+// ============================================================
+
+/**
+ * PUT /api/bank-transactions/:id/customer-payments — Qué cobros trajo este depósito.
+ *
+ * El gemelo de `applyPaymentSchema` para un ingreso, y con la misma semántica: **reemplaza** la
+ * lista, `[]` desvincula todo. Se vincula el COBRO, no la venta: el saldo de la venta es del
+ * módulo de cobranza, y Bancos solo dice qué dinero lo trajo.
+ */
+export const linkCustomerPaymentsSchema = z.object({
+  version: z.number().int().min(1),
+  payments: z
+    .array(
+      z.object({
+        customerPaymentId: z.string().uuid(),
+        appliedAmount: z.number().positive().max(LIMITS.MAX_AMOUNT),
+      }),
+    )
+    .max(APPLY.MAX_APPLICATIONS),
+});
+
+/**
+ * POST /api/bank-transactions/:id/customer-payments/new — El cobro que el depósito revela.
+ *
+ * Para el depósito de un cliente que nadie registró: crea el cobro en cobranza, aplicado a sus
+ * ventas por cobrar (tickets a crédito, pedidos, ventas sin caja), y lo vincula al depósito. El
+ * importe es la suma de lo aplicado; tiene que caber en lo que el depósito aún no explica.
+ */
+export const createCustomerPaymentFromDepositSchema = z.object({
+  version: z.number().int().min(1),
+  customerId: z.string().uuid(),
+  applications: z
+    .array(
+      z.object({
+        documentId: z.string().uuid(),
+        amount: z.number().positive().max(LIMITS.MAX_AMOUNT),
+      }),
+    )
+    .min(1)
+    .max(APPLY.MAX_APPLICATIONS),
+  notes: z.string().trim().max(500).optional(),
+});
+
+/** GET /api/bank-transactions/:id/customer-payment-candidates — Cobros que podría haber traído. */
+export const getCustomerPaymentCandidatesSchema = z.object({
+  /** Folio, cliente o referencia (`PUE:<uuid>` incluido). Sin él, los de fechas cercanas. */
+  search: z.string().trim().max(100).optional(),
+});
+
 /** GET /api/payable-documents — Documentos por pagar con su saldo. */
 export const getPayableDocumentsSchema = z.object({
   /** Filtra por proveedor (soft ref). */

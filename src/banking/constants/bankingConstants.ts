@@ -190,6 +190,18 @@ export const BANKING_CONSTANTS = {
    */
   PAYABLE_DOCUMENT_TYPES: ['PURCHASE', 'EXPENSE'] as const,
 
+  /**
+   * B2 · Documentos a los que un **ingreso** se aplica: el cobro a cliente.
+   *
+   * El gemelo de `PAYABLE_DOCUMENT_TYPES` por el otro lado, con una diferencia a propósito: el
+   * depósito no se aplica a la venta sino **al cobro**. El saldo de una venta se deriva solo de los
+   * cobros de su módulo; si el depósito restara de la venta por su cuenta habría dos derivaciones
+   * del mismo saldo. Lo que Bancos guarda es la conciliación: qué depósito trajo qué cobro.
+   *
+   * `CUST_PAYMENT` y no `CUSTOMER_PAYMENT`: la columna es `varchar(15)`.
+   */
+  RECEIVABLE_DOCUMENT_TYPES: ['CUST_PAYMENT'] as const,
+
   PAYMENT_APPLICATION_LIMITS: {
     /**
      * Documentos que un solo movimiento puede pagar.
@@ -345,6 +357,7 @@ export type MatchStatusValue = (typeof BANKING_CONSTANTS.MATCH_STATUSES)[number]
 export type MatchOriginValue = (typeof BANKING_CONSTANTS.MATCH_ORIGINS)[number];
 export type ReconciliationRuleActionValue = (typeof BANKING_CONSTANTS.RULE_ACTIONS)[number];
 export type PayableDocumentTypeValue = (typeof BANKING_CONSTANTS.PAYABLE_DOCUMENT_TYPES)[number];
+export type ReceivableDocumentTypeValue = (typeof BANKING_CONSTANTS.RECEIVABLE_DOCUMENT_TYPES)[number];
 export type ExtractionCheckName = (typeof BANKING_CONSTANTS.EXTRACTION_CHECKS)[number];
 
 export type AccountNatureValue = (typeof BANKING_CONSTANTS.ACCOUNT_NATURES)[number];
