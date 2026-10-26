@@ -27,6 +27,8 @@ export const OPERATION_KIND = {
     PRODUCTION: 'PRODUCTION',
     BANK_MOVEMENT: 'BANK_MOVEMENT',
     MANUAL_JOURNAL: 'MANUAL_JOURNAL',
+    /** D1 · La venta sin caja: capturada, timbrada o registrada desde un CFDI de otro sistema. */
+    DIRECT_SALE: 'DIRECT_SALE',
 } as const;
 
 export type OperationKind = (typeof OPERATION_KIND)[keyof typeof OPERATION_KIND];
