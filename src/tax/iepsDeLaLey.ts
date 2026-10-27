@@ -108,3 +108,19 @@ export function categoriaDelIepsRecibido(
     const igual = catalogo.find((c) => c.factor.toLowerCase() === f && Math.abs(c.tasaOCuota - t) < 0.000_001 && c.categoria);
     return igual?.categoria ?? null;
 }
+
+/**
+ * D1c · Los IEPS del catálogo de impuestos de la empresa, como los lee `categoriaDelIepsRecibido`:
+ * la tasa como fracción (el catálogo la puede guardar como 8 o como 0.08) y la cuota en pesos.
+ * Solo los que tienen clase: sin ella no hay a qué atribuir el IEPS.
+ */
+export function iepsDelCatalogoDeImpuestos(
+    taxes: ReadonlyArray<{ kind: string; rate: number; satFactor: string | null; iepsCategoria: string | null }>,
+): IepsDelCatalogo[] {
+    return taxes
+        .filter((t) => t.kind === 'IEPS' && t.iepsCategoria)
+        .map((t) => {
+            const factor = (t.satFactor ?? '').trim().toLowerCase() === 'cuota' ? ('Cuota' as const) : ('Tasa' as const);
+            return { factor, tasaOCuota: factor === 'Tasa' && t.rate > 1 ? t.rate / 100 : t.rate, categoria: t.iepsCategoria };
+        });
+}

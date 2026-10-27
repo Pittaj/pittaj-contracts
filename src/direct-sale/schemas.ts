@@ -10,6 +10,14 @@
 import { z } from 'zod';
 import { fechaCivilSchema } from '../shared/fechas.js';
 import { IMPUESTOS_DE_VENTA_SIN_CAJA, TASAS_DE_IVA } from './ventaSinCaja.js';
+import { CATEGORIAS_DE_IEPS } from '../tax/iepsDeLaLey.js';
+
+/** D1c · El IEPS de un renglón. Por tasa es una fracción (0.08); por cuota, pesos por unidad. */
+export const iepsDeRenglonSchema = z.object({
+    factor: z.enum(['Tasa', 'Cuota']),
+    tasaOCuota: z.number().positive('La tasa o cuota del IEPS debe ser mayor que 0').max(100),
+    categoria: z.enum(CATEGORIAS_DE_IEPS).nullish(),
+});
 
 export const directSaleLineSchema = z
     .object({
@@ -31,13 +39,25 @@ export const directSaleLineSchema = z
             .refine((t) => (TASAS_DE_IVA as readonly number[]).includes(t), 'La tasa de IVA es 16 % u 8 %')
             .optional(),
         taxIncluded: z.boolean().default(false),
+        /** D1c · IEPS del renglón; ausente = no lleva. Un renglón no objeto de impuesto no lo lleva. */
+        ieps: iepsDeRenglonSchema.nullish(),
         /** Línea de negocio del renglón; si no viene, la de la venta. */
         businessLineId: z.string().uuid().nullish(),
     })
     .refine((l) => l.quantity * l.unitPrice > 0, {
         message: 'Un renglón sin importe no es una venta',
         path: ['unitPrice'],
+    })
+    .refine((l) => !(l.ieps && l.tax === 'NOT_OBJECT'), {
+        message: 'Un renglón no objeto de impuesto no lleva IEPS',
+        path: ['ieps'],
     });
+
+/** D1c · Lo que el cliente retiene. Importes ya decididos, no tasas. */
+export const retencionesDeVentaSchema = z.object({
+    isr: z.number().min(0).default(0),
+    iva: z.number().min(0).default(0),
+});
 
 export const createDirectSaleSchema = z.object({
     /**
@@ -58,6 +78,8 @@ export const createDirectSaleSchema = z.object({
     reference: z.string().trim().max(100).nullish(),
     notes: z.string().max(2000).nullish(),
     lines: z.array(directSaleLineSchema).min(1, 'La venta necesita al menos un renglón').max(200),
+    /** D1c · Lo que el cliente retiene de ISR y de IVA. Sin ello, nada. */
+    withholdings: retencionesDeVentaSchema.nullish(),
 });
 
 export const cancelDirectSaleSchema = z.object({

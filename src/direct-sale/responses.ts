@@ -50,6 +50,11 @@ export interface DirectSaleLineResponse {
     /** La venta neta del renglón (y la base de su IVA). */
     readonly base: number;
     readonly taxAmount: number;
+    /** D1c · El IEPS del renglón (0 si no lleva), con su factor, tasa o cuota y clase. */
+    readonly iepsAmount: number;
+    readonly iepsFactor: 'Tasa' | 'Cuota' | null;
+    readonly iepsRate: number | null;
+    readonly iepsCategoria: string | null;
     readonly total: number;
     readonly businessLineId: string | null;
 }
@@ -72,6 +77,12 @@ export interface DirectSaleResponse {
     readonly discount: number;
     readonly base: number;
     readonly taxAmount: number;
+    /** D1c · Σ IEPS de los renglones. */
+    readonly iepsAmount: number;
+    /** D1c · Lo que el cliente retiene. */
+    readonly isrWithheld: number;
+    readonly ivaWithheld: number;
+    /** Lo que el cliente paga: base + IVA + IEPS − retenciones (el `Total` del CFDI). */
     readonly total: number;
     /** Cobrado por cobros vigentes. Derivado, nunca guardado. */
     readonly paid: number;
