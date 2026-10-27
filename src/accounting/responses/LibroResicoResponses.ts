@@ -40,6 +40,7 @@ export interface ResicoBookResponse {
         readonly accruedIncome: number;
         readonly receivablesChange: number;
         readonly vatPendingChange: number;
+        readonly iepsPendingChange: number;
         readonly advancesChange: number;
     };
 
@@ -84,6 +85,13 @@ export interface ResicoBookResponse {
     readonly entriesDifference: number;
     /** El detalle se cortó en el límite; `entriesTotal` entonces no es todo. */
     readonly entriesTruncated: boolean;
+
+    /**
+     * IVA que los clientes retuvieron y se asentó este mes. Cuenta como cobrado en el mes de la
+     * venta y se resta en el del cobro (limitación conocida, `apps/contabilidad.md` §10.2): se
+     * enseña para poder ajustarlo a mano.
+     */
+    readonly vatWithheldInMonth: number;
 
     /**
      * Huecos del motor sin cuenta que el cobrado necesita (clientes por cobrar, IVA por cobrar).
