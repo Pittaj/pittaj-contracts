@@ -203,6 +203,7 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
             { ruta: 'periodos', nombre: 'Periodos' },
             { ruta: 'obligaciones', nombre: 'Mis obligaciones' },
             { ruta: 'libro-resico', nombre: 'Libro del RESICO' },
+            { ruta: 'pago-provisional', nombre: 'Pago provisional de ISR' },
             { ruta: 'balanza', nombre: 'Balanza de comprobación' },
             { ruta: 'auxiliar', nombre: 'Auxiliar de cuenta' },
             { ruta: 'estado-resultados', nombre: 'Estado de resultados' },
