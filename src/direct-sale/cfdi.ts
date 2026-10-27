@@ -16,6 +16,7 @@
  * Workers, donde no hay `DOMParser` (misma decisión que `leerRespuestaSat`).
  */
 import { z } from 'zod';
+import { CLASES_DE_RETENCION, type RetencionesDecididas } from '../tax/retencionesDeLaVenta.js';
 
 /** CANCELLED (F3.3): el comprobante se canceló ante el SAT donde se emitió (p. ej. en la cobranza de la plataforma). */
 export const CFDI_DE_VENTA_SIN_CAJA = ['STAMPED', 'FAILED', 'CANCELLED'] as const;
@@ -42,6 +43,26 @@ export const registerDirectSaleCfdiSchema = z.object({
     xml: z.string().min(200, 'Eso no parece un CFDI').max(2_000_000),
 });
 
+/**
+ * D3 · POST /api/sales-cfdi/direct-sales/retenciones — las retenciones que la ley pide para una venta
+ * sin caja antes de emitirla: dependen de quién vende (la empresa de la sucursal), a quién y qué se
+ * vende. La web y el escritorio la piden al capturar; quien captura puede cambiarla.
+ */
+export const retencionesSugeridasSchema = z.object({
+    locationId: z.string().uuid(),
+    customerId: z.string().uuid(),
+    /** La clase de cada renglón; null = general. */
+    clases: z.array(z.enum(CLASES_DE_RETENCION).nullable()).max(200),
+});
+
+export interface RetencionesSugeridasResponse {
+    /** `{}` = no se retiene nada. */
+    readonly decididas: RetencionesDecididas;
+    /** Por qué no se pudo decidir (faltan datos fiscales); null si se decidió. */
+    readonly motivo: string | null;
+}
+
+export type RetencionesSugeridasBody = z.infer<typeof retencionesSugeridasSchema>;
 export type StampDirectSaleBody = z.input<typeof stampDirectSaleSchema>;
 export type RegisterDirectSaleCfdiBody = z.infer<typeof registerDirectSaleCfdiSchema>;
 

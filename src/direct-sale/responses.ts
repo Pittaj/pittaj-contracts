@@ -4,6 +4,7 @@
  */
 import type { DirectSaleStatus, ImpuestoDeVentaSinCaja } from './ventaSinCaja.js';
 import type { EstadoDelCfdiDeVentaSinCaja, OrigenDelCfdi } from './cfdi.js';
+import type { ClaseDeRetencion, RetencionesDecididas } from '../tax/retencionesDeLaVenta.js';
 
 /** F3.2 · El comprobante de la venta, sin el XML. */
 export interface DirectSaleCfdiResponse {
@@ -55,6 +56,8 @@ export interface DirectSaleLineResponse {
     readonly iepsFactor: 'Tasa' | 'Cuota' | null;
     readonly iepsRate: number | null;
     readonly iepsCategoria: string | null;
+    /** D3 · Clase de retención del renglón; null = general. */
+    readonly retentionClass: ClaseDeRetencion | null;
     readonly total: number;
     readonly businessLineId: string | null;
 }
@@ -82,6 +85,8 @@ export interface DirectSaleResponse {
     /** D1c · Lo que el cliente retiene. */
     readonly isrWithheld: number;
     readonly ivaWithheld: number;
+    /** D3 · La decisión de tasas de la que salieron; null si llegaron como importes (D1) o no hay. */
+    readonly withholdingsDecision: RetencionesDecididas | null;
     /** Lo que el cliente paga: base + IVA + IEPS − retenciones (el `Total` del CFDI). */
     readonly total: number;
     /** Cobrado por cobros vigentes. Derivado, nunca guardado. */

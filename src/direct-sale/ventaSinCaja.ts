@@ -19,9 +19,11 @@
  * - Lleva **IVA** (16 %, 8 % frontera, tasa 0, exento o no objeto), con la misma regla de
  *   redondeo del ticket (`importesDelRenglonDeVenta`).
  * - **D1c · IEPS por renglón** (por tasa o por cuota, con su clase de la ley) y **retenciones del
- *   cliente** (ISR e IVA) por documento. Las retenciones son importes ya decididos —los trae el CFDI
- *   de otro sistema, o los decidirá `retencionesDeLaVenta` cuando Pittaj timbre (D3)—, no se
- *   recalculan aquí. Impuestos locales siguen sin aplicar y se rechazan.
+ *   cliente** (ISR e IVA) por documento. Las de un CFDI de otro sistema llegan como importes ya
+ *   decididos. **D3 ·** las que se capturan en Pittaj llegan como una decisión de tasas por clase
+ *   (`RetencionesDecididas`, la misma del ticket) y sus importes salen renglón por renglón con la
+ *   regla del CFDI (`retencionesDeVentaSinCaja`): así el total timbrado es, al centavo, el de la
+ *   venta. Impuestos locales siguen sin aplicar y se rechazan.
  *
  * **El total es lo que el cliente paga**: base + IVA + IEPS − retenciones, como el `Total` del CFDI.
  * Es lo que entra a cuentas por cobrar; lo retenido lo entera el cliente al SAT a nombre de quien
@@ -34,6 +36,11 @@
 import { importesDelRenglonDeVenta } from '../tax/importesDelRenglonDeVenta.js';
 import { snapshotDelImpuesto, type SnapshotDelImpuesto } from '../tax/impuestoDelRenglon.js';
 import type { FactorDeIeps } from '../tax/importesDelRenglonDeVenta.js';
+import {
+    retencionesDelConcepto,
+    type ClaseDeRetencion,
+    type RetencionesDecididas,
+} from '../tax/retencionesDeLaVenta.js';
 
 /** D1c · El IEPS de un renglón: por tasa (fracción de la base) o por cuota (pesos por unidad). */
 export interface IepsDeRenglonSinCaja {
@@ -82,6 +89,8 @@ export interface RenglonDeVentaSinCaja {
     readonly impuestosIncluidos?: boolean;
     /** D1c · El IEPS del renglón; ausente = no lleva. */
     readonly ieps?: IepsDeRenglonSinCaja | null;
+    /** D3 · Qué se vende, en lo que importa para retener (honorarios, fletes…); null = general. */
+    readonly claseDeRetencion?: ClaseDeRetencion | null;
 }
 
 /** Los importes de un renglón, ya redondeados como se guardan. */
@@ -193,6 +202,35 @@ export function retencionesQueNoCaben(
         return `El IVA retenido (${retenciones.iva.toFixed(2)}) pasa del IVA de la venta (${totales.iva.toFixed(2)})`;
     }
     return null;
+}
+
+/**
+ * D3 · Lo que el cliente retiene según la decisión, renglón por renglón con la regla del CFDI
+ * (`retencionesDelConcepto`): ISR sobre la base, IVA sobre base + IEPS, cada concepto redondeado.
+ * Es la misma cuenta que hace el constructor del CFDI, y por eso el total timbrado cuadra con el de
+ * la venta. Un renglón no objeto de impuesto no retiene (su concepto no lleva nodo de impuestos).
+ */
+export function retencionesDeVentaSinCaja(
+    renglones: readonly RenglonDeVentaSinCaja[],
+    decididas: RetencionesDecididas | null | undefined,
+): RetencionesDeVentaSinCaja {
+    let isr = 0;
+    let iva = 0;
+    for (const r of renglones) {
+        if (r.impuesto === 'NOT_OBJECT') continue;
+        const i = importesDeRenglonSinCaja(r);
+        const tasa = tasaDelRenglon(r);
+        for (const ret of retencionesDelConcepto(decididas, {
+            clase: r.claseDeRetencion ?? null,
+            base: i.base,
+            baseIva: r2(i.base + i.ieps),
+            tasaIva: tasa > 0 ? tasa : null,
+        })) {
+            if (ret.impuesto === '001') isr += ret.importe;
+            else iva += ret.importe;
+        }
+    }
+    return { isr: r2(isr), iva: r2(iva) };
 }
 
 /** El impuesto guardado de un renglón, de vuelta a la opción que lo produjo. */
