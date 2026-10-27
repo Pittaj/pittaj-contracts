@@ -11,6 +11,8 @@ import { z } from 'zod';
 import { fechaCivilSchema } from '../shared/fechas.js';
 import { IMPUESTOS_DE_VENTA_SIN_CAJA, TASAS_DE_IVA } from './ventaSinCaja.js';
 import { CATEGORIAS_DE_IEPS } from '../tax/iepsDeLaLey.js';
+import { CLASES_DE_RETENCION } from '../tax/retencionesDeLaVenta.js';
+import { retencionesDecididasSchema } from '../sales-cfdi/schemas/saleCfdi.schema.js';
 
 /** D1c · El IEPS de un renglón. Por tasa es una fracción (0.08); por cuota, pesos por unidad. */
 export const iepsDeRenglonSchema = z.object({
@@ -41,6 +43,8 @@ export const directSaleLineSchema = z
         taxIncluded: z.boolean().default(false),
         /** D1c · IEPS del renglón; ausente = no lleva. Un renglón no objeto de impuesto no lo lleva. */
         ieps: iepsDeRenglonSchema.nullish(),
+        /** D3 · Clase de retención (honorarios, arrendamiento, fletes…); ausente = general. */
+        retentionClass: z.enum(CLASES_DE_RETENCION).nullish(),
         /** Línea de negocio del renglón; si no viene, la de la venta. */
         businessLineId: z.string().uuid().nullish(),
     })
@@ -78,9 +82,26 @@ export const createDirectSaleSchema = z.object({
     reference: z.string().trim().max(100).nullish(),
     notes: z.string().max(2000).nullish(),
     lines: z.array(directSaleLineSchema).min(1, 'La venta necesita al menos un renglón').max(200),
-    /** D1c · Lo que el cliente retiene de ISR y de IVA. Sin ello, nada. */
+    /**
+     * D1c · Lo que el cliente retiene de ISR y de IVA, como importes. Es lo que trae un CFDI de otro
+     * sistema; una venta capturada en Pittaj manda `retenciones` (las tasas) y no esto.
+     */
     withholdings: retencionesDeVentaSchema.nullish(),
-});
+    /**
+     * D3 · Las retenciones como decisión: tasas por clase, la misma forma que al facturar un ticket.
+     * Los importes los calcula la nube renglón por renglón (`retencionesDeVentaSinCaja`). Sin
+     * retención local: la venta sin caja no lleva impuestos locales.
+     */
+    retenciones: retencionesDecididasSchema.nullish(),
+})
+    .refine((v) => !(v.withholdings && v.retenciones), {
+        message: 'Las retenciones van como importes o como tasas, no las dos',
+        path: ['retenciones'],
+    })
+    .refine((v) => !Object.values(v.retenciones ?? {}).some((t) => t && (t as { local?: unknown }).local), {
+        message: 'La venta sin caja no lleva retenciones locales',
+        path: ['retenciones'],
+    });
 
 export const cancelDirectSaleSchema = z.object({
     reason: z.string().trim().min(3, 'Di por qué se cancela').max(300),

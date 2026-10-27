@@ -7,6 +7,7 @@ import {
     createDirectSaleSchema,
     impuestoDeSnapshot,
     importesDeRenglonSinCaja,
+    retencionesDeVentaSinCaja,
     totalesDeVentaSinCaja,
 } from '../../src/direct-sale/index.js';
 
@@ -96,5 +97,58 @@ describe('createDirectSaleSchema', () => {
     it('pide cliente', () => {
         const { customerId: _, ...sinCliente } = base;
         expect(createDirectSaleSchema.safeParse(sinCliente).success).toBe(false);
+    });
+});
+
+describe('D3 · retencionesDeVentaSinCaja (vectores compartidos con VentaSinCaja.cs)', () => {
+    const iva16 = { impuesto: 'IVA' as const, tasaIva: 0.16 };
+
+    it('honorarios a una persona moral: ISR 10 % y ⅔ del IVA', () => {
+        const r = retencionesDeVentaSinCaja(
+            [{ cantidad: 1, precioUnitario: 1000, ...iva16, claseDeRetencion: 'HONORARIOS' }],
+            { HONORARIOS: { isr: 0.1, iva: { modo: 'DOS_TERCIOS' } } },
+        );
+        expect(r).toEqual({ isr: 100, iva: 106.67 });
+    });
+
+    it('RESICO 1.25 % se redondea por renglón, como el CFDI', () => {
+        const r = retencionesDeVentaSinCaja(
+            [
+                { cantidad: 1, precioUnitario: 333.33, ...iva16 },
+                { cantidad: 1, precioUnitario: 666.67, ...iva16 },
+            ],
+            { GENERAL: { isr: 0.0125, iva: null } },
+        );
+        expect(r).toEqual({ isr: 12.5, iva: 0 });
+    });
+
+    it('con IEPS, el IVA se retiene sobre base + IEPS', () => {
+        const r = retencionesDeVentaSinCaja(
+            [{ cantidad: 1, precioUnitario: 100, ...iva16, ieps: { factor: 'Tasa', tasaOCuota: 0.08 }, claseDeRetencion: 'COMISIONES' }],
+            { COMISIONES: { isr: null, iva: { modo: 'DOS_TERCIOS' } } },
+        );
+        expect(r).toEqual({ isr: 0, iva: 11.52 });
+    });
+
+    it('un renglón no objeto no retiene, y una clase fuera de la decisión tampoco', () => {
+        const r = retencionesDeVentaSinCaja(
+            [
+                { cantidad: 1, precioUnitario: 500, impuesto: 'NOT_OBJECT' },
+                { cantidad: 1, precioUnitario: 500, ...iva16, claseDeRetencion: 'FLETES' },
+            ],
+            { GENERAL: { isr: 0.0125, iva: null } },
+        );
+        expect(r).toEqual({ isr: 0, iva: 0 });
+    });
+
+    it('el esquema no acepta importes y tasas a la vez, ni retención local', () => {
+        const base = {
+            customerId: '11111111-1111-4111-8111-111111111111',
+            locationId: '22222222-2222-4222-8222-222222222222',
+            lines: [{ description: 'Asesoría', satProductCode: '80111600', satUnitCode: 'E48', quantity: 1, unitPrice: 1000, tax: 'IVA', taxRate: 0.16 }],
+        };
+        expect(createDirectSaleSchema.safeParse({ ...base, retenciones: { GENERAL: { isr: 0.0125 } } }).success).toBe(true);
+        expect(createDirectSaleSchema.safeParse({ ...base, retenciones: {}, withholdings: { isr: 1, iva: 0 } }).success).toBe(false);
+        expect(createDirectSaleSchema.safeParse({ ...base, retenciones: { GENERAL: { isr: null, local: { nombre: 'Cedular', tasa: 0.02 } } } }).success).toBe(false);
     });
 });
