@@ -103,6 +103,12 @@ export const bankTransactionSyncSchema = z.object({
     reference: texto(LIMITS.MAX_REFERENCE_LENGTH).nullish(),
     notes: texto(LIMITS.MAX_NOTES_LENGTH).nullish(),
     transferId: z.string().uuid().nullish(),
+    /**
+     * La conciliación que lo confirmó (A4.1). El escritorio solo sube `CLEARED` cuando cerró él el estado de
+     * cuenta: la nube lo acepta si ese estado existe, está `RECONCILED` y alguna de sus líneas ligó este
+     * movimiento. Sin esa prueba, un `CLEARED` de banco o de pasarela se rechaza.
+     */
+    reconciliationId: z.string().uuid().nullish(),
     /** Quien capturó. Si el operador del escritorio no tiene id de usuario de la nube, la nube pone el de la sesión. */
     userId: z.string().uuid().nullish(),
     status: z.enum(BANKING_CONSTANTS.TRANSACTION_STATUSES),
@@ -113,3 +119,42 @@ export type BankAccountSync = z.infer<typeof bankAccountSyncSchema>;
 export type TransactionCategorySync = z.infer<typeof transactionCategorySyncSchema>;
 export type BankTransferSync = z.infer<typeof bankTransferSyncSchema>;
 export type BankTransactionSync = z.infer<typeof bankTransactionSyncSchema>;
+
+const lineaDeEstadoSchema = z.object({
+    id: z.string().uuid(),
+    date: fechaCivil,
+    description: texto(LIMITS.MAX_NOTES_LENGTH).max(BANKING_CONSTANTS.RECONCILIATION_LIMITS.MAX_LINE_DESCRIPTION_LENGTH),
+    reference: texto(LIMITS.MAX_REFERENCE_LENGTH).nullish(),
+    /** Con signo: positivo abona (entra), negativo carga (sale). Nunca cero. */
+    amount: importe.refine((v) => v !== 0, 'Un renglón de cero no es un movimiento'),
+    sequence: z.number().int().min(0),
+    matchStatus: z.enum(BANKING_CONSTANTS.MATCH_STATUSES),
+    matchOrigin: z.enum(BANKING_CONSTANTS.MATCH_ORIGINS).nullish(),
+    matchedTransactionIds: z.array(z.string().uuid()).max(BANKING_CONSTANTS.RECONCILIATION_LIMITS.MAX_MATCHED_TRANSACTIONS).default([]),
+    suggestion: z.record(z.unknown()).nullish(),
+});
+
+/**
+ * Estado de cuenta con sus líneas (A4.1). Las líneas viajan dentro del estado: no tienen versión propia, y la
+ * unidad que se versiona y se concilia es el estado entero. `RECONCILIATION_ID` de los movimientos apunta a su `id`.
+ *
+ * El escritorio importa tabular (CSV/XLSX); PDF y foto —que cuestan un modelo— siguen siendo de la nube.
+ */
+export const bankStatementSyncSchema = z.object({
+    id: z.string().uuid(),
+    accountId: z.string().uuid(),
+    periodStart: fechaCivil,
+    periodEnd: fechaCivil,
+    openingBalance: importe,
+    closingBalance: importe,
+    currency: z.string().length(3),
+    source: z.enum(BANKING_CONSTANTS.STATEMENT_SOURCES),
+    extractor: texto(100).nullish(),
+    status: z.enum(BANKING_CONSTANTS.STATEMENT_STATUSES),
+    closedBy: z.string().max(36).nullish(),
+    closedAt: z.coerce.date().nullish(),
+    lines: z.array(lineaDeEstadoSchema).max(BANKING_CONSTANTS.RECONCILIATION_LIMITS.MAX_STATEMENT_LINES),
+    version: z.number().int().min(1),
+});
+
+export type BankStatementSync = z.infer<typeof bankStatementSyncSchema>;
