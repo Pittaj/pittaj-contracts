@@ -16,6 +16,7 @@
  */
 
 import { z } from 'zod';
+import type { InventoryHomeResponse } from '../responses/InventoryAlertResponse.js';
 
 export const INVENTORY_ALERT_KINDS = [
     'LOW_STOCK',
@@ -324,3 +325,78 @@ export function semillaDeAcuse(alertId: string): string {
 
 /** Orden de la lista: severidad, luego lo que más duele. */
 export const SEVERIDAD_ORDEN: Readonly<Record<InventoryAlertSeverity, number>> = { HIGH: 0, MEDIUM: 1, LOW: 2 };
+
+// ── El tablero de Inicio (I2b) ────────────────────────────────────────────────────────────────
+//
+// Las cifras de `InventoryHomeResponse` que salen de sumar, armadas en un solo lugar para que la web
+// y el escritorio redondeen y ordenen igual. Espejo: `TableroDeInventario.Armar` (C#).
+//
+// Lo que necesita el costo de venta (rotación, días de inventario, merma como % del costo de venta)
+// va nulo: las ventas se escriben con costo 0 y el costo sale de recorrer el kárdex con el promedio
+// móvil; eso llega con los reportes de valuación y rotación (I5). Caducidades (I8) y reservas (I7), en 0.
+
+/** Ventanas del tablero, en días. */
+export const VENTANAS_DEL_TABLERO = { valor: 30, exactitud: 90, merma: 30 } as const;
+
+export interface EntradaDelTablero {
+    readonly asOf: string;
+    /** Un renglón por par producto × bodega de la proyección (`stock_items`), ya recortado al alcance. */
+    readonly existencias: ReadonlyArray<{
+        readonly productId: string;
+        readonly warehouseId: string;
+        readonly warehouseName: string;
+        readonly onHand: number;
+        readonly averageCost: number;
+    }>;
+    /** Σ existencia × costo promedio hace `VENTANAS_DEL_TABLERO.valor` días (kárdex a esa fecha). */
+    readonly valorHace30: number;
+    readonly cajones: {
+        readonly lowStock: number;
+        readonly negative: number;
+        readonly transfersInTransit: number;
+        readonly transfersToReceive: number;
+        readonly countsOpen: number;
+        readonly adjustmentsDraft: number;
+    };
+    /** Renglones contados en conteos aplicados en la ventana, y cuántos cuadraron (contado = teórico). */
+    readonly renglonesContados: number;
+    readonly renglonesCuadrados: number;
+    /** Valor de las salidas por merma (`MERMA`) en la ventana. */
+    readonly merma: number;
+}
+
+const centavos = (n: number) => Math.round(n * 100) / 100;
+
+/** Porcentaje con un decimal; nulo sin renglones contados (no es 100 %, es «no se sabe»). */
+export function exactitudDeConteos(contados: number, cuadrados: number): number | null {
+    return contados > 0 ? Math.round((cuadrados / contados) * 1000) / 10 : null;
+}
+
+export function armarTablero(e: EntradaDelTablero): InventoryHomeResponse {
+    let total = 0;
+    const conExistencia = new Set<string>();
+    const porBodega = new Map<string, { warehouseId: string; warehouseName: string; value: number; products: Set<string> }>();
+    for (const x of e.existencias) {
+        const valor = x.onHand * x.averageCost;
+        total += valor;
+        if (x.onHand > 0) conExistencia.add(x.productId);
+        const b = porBodega.get(x.warehouseId) ?? { warehouseId: x.warehouseId, warehouseName: x.warehouseName, value: 0, products: new Set() };
+        b.value += valor;
+        if (x.onHand > 0) b.products.add(x.productId);
+        porBodega.set(x.warehouseId, b);
+    }
+    return {
+        asOf: e.asOf,
+        totalValue: centavos(total),
+        totalValueDelta30d: centavos(total - e.valorHace30),
+        productsWithStock: conExistencia.size,
+        cajones: { ...e.cajones, expiringSoon: 0, reservationsExpiring: 0 },
+        countAccuracy90d: exactitudDeConteos(e.renglonesContados, e.renglonesCuadrados),
+        shrinkage30d: { value: centavos(e.merma), pctOfCogs: null },
+        turnover: null,
+        daysOfInventory: null,
+        byWarehouse: [...porBodega.values()]
+            .map((b) => ({ warehouseId: b.warehouseId, warehouseName: b.warehouseName, value: centavos(b.value), products: b.products.size }))
+            .sort((a, b) => b.value - a.value || a.warehouseName.localeCompare(b.warehouseName)),
+    };
+}
