@@ -72,14 +72,70 @@ const warehouseBody = z.object({
     usesBins: z.literal(false).optional().default(false),
 });
 
+/**
+ * `TRANSIT` es la bodega virtual de los traspasos enviados: la crea y la usa el sistema (I4b), no
+ * se da de alta a mano. Los otros cuatro sí.
+ */
+export const WAREHOUSE_TYPES_ELEGIBLES = WAREHOUSE_TYPES.filter((t) => t !== 'TRANSIT') as readonly Exclude<WarehouseType, 'TRANSIT'>[];
+
+const sinTransito = <T extends { type: WarehouseType }>(v: T) => v.type !== 'TRANSIT';
+const MENSAJE_TRANSITO = { message: 'La bodega en tránsito la maneja el sistema: no se da de alta a mano.', path: ['type'] };
+
 /** POST /api/warehouses */
-export const createWarehouseSchema = warehouseBody.extend({ id: z.string().uuid() });
+export const createWarehouseSchema = warehouseBody.extend({ id: z.string().uuid() }).refine(sinTransito, MENSAJE_TRANSITO);
 
 /** PUT /api/warehouses/:id */
-export const updateWarehouseSchema = warehouseBody.extend({
-    status: z.enum(WAREHOUSE_STATUSES),
-    version: z.number().int().min(1),
-});
+export const updateWarehouseSchema = warehouseBody
+    .extend({
+        status: z.enum(WAREHOUSE_STATUSES),
+        version: z.number().int().min(1),
+    })
+    .refine(sinTransito, MENSAJE_TRANSITO);
 
 export type CreateWarehouseRequest = z.infer<typeof createWarehouseSchema>;
 export type UpdateWarehouseRequest = z.infer<typeof updateWarehouseSchema>;
+
+// ── Las reglas (I4) ───────────────────────────────────────────────────────────────────────────
+//
+// Una sola definición para las dos puntas; espejo en el escritorio: `ReglasDeBodega` (C#), mismos
+// casos en `reglasDeBodega.test.ts` y `ReglasDeBodegaTests.cs`.
+
+/** Lo que importa de una bodega para decidir de dónde se vende. */
+export interface BodegaParaVenta {
+    readonly id: string;
+    readonly locationId: string | null;
+    readonly status: 'ACTIVE' | 'INACTIVE';
+    readonly allowsSale: boolean;
+}
+
+/** Las banderas efectivas: lo capturado o, si no se dijo, lo del tipo. */
+export function reglasDeBodega(
+    type: WarehouseType,
+    allowsSale?: boolean | null,
+    countsInAvailable?: boolean | null
+): { allowsSale: boolean; countsInAvailable: boolean } {
+    const d = WAREHOUSE_TYPE_DEFAULTS[type];
+    return { allowsSale: allowsSale ?? d.allowsSale, countsInAvailable: countsInAvailable ?? d.countsInAvailable };
+}
+
+const vende = (b: BodegaParaVenta) => b.status === 'ACTIVE' && b.allowsSale;
+
+/**
+ * ¿El cambio deja a una sucursal (o a las bodegas sin sucursal) sin ninguna bodega activa de venta,
+ * cuando antes tenía al menos una? Así una caja nunca se queda sin de dónde descontar por una
+ * edición: la venta seguiría y la salida de existencia no tendría bodega.
+ *
+ * Devuelve la sucursal que se quedaría sin venta (`null` = las bodegas sin sucursal), o `undefined`
+ * si el cambio no deja a nadie sin venta.
+ */
+export function sucursalQueSeQuedaSinVenta(
+    bodegas: readonly BodegaParaVenta[],
+    cambiada: BodegaParaVenta
+): string | null | undefined {
+    const antes = bodegas.find((b) => b.id === cambiada.id);
+    if (!antes || !vende(antes)) return undefined;
+    const despues = bodegas.map((b) => (b.id === cambiada.id ? cambiada : b));
+    const sucursal = antes.locationId;
+    const seguia = despues.some((b) => b.locationId === sucursal && vende(b));
+    return seguia ? undefined : sucursal;
+}
