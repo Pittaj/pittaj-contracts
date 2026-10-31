@@ -103,6 +103,26 @@ export const WAREHOUSE_INVENTORY_SLOT: Readonly<
     PRODUCTION: 'INVENTORY_RAW',
 };
 
+export type InventoryAccountSlot = (typeof WAREHOUSE_INVENTORY_SLOT)[WarehouseType];
+
+/**
+ * La cuenta de inventario de UNA bodega (I4b): la que se le corrigió (`inventoryAccountSlot`) o
+ * la de su tipo. Sin tipo —una bodega anterior a I4— es la de mercancía. La usan Contabilidad al
+ * postear el traspaso y el ajuste, y la ficha del traspaso para decir si habrá póliza.
+ */
+export function cuentaDeInventarioDeBodega(bodega: {
+    readonly type?: WarehouseType | null;
+    readonly inventoryAccountSlot?: InventoryAccountSlot | null;
+}): InventoryAccountSlot {
+    return bodega.inventoryAccountSlot ?? WAREHOUSE_INVENTORY_SLOT[bodega.type ?? 'STORE'] ?? 'INVENTORY';
+}
+
+/**
+ * A dónde va lo que salió en un traspaso y no llegó (`missingQuantity`): merma en tránsito. No es
+ * robo —eso pide acta y lo declara quien lo sabe, con un ajuste— ni diferencia de conteo.
+ */
+export const HUECO_FALTANTE_DE_TRASPASO: InventoryPostingSlot = 'INVENTORY_SHRINKAGE';
+
 /**
  * Qué hacer con un traspaso cuyo origen y destino pertenecen a empresas distintas.
  * `INTERCOMPANY_SALE` (futuro): el traspaso genera una venta en la empresa origen (con CFDI) y
