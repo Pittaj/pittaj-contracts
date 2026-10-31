@@ -20,3 +20,4 @@ export * from './inventoryReports.schema.js';
 export * from './labelPrint.schema.js';
 export * from './warehouse.schema.js';
 export * from './inventoryAccounting.schema.js';
+export * from './reportesDeInventario.js';

@@ -8,11 +8,16 @@
  *
  * Un solo esquema de filtros comunes y uno por reporte. Todos aceptan `format` para exportar;
  * `json` es lo que pinta la pantalla.
+ *
+ * **Las fechas son civiles** (`YYYY-MM-DD`, D3): «al 31 de diciembre» es al cierre de ese día en la
+ * zona de la bodega pedida (si se pidió una sola) o en la del negocio. Quien convierte a instante es
+ * el servidor, una vez; un `Date` del navegador traería la zona de la computadora de quien pregunta.
  */
 
 import { z } from 'zod';
 import { STOCK_SOURCE_TYPES } from './getStockMovements.schema.js';
 import { ABC_CLASSES } from './countPlan.schema.js';
+import { fechaCivilSchema } from '../../shared/fechas.js';
 
 export const INVENTORY_REPORT_KINDS = [
     /** Existencia y valor a una fecha, por producto × bodega. */
@@ -75,20 +80,21 @@ const comunes = {
     format: z.enum(REPORT_FORMATS).optional().default('json'),
 };
 
+/** Del inicio de `dateFrom` al cierre de `dateTo`, los dos incluidos. */
 const periodo = {
-    dateFrom: z.coerce.date(),
-    dateTo: z.coerce.date(),
+    dateFrom: fechaCivilSchema,
+    dateTo: fechaCivilSchema,
 };
 
 export const stockAtDateReportSchema = z.object({
     ...comunes,
-    /** Al cierre de este día (hora local de la cuenta). */
-    asOf: z.coerce.date(),
+    /** Al cierre de este día (D3). */
+    asOf: fechaCivilSchema,
 });
 
 export const valuationReportSchema = z.object({
     ...comunes,
-    asOf: z.coerce.date(),
+    asOf: fechaCivilSchema,
     groupBy: z.enum(REPORT_GROUP_BY).optional().default('CATEGORY'),
 });
 
@@ -158,7 +164,7 @@ export const traceabilityReportSchema = z
 export const accountingReconciliationReportSchema = z.object({
     /** Una empresa: la balanza es por contribuyente. */
     companyId: z.string().uuid(),
-    asOf: z.coerce.date(),
+    asOf: fechaCivilSchema,
     format: z.enum(REPORT_FORMATS).optional().default('json'),
 });
 
