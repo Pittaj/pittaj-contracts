@@ -332,8 +332,8 @@ export const SEVERIDAD_ORDEN: Readonly<Record<InventoryAlertSeverity, number>> =
 // y el escritorio redondeen y ordenen igual. Espejo: `TableroDeInventario.Armar` (C#).
 //
 // Lo que necesita el costo de venta (rotación, días de inventario, merma como % del costo de venta)
-// va nulo: las ventas se escriben con costo 0 y el costo sale de recorrer el kárdex con el promedio
-// móvil; eso llega con los reportes de valuación y rotación (I5). Caducidades (I8) y reservas (I7), en 0.
+// sale de `costoDeVenta30` (I5b, `consumoDelPar`: las ventas se escriben con costo 0 y se costean al
+// promedio móvil). Sin él, nulo. Caducidades (I8) y reservas (I7), en 0.
 
 /** Ventanas del tablero, en días. */
 export const VENTANAS_DEL_TABLERO = { valor: 30, exactitud: 90, merma: 30 } as const;
@@ -363,6 +363,11 @@ export interface EntradaDelTablero {
     readonly renglonesCuadrados: number;
     /** Valor de las salidas por merma (`MERMA`) en la ventana. */
     readonly merma: number;
+    /**
+     * I5b · Costo de lo vendido en los últimos `VENTANAS_DEL_TABLERO.valor` días. Nulo = no se sabe
+     * (y la rotación, los días y el % de merma van nulos).
+     */
+    readonly costoDeVenta30?: number | null;
 }
 
 const centavos = (n: number) => Math.round(n * 100) / 100;
@@ -370,6 +375,16 @@ const centavos = (n: number) => Math.round(n * 100) / 100;
 /** Porcentaje con un decimal; nulo sin renglones contados (no es 100 %, es «no se sabe»). */
 export function exactitudDeConteos(contados: number, cuadrados: number): number | null {
     return contados > 0 ? Math.round((cuadrados / contados) * 1000) / 10 : null;
+}
+
+/** Rotación, días de inventario y merma como % del costo de venta de la ventana. Nulos sin venta. */
+function indicadoresDelTablero(cogs: number | null, promedio: number, merma: number) {
+    const hay = cogs != null && cogs > 0;
+    return {
+        shrinkage30d: { value: centavos(merma), pctOfCogs: hay ? centavos((merma / cogs!) * 100) : null },
+        turnover: hay && promedio > 0 ? centavos(cogs! / promedio) : null,
+        daysOfInventory: hay ? Math.round((promedio / cogs!) * VENTANAS_DEL_TABLERO.valor * 10) / 10 : null,
+    };
 }
 
 export function armarTablero(e: EntradaDelTablero): InventoryHomeResponse {
@@ -392,9 +407,8 @@ export function armarTablero(e: EntradaDelTablero): InventoryHomeResponse {
         productsWithStock: conExistencia.size,
         cajones: { ...e.cajones, expiringSoon: 0, reservationsExpiring: 0 },
         countAccuracy90d: exactitudDeConteos(e.renglonesContados, e.renglonesCuadrados),
-        shrinkage30d: { value: centavos(e.merma), pctOfCogs: null },
-        turnover: null,
-        daysOfInventory: null,
+        // Inventario promedio de la ventana = (hace 30 días + hoy) / 2; misma regla que la rotación (I5b).
+        ...indicadoresDelTablero(e.costoDeVenta30 ?? null, (e.valorHace30 + total) / 2, e.merma),
         byWarehouse: [...porBodega.values()]
             .map((b) => ({ warehouseId: b.warehouseId, warehouseName: b.warehouseName, value: centavos(b.value), products: b.products.size }))
             .sort((a, b) => b.value - a.value || a.warehouseName.localeCompare(b.warehouseName)),

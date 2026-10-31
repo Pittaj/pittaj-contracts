@@ -29,7 +29,17 @@
  */
 
 import type { StockSourceType } from '../responses/StockMovementResponse.js';
-import type { KardexRow, MovementSummaryRow, StockValuationRow } from '../responses/InventoryReportsResponse.js';
+import type {
+    CountAccuracyRow,
+    KardexRow,
+    MovementSummaryRow,
+    NoMovementRow,
+    RotationAbcRow,
+    ShrinkageRow,
+    StockValuationRow,
+} from '../responses/InventoryReportsResponse.js';
+import type { AbcClass } from './countPlan.schema.js';
+import { STOCK_ADJUSTMENT_REASON_LABELS, type StockAdjustmentReason } from './stockAdjustment.schema.js';
 
 const r2 = (n: number) => Math.round(n * 100) / 100;
 const r4 = (n: number) => Math.round(n * 10_000) / 10_000;
@@ -393,5 +403,292 @@ export function armarResumenDeMovimientos(
     return {
         rows,
         totals: { openingQuantity: r4(suma('oq')), openingValue: r2(suma('ov')), closingQuantity: r4(suma('cq')), closingValue: r2(suma('cv')) },
+    };
+}
+
+// ══ I5b ══════════════════════════════════════════════════════════════════════════════════════
+
+// ── Costo de venta ───────────────────────────────────────────────────────────────────────────
+
+/** Un movimiento del periodo de un par, lo mínimo para costearlo. */
+export interface PasoDelPeriodo {
+    readonly id: string;
+    readonly occurredAt: string;
+    readonly direction: 'IN' | 'OUT';
+    readonly quantity: number;
+    readonly unitCost: number;
+    readonly sourceType: StockSourceType;
+}
+
+/**
+ * El costo de lo vendido de UN par en el periodo, partiendo de su existencia al abrir (no hace falta
+ * recorrer la historia: la nube la saca con `existencia_a_fecha`). Una venta sale al promedio que
+ * había; una devolución de venta lo regresa al costo con que entra al kárdex. También deja el estado
+ * al cierre, para el inventario promedio.
+ */
+export function consumoDelPar(
+    apertura: EstadoDeExistencia,
+    pasos: readonly PasoDelPeriodo[]
+): { cogs: number; cierre: EstadoDeExistencia } {
+    let e = apertura;
+    let cogs = 0;
+    for (const m of [...pasos].sort(ordenDelKardex)) {
+        if (m.sourceType === 'SALE' && m.direction === 'OUT') cogs += m.quantity * e.averageCost;
+        if (m.sourceType === 'RETURN' && m.direction === 'IN') cogs -= m.quantity * (m.unitCost < 0 ? 0 : m.unitCost);
+        e = pasoDeExistencia(e, m.direction, m.quantity, m.unitCost);
+    }
+    return { cogs, cierre: e };
+}
+
+// ── Rotación y ABC ───────────────────────────────────────────────────────────────────────────
+
+export interface ConsumoDeProducto {
+    readonly productId: string;
+    readonly productCode: string | null;
+    readonly productName: string;
+    readonly cogs: number;
+    /** Valor al abrir y al cerrar el periodo (Σ de sus bodegas). */
+    readonly valorInicial: number;
+    readonly valorFinal: number;
+}
+
+/**
+ * ROTATION_ABC. Inventario promedio = (inicial + final) / 2; rotación = costo de venta / inventario
+ * promedio; días de inventario = inventario promedio / costo de venta × días del periodo. Sin
+ * inventario o sin venta, nulos (no es cero: es «no se puede decir»).
+ *
+ * La clase la decide el **% acumulado del costo de venta** antes del producto, de mayor a menor:
+ * mientras no se llega a `cutoffA` es A, a `cutoffB` es B, después C. Así el primero es A aunque él
+ * solo pase del 80 %. Lo que no se vendió es C.
+ */
+export function armarRotacionAbc(
+    productos: readonly ConsumoDeProducto[],
+    dias: number,
+    cortes: { cutoffA: number; cutoffB: number },
+    soloClase?: AbcClass
+): { rows: RotationAbcRow[]; totals: { cogs: number; averageInventoryValue: number; turnover: number | null; daysOfInventory: number | null } } {
+    const total = productos.reduce((s, p) => s + Math.max(p.cogs, 0), 0);
+    const ordenados = [...productos].sort(
+        (a, b) => b.cogs - a.cogs || a.productName.localeCompare(b.productName, 'es') || (a.productId < b.productId ? -1 : 1)
+    );
+    let acumulado = 0;
+    const indicadores = (cogs: number, prom: number) => ({
+        turnover: prom > 0 && cogs > 0 ? r2(cogs / prom) : null,
+        daysOfInventory: cogs > 0 ? Math.round((prom / cogs) * dias * 10) / 10 : null,
+    });
+    const rows: RotationAbcRow[] = ordenados.map((p) => {
+        const antes = total > 0 ? (acumulado / total) * 100 : 100;
+        acumulado += Math.max(p.cogs, 0);
+        const abcClass: AbcClass = p.cogs <= 0 ? 'C' : antes < cortes.cutoffA ? 'A' : antes < cortes.cutoffB ? 'B' : 'C';
+        const prom = (p.valorInicial + p.valorFinal) / 2;
+        return {
+            productId: p.productId,
+            productCode: p.productCode,
+            productName: p.productName,
+            abcClass,
+            cogs: r2(p.cogs),
+            averageInventoryValue: r2(prom),
+            ...indicadores(p.cogs, prom),
+            cumulativeShare: total > 0 ? r2((acumulado / total) * 100) : 0,
+        };
+    });
+    const prom = productos.reduce((s, p) => s + (p.valorInicial + p.valorFinal) / 2, 0);
+    const cogs = productos.reduce((s, p) => s + p.cogs, 0);
+    return {
+        rows: soloClase ? rows.filter((r) => r.abcClass === soloClase) : rows,
+        totals: { cogs: r2(cogs), averageInventoryValue: r2(prom), ...indicadores(cogs, prom) },
+    };
+}
+
+// ── Sin movimiento ───────────────────────────────────────────────────────────────────────────
+
+export interface ParQuieto {
+    readonly productId: string;
+    readonly productCode: string | null;
+    readonly productName: string;
+    readonly warehouseName: string;
+    readonly onHand: number;
+    readonly averageCost: number;
+    readonly firstMovementAt: string | null;
+    readonly lastMovementAt: string | null;
+    readonly lastSaleAt: string | null;
+}
+
+const DIA_MS = 86_400_000;
+
+/**
+ * NO_MOVEMENT: los pares con existencia que llevan `dias` o más sin moverse — sin **venderse** si
+ * `soloVentas` (una devolución o un traspaso no son rotación). Lo que nunca se vendió cuenta desde
+ * su primer movimiento. De más a menos dinero parado.
+ */
+export function armarSinMovimiento(
+    pares: readonly ParQuieto[],
+    ahora: Date,
+    dias: number,
+    soloVentas: boolean
+): { rows: NoMovementRow[]; totals: { value: number; products: number } } {
+    const rows: NoMovementRow[] = [];
+    for (const p of pares) {
+        if (r4(p.onHand) <= 0) continue;
+        const desde = (soloVentas ? p.lastSaleAt : p.lastMovementAt) ?? p.firstMovementAt;
+        if (!desde) continue;
+        const daysIdle = Math.floor((ahora.getTime() - new Date(desde).getTime()) / DIA_MS);
+        if (daysIdle < dias) continue;
+        rows.push({
+            productId: p.productId,
+            productCode: p.productCode,
+            productName: p.productName,
+            warehouseName: p.warehouseName,
+            onHand: r4(p.onHand),
+            value: r2(p.onHand * p.averageCost),
+            lastMovementAt: p.lastMovementAt,
+            lastSaleAt: p.lastSaleAt,
+            daysIdle,
+        });
+    }
+    rows.sort((a, b) => b.value - a.value || b.daysIdle - a.daysIdle || a.productName.localeCompare(b.productName, 'es'));
+    return {
+        rows,
+        totals: { value: r2(rows.reduce((s, r) => s + r.value, 0)), products: new Set(rows.map((r) => r.productId)).size },
+    };
+}
+
+// ── Merma y ajustes ──────────────────────────────────────────────────────────────────────────
+
+/** Un movimiento de ajuste, merma o conteo del periodo. */
+export interface MovimientoDeMerma {
+    readonly productId: string;
+    readonly productName: string;
+    readonly categoryId: string | null;
+    readonly categoryName: string | null;
+    readonly warehouseId: string;
+    readonly warehouseName: string;
+    readonly sourceType: StockSourceType;
+    readonly reason: StockAdjustmentReason | null;
+    readonly direction: 'IN' | 'OUT';
+    readonly quantity: number;
+    readonly unitCost: number;
+    readonly sourceDocId: string | null;
+}
+
+/** El motivo cuando el movimiento no lo trae (espejo de `motivoPorTipo` de Contabilidad). */
+export function motivoDeMerma(m: Pick<MovimientoDeMerma, 'sourceType' | 'reason'>): StockAdjustmentReason {
+    if (m.reason) return m.reason;
+    if (m.sourceType === 'MERMA') return 'SHRINKAGE';
+    if (m.sourceType === 'COUNT') return 'COUNT';
+    if (m.sourceType === 'INITIAL') return 'OPENING';
+    return 'OTHER';
+}
+
+/**
+ * SHRINKAGE: lo que el inventario perdió (o ganó) por ajustes, mermas y conteos, **al costo con que
+ * se asentó** (el mismo que la póliza). Una salida suma; una entrada (un sobrante) resta. El
+ * inventario inicial no es merma y no entra. `cogs` da el % sobre el costo de venta del periodo.
+ */
+export function armarMerma(
+    movimientos: readonly MovimientoDeMerma[],
+    agrupar: 'REASON' | 'PRODUCT' | 'CATEGORY' | 'WAREHOUSE',
+    cogs: number | null
+): { rows: ShrinkageRow[]; totals: { value: number; pctOfCogs: number | null } } {
+    const pctDe = (v: number) => (cogs && cogs > 0 ? r2((v / cogs) * 100) : null);
+    const grupos = new Map<string, { label: string; reason: StockAdjustmentReason | null; q: number; v: number; docs: Set<string> }>();
+    let total = 0;
+    for (const m of movimientos) {
+        const motivo = motivoDeMerma(m);
+        if (m.sourceType === 'INITIAL' || motivo === 'OPENING') continue;
+        const signo = m.direction === 'OUT' ? 1 : -1;
+        const valor = signo * m.quantity * m.unitCost;
+        total += valor;
+        const { key, label } =
+            agrupar === 'REASON'
+                ? { key: motivo, label: STOCK_ADJUSTMENT_REASON_LABELS[motivo] }
+                : agrupar === 'CATEGORY'
+                  ? { key: m.categoryId ?? '', label: m.categoryName ?? SIN.CATEGORY }
+                  : agrupar === 'WAREHOUSE'
+                    ? { key: m.warehouseId, label: m.warehouseName }
+                    : { key: m.productId, label: m.productName };
+        const g = grupos.get(key) ?? { label, reason: agrupar === 'REASON' ? motivo : null, q: 0, v: 0, docs: new Set<string>() };
+        g.q += signo * m.quantity;
+        g.v += valor;
+        if (m.sourceDocId) g.docs.add(m.sourceDocId);
+        grupos.set(key, g);
+    }
+    const rows = [...grupos.entries()]
+        .map(([key, g]) => ({
+            groupKey: key,
+            groupLabel: g.label,
+            reason: g.reason,
+            quantity: r4(g.q),
+            value: r2(g.v),
+            pctOfCogs: pctDe(g.v),
+            documents: g.docs.size,
+        }))
+        .sort((a, b) => b.value - a.value || porNombre(a, b));
+    return { rows, totals: { value: r2(total), pctOfCogs: pctDe(total) } };
+}
+
+// ── Exactitud de conteos ─────────────────────────────────────────────────────────────────────
+
+export interface ConteoAplicado {
+    readonly countId: string;
+    readonly countNumber: string;
+    readonly appliedAt: string;
+    readonly warehouseName: string;
+    readonly lines: ReadonlyArray<{ readonly expected: number | null; readonly counted: number | null; readonly unitCost: number }>;
+}
+
+/**
+ * COUNT_ACCURACY: por conteo aplicado, cuántos renglones contados cuadraron (contado = teórico, a 4
+ * decimales) y cuánto valió la diferencia, con signo y en absoluto. La exactitud lleva un decimal,
+ * como en el tablero (`exactitudDeConteos`). Del más reciente al más viejo.
+ */
+export function armarExactitud(conteos: readonly ConteoAplicado[]): {
+    rows: CountAccuracyRow[];
+    totals: { linesCounted: number; linesMatched: number; accuracy: number | null; differenceValue: number; absoluteDifferenceValue: number };
+} {
+    let lc = 0;
+    let lm = 0;
+    let dv = 0;
+    let av = 0;
+    const rows = conteos
+        .map((c) => {
+            let contados = 0;
+            let cuadrados = 0;
+            let dif = 0;
+            let abs = 0;
+            for (const l of c.lines) {
+                if (l.counted == null) continue;
+                contados += 1;
+                const d = l.counted - (l.expected ?? 0);
+                if (r4(d) === 0) cuadrados += 1;
+                dif += d * l.unitCost;
+                abs += Math.abs(d) * l.unitCost;
+            }
+            lc += contados;
+            lm += cuadrados;
+            dv += dif;
+            av += abs;
+            return {
+                countId: c.countId,
+                countNumber: c.countNumber,
+                appliedAt: c.appliedAt,
+                warehouseName: c.warehouseName,
+                linesCounted: contados,
+                linesMatched: cuadrados,
+                accuracy: contados > 0 ? Math.round((cuadrados / contados) * 1000) / 10 : 0,
+                differenceValue: r2(dif),
+                absoluteDifferenceValue: r2(abs),
+            };
+        })
+        .sort((a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime() || (a.countNumber < b.countNumber ? 1 : -1));
+    return {
+        rows,
+        totals: {
+            linesCounted: lc,
+            linesMatched: lm,
+            accuracy: lc > 0 ? Math.round((lm / lc) * 1000) / 10 : null,
+            differenceValue: r2(dv),
+            absoluteDifferenceValue: r2(av),
+        },
     };
 }
