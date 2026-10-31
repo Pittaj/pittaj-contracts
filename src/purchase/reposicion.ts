@@ -33,6 +33,17 @@ export interface ProductoAReponer {
      * sugerir un número que el proveedor no vende obliga a corregirlo a mano cada vez.
      */
     readonly piezasPorCaja: number;
+    /**
+     * I5c · Lo que ya viene en camino a esta bodega (unidad base): lo pendiente de recibir de las
+     * compras abiertas y lo enviado por traspaso sin recibir. Sin él se vuelve a pedir lo que ya se
+     * pidió. Ausente = 0 (un escritorio sin I5c).
+     */
+    readonly enCamino?: number;
+}
+
+/** Lo que hay más lo que viene: con esto se decide si pedir y cuánto. Los días que alcanza no lo usan. */
+export function posicion(p: ProductoAReponer): number {
+    return p.existencia + Math.max(p.enCamino ?? 0, 0);
 }
 
 /** Cuántas semanas de venta se busca cubrir con cada pedido. */
@@ -73,7 +84,8 @@ export function diasQueAlcanza(p: ProductoAReponer): number | null {
 export function hayQuePedir(p: ProductoAReponer): boolean {
     const umbral = p.puntoDeReorden > 0 ? p.puntoDeReorden : p.minimo;
     if (umbral <= 0) return false;
-    return p.existencia <= umbral;
+    // I5c: lo que ya viene cuenta. Si con eso pasa del umbral, ya se pidió: no hay que pedir otra vez.
+    return posicion(p) <= umbral;
 }
 
 /** Con qué tono se enseña. */
@@ -99,7 +111,7 @@ export function urgencia(p: ProductoAReponer): UrgenciaDeReposicion {
  */
 export function cantidadSugerida(p: ProductoAReponer): number {
     const objetivo = Math.ceil(p.ventaSemanal * SEMANAS_DE_COBERTURA) + p.minimo;
-    const falta = objetivo - p.existencia;
+    const falta = objetivo - posicion(p);
     if (falta <= 0) return 0;
 
     const caja = p.piezasPorCaja > 0 ? p.piezasPorCaja : 1;
@@ -116,7 +128,8 @@ export function cantidadSugerida(p: ProductoAReponer): number {
 export function explicar(p: ProductoAReponer, nombreProveedor?: string): string {
     const dias = diasQueAlcanza(p);
     const cobertura = Math.ceil(p.ventaSemanal * SEMANAS_DE_COBERTURA);
-    const bruto = cobertura + p.minimo - p.existencia;
+    const camino = Math.max(p.enCamino ?? 0, 0);
+    const bruto = cobertura + p.minimo - p.existencia - camino;
     const sugerido = cantidadSugerida(p);
     const caja = p.piezasPorCaja > 0 ? p.piezasPorCaja : 1;
 
@@ -129,8 +142,12 @@ export function explicar(p: ProductoAReponer, nombreProveedor?: string): string 
               `día${dias === 1 ? '' : 's'} — ${quien} ${p.diasDeEntrega}. `;
 
     const cuenta =
-        `Se sugiere cubrir ${SEMANAS_DE_COBERTURA} semanas de venta (${cobertura}) más el mínimo, ` +
-        `menos lo que ya tienes: ${cobertura} + ${p.minimo} − ${p.existencia} = ${bruto}`;
+        camino > 0
+            ? `Se sugiere cubrir ${SEMANAS_DE_COBERTURA} semanas de venta (${cobertura}) más el mínimo, ` +
+              `menos lo que ya tienes y lo que ya viene en camino: ` +
+              `${cobertura} + ${p.minimo} − ${p.existencia} − ${camino} = ${bruto}`
+            : `Se sugiere cubrir ${SEMANAS_DE_COBERTURA} semanas de venta (${cobertura}) más el mínimo, ` +
+              `menos lo que ya tienes: ${cobertura} + ${p.minimo} − ${p.existencia} = ${bruto}`;
 
     const redondeo =
         caja === 1

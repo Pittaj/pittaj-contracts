@@ -38,7 +38,12 @@ export const INVENTORY_REPORT_KINDS = [
     'ROTATION_ABC',
     /** Exactitud de los conteos: renglones que cuadraron, diferencia en valor. */
     'COUNT_ACCURACY',
-    /** Sugerido de reabasto: lo que está bajo el punto de reorden y cuánto pedir. */
+    /**
+     * Sugerido de reabasto: lo que está bajo el punto de reorden y cuánto pedir. **No tiene ruta
+     * propia** (I5c): es la hoja de Compras › Reabastecimiento (`GET /api/purchases/reposicion`,
+     * regla `purchase/reposicion.ts`), que además dice si se resuelve con traspaso. Dos cálculos del
+     * mismo sugerido serían dos verdades; Reportes de Inventario enlaza allá.
+     */
     'REPLENISHMENT',
     /** Trazabilidad de un lote o una serie: de dónde vino y a dónde fue. */
     'TRACEABILITY',
