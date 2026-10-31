@@ -60,6 +60,12 @@ export interface StockTransferResponse {
     /** Si al recibir faltó algo: piezas que salieron y no llegaron. */
     readonly missingQuantity: number;
 
+    /**
+     * I4c · La bodega de tránsito donde está lo enviado hasta recibirlo. Nula si se envió antes de
+     * I4c (o la origen no tiene sucursal): ese traspaso sale y entra como antes, sin escala.
+     */
+    readonly transitWarehouseId?: string | null;
+
     readonly lines: readonly StockTransferLineResponse[];
 
     /**

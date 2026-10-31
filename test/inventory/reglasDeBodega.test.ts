@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
     createWarehouseSchema,
+    esBodegaElegible,
+    nombreDeBodegaDeTransito,
+    semillaDeBodegaDeTransito,
     reglasDeBodega,
     sucursalQueSeQuedaSinVenta,
     type BodegaParaVenta,
@@ -48,5 +51,20 @@ describe('sucursalQueSeQuedaSinVenta', () => {
     });
     it('las bodegas sin sucursal cuentan como un grupo', () => {
         expect(sucursalQueSeQuedaSinVenta([b('principal', null)], b('principal', null, false))).toBeNull();
+    });
+});
+
+describe('bodega de tránsito (I4c)', () => {
+    it('la semilla es la misma en las dos plataformas: solo depende de la sucursal', () => {
+        expect(semillaDeBodegaDeTransito('loc-1')).toBe('warehouse:transit:loc-1');
+    });
+    it('el nombre lleva la sucursal y cabe en la columna', () => {
+        expect(nombreDeBodegaDeTransito(' Centro ')).toBe('En tránsito · Centro');
+        expect(nombreDeBodegaDeTransito('x'.repeat(200))).toHaveLength(100);
+    });
+    it('tránsito no se elige a mano; una bodega sin tipo sí', () => {
+        expect(esBodegaElegible({ type: 'TRANSIT' })).toBe(false);
+        expect(esBodegaElegible({ type: 'STORE' })).toBe(true);
+        expect(esBodegaElegible({})).toBe(true);
     });
 });

@@ -73,7 +73,7 @@ const warehouseBody = z.object({
 });
 
 /**
- * `TRANSIT` es la bodega virtual de los traspasos enviados: la crea y la usa el sistema (I4b), no
+ * `TRANSIT` es la bodega virtual de los traspasos enviados: la crea y la usa el sistema (I4c), no
  * se da de alta a mano. Los otros cuatro sí.
  */
 export const WAREHOUSE_TYPES_ELEGIBLES = WAREHOUSE_TYPES.filter((t) => t !== 'TRANSIT') as readonly Exclude<WarehouseType, 'TRANSIT'>[];
@@ -138,4 +138,30 @@ export function sucursalQueSeQuedaSinVenta(
     const sucursal = antes.locationId;
     const seguia = despues.some((b) => b.locationId === sucursal && vende(b));
     return seguia ? undefined : sucursal;
+}
+
+// ── La bodega de tránsito (I4c) ───────────────────────────────────────────────────────────────
+//
+// Lo enviado y no recibido tiene que estar en ALGÚN kárdex: si sale de la origen y no entra a
+// ningún lado hasta recibirse, a fin de mes el inventario vale menos que la balanza y nadie sabe
+// por qué. Enviar lo pasa a la bodega de tránsito de la sucursal de origen; recibir lo saca de ahí
+// a la destino; cancelar lo regresa a la origen.
+//
+// Hay **una por sucursal** y su id es **determinista**: la nube y el escritorio que la creen sin
+// red llegan al mismo id, y el sync las funde en vez de duplicarlas. El traspaso guarda cuál usó
+// (`transitWarehouseId`): uno enviado antes de I4c no la tiene y se recibe como antes.
+
+/** Semilla del id de la bodega de tránsito de una sucursal (`IdDeterminista` / `deterministicUuidV4`). */
+export function semillaDeBodegaDeTransito(locationId: string): string {
+    return `warehouse:transit:${locationId}`;
+}
+
+/** Nombre de la bodega de tránsito. El nombre de bodega es único: lleva el de la sucursal. */
+export function nombreDeBodegaDeTransito(nombreDeSucursal: string): string {
+    return `En tránsito · ${nombreDeSucursal.trim()}`.slice(0, 100);
+}
+
+/** ¿Se puede elegir como origen o destino de un traspaso, ajuste, compra o venta? Tránsito no. */
+export function esBodegaElegible(bodega: { readonly type?: WarehouseType | null }): boolean {
+    return bodega.type !== 'TRANSIT';
 }
