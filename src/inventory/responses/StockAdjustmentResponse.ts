@@ -83,6 +83,8 @@ export interface StockAdjustmentResponse {
     readonly countPlanId?: string | null;
     readonly assigneeUserId?: string | null;
     readonly assigneeName?: string | null;
+    /** (I6a) Cuándo se cerró la captura. En uno ciego, desde ahí se ven teórico y diferencia. */
+    readonly captureClosedAt?: string | null;
 
     /**
      * Contabilidad (1.19.0, opcional). La fecha que llevan sus movimientos, el hueco de la

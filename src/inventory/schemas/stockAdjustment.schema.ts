@@ -194,6 +194,8 @@ export const createStockAdjustmentSchema = z.object({
     countPlanId: z.string().uuid().nullish(),
     /** A quién le toca contar. */
     assigneeUserId: z.string().uuid().nullish(),
+    /** (I6a) Su nombre, como snapshot: el token solo trae ids y el documento se lee sin la lista de usuarios. */
+    assigneeName: z.string().trim().max(200).nullish(),
     /**
      * Contabilidad (1.19.0). `effectiveAt`: la fecha en que ocurrió (el conteo del día 31 que se
      * aplica el 2); sin ella, al aplicar. No puede ser futura ni caer en un periodo cerrado
@@ -227,6 +229,18 @@ export const updateStockAdjustmentSchema = z.object({
     note: z.string().trim().max(1000).nullish(),
     lines: z.array(lineSchema).max(2000),
     version: z.number().int().min(1),
+    /** (I6a) Reasignar el conteo. Ausente = no cambia; `null` = sin asignar. */
+    assigneeUserId: z.string().uuid().nullish(),
+    assigneeName: z.string().trim().max(200).nullish(),
+});
+
+/**
+ * POST /api/stock-counts/:id/close-capture (I6a) — terminar de contar. En un conteo ciego es lo que
+ * destapa el teórico y la diferencia; sin cerrarla, uno ciego no se aplica. Se puede seguir
+ * corrigiendo después, ya con la diferencia a la vista.
+ */
+export const closeStockCountCaptureSchema = z.object({
+    version: z.number().int().min(1),
 });
 
 /** POST /:id/apply */
@@ -252,3 +266,4 @@ export type UpdateStockAdjustmentRequest = z.infer<typeof updateStockAdjustmentS
 export type ScanStockCountLineRequest = z.infer<typeof scanStockCountLineSchema>;
 export type ApplyStockAdjustmentRequest = z.infer<typeof applyStockAdjustmentSchema>;
 export type CancelStockAdjustmentRequest = z.infer<typeof cancelStockAdjustmentSchema>;
+export type CloseStockCountCaptureRequest = z.infer<typeof closeStockCountCaptureSchema>;
