@@ -23,3 +23,4 @@ export * from './inventoryAccounting.schema.js';
 export * from './reportesDeInventario.js';
 export * from './reglasDeConteo.js';
 export * from './planDeConteo.js';
+export * from './reglasDeReserva.js';
