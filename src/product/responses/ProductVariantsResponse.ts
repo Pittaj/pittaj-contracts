@@ -98,3 +98,8 @@ export interface GenerateProductVariantsResponse {
         readonly active: boolean;
     }[];
 }
+
+export interface KitAssemblyListResponse {
+    readonly items: readonly KitAssemblyResponse[];
+    readonly total: number;
+}
