@@ -12,6 +12,7 @@ export * from './stockTransfer.schema.js';
 export * from './stockAdjustment.schema.js';
 export * from './stockLevel.schema.js';
 export * from './stockLot.schema.js';
+export * from './reglasDeLotes.js';
 export * from './stockReservation.schema.js';
 export * from './countPlan.schema.js';
 export * from './inventorySettings.schema.js';
