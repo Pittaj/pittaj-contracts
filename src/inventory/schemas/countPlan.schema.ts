@@ -69,6 +69,8 @@ const countPlanBody = z.object({
     blind: z.boolean().optional().default(true),
     /** A quién se le asigna la tanda por defecto. */
     assigneeUserId: z.string().uuid().nullish(),
+    /** (I6b) Su nombre, como snapshot: la tanda lo copia al conteo. */
+    assigneeName: z.string().trim().max(200).nullish(),
 });
 
 /** POST /api/count-plans */

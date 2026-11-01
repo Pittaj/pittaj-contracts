@@ -36,6 +36,8 @@ export const POSTING_SWEEPS = [
     { key: 'purchases', label: 'Compras recibidas' },
     { key: 'bank-transactions', label: 'Movimientos bancarios' },
     { key: 'stock-movements', label: 'Merma, ajuste, conteo e inicial' },
+    // I4b: el traspaso recibido entre bodegas de cuentas distintas (reclasificación) o con faltante.
+    { key: 'stock-transfers', label: 'Traspasos entre cuentas de inventario y faltantes' },
     { key: 'cash-movements', label: 'Movimientos de efectivo' },
     { key: 'supplier-notes', label: 'Notas de proveedor' },
     { key: 'sales-returns', label: 'Devoluciones de venta' },

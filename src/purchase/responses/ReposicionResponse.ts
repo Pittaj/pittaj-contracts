@@ -17,6 +17,11 @@ export interface ReposicionItemResponse {
     readonly productCode: string | null;
 
     readonly existencia: number;
+    /**
+     * I5c · Lo que ya viene en camino a la bodega: pendiente de compras abiertas y, con bodega
+     * elegida, traspasos enviados sin recibir. Ya está descontado de `cantidadSugerida`.
+     */
+    readonly enCamino?: number;
     readonly minimo: number;
     readonly puntoDeReorden: number;
     /** Lo que se vende en una semana, promediado sobre las últimas. */

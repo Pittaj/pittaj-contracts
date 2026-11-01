@@ -112,16 +112,26 @@ export const saveProductComponentsSchema = z.object({
 });
 
 /**
- * POST /api/kits/:id/assemble — armar (o desarmar con `quantity` negativa) N kits.
- * Escribe salida de componentes y entrada del kit al costo sumado, con un folio propio.
+ * POST /api/kit-assemblies — armar (o desarmar con `quantity` negativa) N kits (I9c).
+ * Escribe salida de componentes y entrada del kit al costo sumado, con un folio propio (`KW-`).
+ * `id` es el del armado (identidad en origen: reintentar no duplica).
  */
 export const assembleKitSchema = z.object({
     id: z.string().uuid(),
+    kitProductId: z.string().uuid(),
     warehouseId: z.string().uuid(),
     quantity: z.number().refine((q) => q !== 0, 'Armar cero no arma nada'),
     note: z.string().trim().max(500).nullish(),
     actorName: z.string().trim().max(200).nullish(),
 });
+
+/** GET /api/kit-assemblies — los armados, del más nuevo al más viejo. */
+export const getKitAssembliesSchema = z.object({
+    kitProductId: z.string().uuid().optional(),
+    page: z.coerce.number().int().min(1).optional().default(1),
+    limit: z.coerce.number().int().min(1).max(100).optional().default(50),
+});
+export type GetKitAssembliesQuery = z.infer<typeof getKitAssembliesSchema>;
 
 export type SaveProductVariantsRequest = z.infer<typeof saveProductVariantsSchema>;
 export type GenerateProductVariantsRequest = z.infer<typeof generateProductVariantsSchema>;

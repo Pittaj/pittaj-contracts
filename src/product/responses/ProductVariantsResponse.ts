@@ -83,3 +83,23 @@ export interface KitAssemblyResponse {
     readonly posting: InventoryPostingInfo | null;
     readonly createdAt: string;
 }
+
+/** POST /api/products/:id/variants/generate — la matriz propuesta, sin guardar. */
+export interface GenerateProductVariantsResponse {
+    readonly productId: string;
+    readonly attributes: readonly VariantAttributeInput[];
+    readonly variants: readonly {
+        /** El de la variante que ya existía, o el determinista del hijo nuevo. */
+        readonly id: string;
+        readonly isNew: boolean;
+        readonly values: Readonly<Record<string, string>>;
+        readonly code: string;
+        readonly displayName: string;
+        readonly active: boolean;
+    }[];
+}
+
+export interface KitAssemblyListResponse {
+    readonly items: readonly KitAssemblyResponse[];
+    readonly total: number;
+}

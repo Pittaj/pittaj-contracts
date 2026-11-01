@@ -19,6 +19,24 @@ export const receivePurchaseLineSchema = z.object({
     lineId: z.string().uuid(),
     /** Cantidad recibida HOY, unidad de compra. > 0 y ≤ pendiente abierto. */
     quantity: z.number().positive().max(1_000_000),
+    /**
+     * I8a · Si el producto se rastrea por lote: en qué lotes llegó, cuánto de cada uno (en la
+     * MISMA unidad que `quantity`). Lo que no se reparta entra sin lote. Un número que ya existe
+     * para el producto se reusa.
+     */
+    lots: z
+        .array(
+            z
+                .object({
+                    lotNumber: z.string().trim().min(1).max(60),
+                    manufacturedAt: z.coerce.date().nullish(),
+                    expiresAt: z.coerce.date().nullish(),
+                    quantity: z.number().positive(),
+                })
+                .strict()
+        )
+        .max(50)
+        .optional(),
 });
 
 export const receivePurchaseSchema = z.object({
