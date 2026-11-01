@@ -3,7 +3,10 @@
  * @module Contracts/Inventory/Responses/CountPlan
  *
  * DTO del feed de sync (`entityType: 'count-plan'`): el plan se edita en cualquier punta; la
- * tanda la genera la nube (o el escritorio sin red, con el mismo algoritmo).
+ * tanda la genera la nube (o el escritorio sin red, con el mismo algoritmo: `planDeConteo.ts`).
+ *
+ * El feed lleva solo la configuración: `lastRun*`, `nextRunAt` y `coverage` se derivan de los
+ * conteos con su `countPlanId` (I6b) y cada punta los calcula al leer.
  */
 
 import type { AbcClass, CountPlanStatus, CountPlanStrategy } from '../schemas/countPlan.schema.js';
@@ -42,7 +45,11 @@ export interface CountPlanResponse {
     readonly lastCountNumber: string | null;
     readonly nextRunAt: string | null;
 
+    /** La cobertura solo viene en la ficha (`GET /:id`): en la lista sale vacía. */
     readonly coverage: readonly CountPlanCoverageResponse[];
+
+    /** Instalación que lo creó (anti-rebote del feed). Nulo = nació en la web. */
+    readonly deviceId?: string | null;
 
     readonly createdAt: string;
     readonly updatedAt: string | null;
