@@ -4,6 +4,8 @@ import {
     alertaDeCaducidad,
     asignarLotesInternos,
     preferenciaDeAjuste,
+    recibidoPorLote,
+    validarLotesDeRenglon,
     seguirLotes,
     type LoteConSaldo,
     type LoteParaAlertas,
@@ -124,5 +126,24 @@ describe('alerta de caducidad', () => {
         expect(alertaDeCaducidad({ ...base, onHand: 0 }, 30, HOY)).toBeNull();
         expect(alertaDeCaducidad({ ...base, expiresAt: null }, 30, HOY)).toBeNull();
         expect(alertaDeCaducidad({ ...base, status: 'RECALLED', expiresAt: '2026-10-01' }, 30, HOY)).toBeNull();
+    });
+});
+
+describe('I8b-2 · lotes elegidos en un documento', () => {
+    it('no más que el renglón, sin ceros, sin repetir', () => {
+        expect(validarLotesDeRenglon(-5, [{ lotNumber: 'A', lotId: 'a', quantity: 3 }, { lotNumber: 'B', lotId: 'b', quantity: 2 }])).toBeNull();
+        expect(validarLotesDeRenglon(4, [{ lotNumber: 'A', quantity: 3 }, { lotNumber: 'B', quantity: 2 }])).toBe('Los lotes suman 5 y el renglón mueve 4.');
+        expect(validarLotesDeRenglon(4, [{ lotNumber: 'A', quantity: 0 }])).toBe('El lote A lleva una cantidad en cero.');
+        expect(validarLotesDeRenglon(4, [{ lotNumber: 'a ', quantity: 1 }, { lotNumber: 'A', quantity: 1 }])).toBe('El lote A está dos veces.');
+    });
+
+    it('lo recibido de cada lote, en su orden', () => {
+        const lots = [
+            { lotId: 'a', lotNumber: 'A', quantity: 4 },
+            { lotId: 'b', lotNumber: 'B', quantity: 2 },
+        ];
+        expect(recibidoPorLote(lots, 5)).toEqual([4, 1]);
+        expect(recibidoPorLote(lots, null)).toEqual([null, null]);
+        expect(recibidoPorLote(lots, 0)).toEqual([0, 0]);
     });
 });

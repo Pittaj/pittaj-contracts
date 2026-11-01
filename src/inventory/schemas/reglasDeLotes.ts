@@ -219,3 +219,36 @@ function tomarEnOrden(cantidad: number, tramos: readonly TramoDeLote[]): Asignac
     }
     return { asignados, sinLote: falta > 0 ? falta : 0 };
 }
+
+// ── I8b-2 · El lote elegido a mano en un documento ──────────────────────────────────────────
+
+/**
+ * Los lotes de un renglón no pueden mover más que el renglón, ni cantidades en cero, ni repetir lote.
+ * Devuelve el problema en una frase, o nulo si está bien. Lo que no cubran va por la regla.
+ */
+export function validarLotesDeRenglon(cantidad: number, lots: readonly { lotId?: string | null; lotNumber: string; quantity: number }[]): string | null {
+    const vistos = new Set<string>();
+    for (const l of lots) {
+        if (!(l.quantity > 0)) return `El lote ${l.lotNumber} lleva una cantidad en cero.`;
+        const k = l.lotId ?? normalizarNumeroDeLote(l.lotNumber);
+        if (vistos.has(k)) return `El lote ${l.lotNumber} está dos veces.`;
+        vistos.add(k);
+    }
+    const suma = r4(lots.reduce((s, l) => s + l.quantity, 0));
+    const tope = r4(Math.abs(cantidad));
+    return suma > tope ? `Los lotes suman ${suma} y el renglón mueve ${tope}.` : null;
+}
+
+/** Lo que llegó de cada lote de un traspaso: lo recibido, en el orden en que salieron. */
+export function recibidoPorLote(
+    lots: readonly { lotId: string; lotNumber: string; quantity: number }[],
+    recibido: number | null
+): (number | null)[] {
+    if (recibido === null) return lots.map(() => null);
+    let queda = r4(recibido);
+    return lots.map((l) => {
+        const t = r4(Math.max(0, Math.min(queda, l.quantity)));
+        queda = r4(queda - t);
+        return t;
+    });
+}
