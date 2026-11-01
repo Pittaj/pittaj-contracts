@@ -102,6 +102,12 @@ export const assignCustomerSchema = z.object({
 /** POST /api/pos-tickets/:id/complete — Completar ticket. */
 export const completePosTicketSchema = z.object({
   version: z.number().int().min(0),
+  /**
+   * I8c-2 · Las series de lo que se lleva, por renglón (`lineId` → series), para los productos que
+   * se rastrean por serie. Tienen que estar en existencia en la bodega de la venta. Menos series que
+   * piezas = el resto sale sin serie capturada.
+   */
+  serialNumbers: z.record(z.string(), z.array(z.string().trim().min(1).max(80)).max(500)).optional(),
 });
 
 /** POST /api/pos-tickets/:id/cancel — Cancelar ticket. */
