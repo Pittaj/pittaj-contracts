@@ -107,6 +107,32 @@ export interface GetSerialNumbersResponse {
     readonly total: number;
     readonly page: number;
     readonly limit: number;
+    /**
+     * I8c · Donde hay más series en existencia que piezas: algo salió sin capturar su serie (una
+     * venta antes de capturarla en la caja, un ajuste). Se corrige con un ajuste que nombre las que ya no están.
+     */
+    readonly descuadres?: readonly {
+        readonly productId: string;
+        readonly productName: string;
+        readonly warehouseId: string;
+        readonly warehouseName: string;
+        readonly seriesEnExistencia: number;
+        readonly existencia: number;
+    }[];
+}
+
+/** I8c · GET /api/serial-numbers/:productId/:serialNumber — la historia de una pieza. */
+export interface SerialNumberTraceResponse {
+    readonly serial: SerialNumberResponse;
+    readonly entries: readonly {
+        readonly movementId: string;
+        readonly occurredAt: string;
+        readonly warehouseId: string;
+        readonly warehouseName: string;
+        readonly direction: 'IN' | 'OUT';
+        readonly sourceType: string;
+        readonly sourceDocId: string | null;
+    }[];
 }
 
 export type SyncPullStockLotResponse = SyncPullResponse<StockLotResponse>;

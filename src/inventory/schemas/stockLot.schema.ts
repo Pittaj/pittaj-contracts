@@ -79,6 +79,14 @@ export const SERIAL_NUMBER_STATUSES = [
 ] as const;
 export type SerialNumberStatus = (typeof SERIAL_NUMBER_STATUSES)[number];
 
+export const SERIAL_NUMBER_STATUS_LABELS: Readonly<Record<SerialNumberStatus, string>> = {
+    IN_STOCK: 'En existencia',
+    SOLD: 'Vendida',
+    IN_TRANSIT: 'En tránsito',
+    RETURNED_TO_SUPPLIER: 'Devuelta al proveedor',
+    WRITTEN_OFF: 'Dada de baja',
+};
+
 /**
  * Cómo se asigna un lote en una salida. Va en el renglón del documento que saca mercancía
  * (traspaso, ajuste, venta) cuando el producto se rastrea por lote.
