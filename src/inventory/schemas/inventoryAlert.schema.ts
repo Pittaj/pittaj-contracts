@@ -73,7 +73,7 @@ export type AcknowledgeInventoryAlertsRequest = z.infer<typeof acknowledgeInvent
 //
 // Una sola definición para las dos puntas: la nube la usa sobre lo que lee en SQL y el escritorio la
 // espeja en `AlertasDeInventario.cs` (mismos casos en `alertasDeInventario.test.ts` y
-// `AlertasDeInventarioTests.cs`). Caducidades (`EXPIRING`, `EXPIRED`) llegan con los lotes (I8).
+// `AlertasDeInventarioTests.cs`). Caducidades (`EXPIRING`, `EXPIRED`): `alertaDeCaducidad` (I8b).
 
 /** La parte de la configuración que decide las alertas (`InventorySettings['alerts']`). */
 export interface ConfiguracionDeAlertas {
@@ -102,6 +102,10 @@ export interface AlertaDerivada {
     readonly threshold: number | null;
     readonly daysWithoutMovement: number | null;
     readonly valueAtRisk: number;
+    /** I8b · Caducidades: el lote, su número y los días que le quedan (negativo = ya caducó). */
+    readonly lotId?: string | null;
+    readonly lotNumber?: string | null;
+    readonly daysToExpiry?: number | null;
     /**
      * Desde cuándo la condición es la que es: el último movimiento del par producto × bodega, o la
      * última edición del documento. Un acuse anterior a esto ya no la oculta (ver {@link estaRevisada}).
@@ -301,6 +305,68 @@ export function alertaDeConteo(
     };
 }
 
+/** I8b · Un lote con saldo en una bodega, para avisar de su caducidad. */
+export interface LoteParaAlertas {
+    readonly lotId: string;
+    readonly lotNumber: string;
+    /** `AVAILABLE` · `QUARANTINE` · `RECALLED` (el guardado; «caducado» lo dice la fecha). */
+    readonly status: string;
+    /** `YYYY-MM-DD` o nulo. */
+    readonly expiresAt: string | null;
+    readonly productId: string;
+    readonly productName: string;
+    readonly productCode: string | null;
+    readonly warehouseId: string;
+    readonly warehouseName: string;
+    readonly onHand: number;
+    readonly averageCost: number;
+}
+
+/**
+ * I8b · La caducidad de un lote con saldo en una bodega.
+ *
+ * - `EXPIRED` (alta): ya pasó su fecha y sigue ahí. Hay que darlo de baja.
+ * - `EXPIRING` (media): caduca dentro de `expiringDays` días (hoy cuenta). Con 0 no se avisa.
+ * - Un lote retirado no avisa: ya se sabe que no sirve, y su alerta es el retiro mismo.
+ *
+ * `changedAt` es el día en que la condición empezó (el aviso, el día siguiente a la fecha): un
+ * «Revisado» de «por caducar» no tapa el «caducado», que es otra alerta con otro id.
+ */
+export function alertaDeCaducidad(l: LoteParaAlertas, expiringDays: number, hoy: string): AlertaDerivada | null {
+    if (!(l.onHand > 0) || !l.expiresAt || l.status === 'RECALLED') return null;
+    const exp = l.expiresAt.slice(0, 10);
+    const dias = Math.round((Date.parse(`${exp}T00:00:00Z`) - Date.parse(`${hoy}T00:00:00Z`)) / DIA_MS);
+    const caducado = dias < 0;
+    if (!caducado && (expiringDays <= 0 || dias > expiringDays)) return null;
+    const kind: InventoryAlertKind = caducado ? 'EXPIRED' : 'EXPIRING';
+    const desde = new Date(Date.parse(`${exp}T00:00:00Z`) + (caducado ? DIA_MS : -expiringDays * DIA_MS)).toISOString();
+    return {
+        id: idDeAlerta(kind, l.lotId, l.warehouseId),
+        kind,
+        severity: caducado ? 'HIGH' : 'MEDIUM',
+        message: caducado
+            ? `${l.productName}, lote ${l.lotNumber}: ${cifra(l.onHand)} en ${l.warehouseName}, caducó el ${exp}`
+            : dias === 0
+              ? `${l.productName}, lote ${l.lotNumber}: ${cifra(l.onHand)} en ${l.warehouseName}, caduca hoy`
+              : `${l.productName}, lote ${l.lotNumber}: ${cifra(l.onHand)} en ${l.warehouseName}, caduca en ${dias} ${dias === 1 ? 'día' : 'días'}`,
+        productId: l.productId,
+        productName: l.productName,
+        productCode: l.productCode,
+        warehouseId: l.warehouseId,
+        warehouseName: l.warehouseName,
+        docId: null,
+        docNumber: null,
+        onHand: l.onHand,
+        threshold: caducado ? 0 : expiringDays,
+        daysWithoutMovement: null,
+        valueAtRisk: redondear(l.onHand * l.averageCost),
+        lotId: l.lotId,
+        lotNumber: l.lotNumber,
+        daysToExpiry: dias,
+        changedAt: desde,
+    };
+}
+
 /** Lo que se guarda al marcar «Revisado» (una fila por alerta, id determinista). */
 export interface AcuseDeAlerta {
     readonly acknowledgedAt: string;
@@ -333,7 +399,7 @@ export const SEVERIDAD_ORDEN: Readonly<Record<InventoryAlertSeverity, number>> =
 //
 // Lo que necesita el costo de venta (rotación, días de inventario, merma como % del costo de venta)
 // sale de `costoDeVenta30` (I5b, `consumoDelPar`: las ventas se escriben con costo 0 y se costean al
-// promedio móvil). Sin él, nulo. Caducidades (I8) y reservas (I7), en 0.
+// promedio móvil). Sin él, nulo. Caducidades: `cajones.expiringSoon` (I8b). Reservas por vencer, en 0.
 
 /** Ventanas del tablero, en días. */
 export const VENTANAS_DEL_TABLERO = { valor: 30, exactitud: 90, merma: 30 } as const;
@@ -357,6 +423,8 @@ export interface EntradaDelTablero {
         readonly transfersToReceive: number;
         readonly countsOpen: number;
         readonly adjustmentsDraft: number;
+        /** I8b · Pares lote × bodega con saldo que caducan en `expiringDays` o ya caducaron. */
+        readonly expiringSoon?: number;
     };
     /** Renglones contados en conteos aplicados en la ventana, y cuántos cuadraron (contado = teórico). */
     readonly renglonesContados: number;
@@ -405,7 +473,7 @@ export function armarTablero(e: EntradaDelTablero): InventoryHomeResponse {
         totalValue: centavos(total),
         totalValueDelta30d: centavos(total - e.valorHace30),
         productsWithStock: conExistencia.size,
-        cajones: { ...e.cajones, expiringSoon: 0, reservationsExpiring: 0 },
+        cajones: { ...e.cajones, expiringSoon: e.cajones.expiringSoon ?? 0, reservationsExpiring: 0 },
         countAccuracy90d: exactitudDeConteos(e.renglonesContados, e.renglonesCuadrados),
         // Inventario promedio de la ventana = (hace 30 días + hoy) / 2; misma regla que la rotación (I5b).
         ...indicadoresDelTablero(e.costoDeVenta30 ?? null, (e.valorHace30 + total) / 2, e.merma),
