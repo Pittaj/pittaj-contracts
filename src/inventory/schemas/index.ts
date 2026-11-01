@@ -24,3 +24,4 @@ export * from './reportesDeInventario.js';
 export * from './reglasDeConteo.js';
 export * from './planDeConteo.js';
 export * from './reglasDeReserva.js';
+export * from './reservasDeDocumento.js';
