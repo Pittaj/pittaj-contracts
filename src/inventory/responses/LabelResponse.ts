@@ -6,6 +6,7 @@
  * escritorio, pero la plantilla se puede diseñar desde cualquier lado.
  */
 
+import type { SyncPullResponse, SyncPushResponse } from '../../sync/index.js';
 import type { BarcodeSymbology, LabelField, LabelOutput, LabelPageSize } from '../schemas/labelPrint.schema.js';
 
 export interface LabelTemplateResponse {
@@ -26,6 +27,8 @@ export interface LabelTemplateResponse {
     readonly gapYMm: number;
     /** La de `inventory.labels.defaultTemplateId`. */
     readonly isDefault: boolean;
+    /** Instalación que la creó (anti-rebote del feed). Nulo = nació en la web. */
+    readonly deviceId?: string | null;
     readonly createdAt: string;
     readonly updatedAt: string | null;
     readonly version: number;
@@ -76,3 +79,6 @@ export interface LabelPrintResponse {
     readonly skipPositions: number;
     readonly lines: readonly LabelLineDataResponse[];
 }
+
+export type SyncPullLabelTemplateResponse = SyncPullResponse<LabelTemplateResponse>;
+export type SyncPushLabelTemplateResponse = SyncPushResponse;
