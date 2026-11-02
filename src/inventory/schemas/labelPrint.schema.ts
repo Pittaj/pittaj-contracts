@@ -101,7 +101,8 @@ export const printLabelsSchema = z.object({
 /** POST /api/labels/propose — renglones sugeridos a partir de un origen. */
 export const proposeLabelsSchema = z.discriminatedUnion('from', [
     z.object({ from: z.literal('DOCUMENT'), sourceType: z.enum(STOCK_SOURCE_TYPES), sourceDocId: z.string().max(40) }),
-    z.object({ from: z.literal('PRICE_CHANGES'), since: z.coerce.date(), priceListId: z.string().uuid().nullish() }),
+    /** I10b · Los productos cuyo precio cambió desde una fecha; con bodega, tantas como hay en ella. */
+    z.object({ from: z.literal('PRICE_CHANGES'), since: z.coerce.date(), priceListId: z.string().uuid().nullish(), warehouseId: z.string().uuid().optional() }),
     z.object({ from: z.literal('CATEGORY'), categoryId: z.string().uuid(), warehouseId: z.string().uuid().optional() }),
     /** I10a · Los productos elegidos a mano (o escaneados): una etiqueta de cada uno. */
     z.object({ from: z.literal('PRODUCTS'), productIds: z.array(z.string().uuid()).min(1).max(500), warehouseId: z.string().uuid().optional() }),

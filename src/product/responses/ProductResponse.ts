@@ -62,6 +62,8 @@ export interface ProductResponse {
     readonly categoryId: string | null;
     /** Línea de negocio propia (null = hereda la de la categoría). */
     readonly businessLineId?: string | null;
+    /** I10b · Cuándo cambió por última vez el precio de venta o de mayoreo (ISO). Nulo = nunca, o antes de la 0202. */
+    readonly priceChangedAt?: string | null;
     readonly tenantId: string;
     readonly createdAt: Date;
     readonly createdBy: string | null;
