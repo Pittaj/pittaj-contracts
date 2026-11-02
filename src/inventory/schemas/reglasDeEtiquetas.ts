@@ -8,13 +8,14 @@
  * `Pittaj.Domain.Inventory.ReglasDeEtiquetas` con los mismos vectores de prueba.
  *
  * - Barras: Code 128 (B, o C si es puro número de largo par) y EAN-13 (si el código es un EAN
- *   válido; si no, Code 128). El QR llega con I10b (se imprime como Code 128 mientras tanto).
+ *   válido; si no, Code 128). QR (I10b): `codigoQr.ts`, cuadrado al pie de la etiqueta.
  * - Precio: el **precio al público**, con sus impuestos (la ley pide el precio total en el anaquel):
  *   si el impuesto no viene incluido en el precio de venta, se suma.
  * - Todas las medidas en milímetros, redondeadas a centésimas; los tamaños de letra en puntos.
  */
 
 import type { BarcodeSymbology, LabelField, LabelOutput, LabelPageSize } from './labelPrint.schema.js';
+import { codigoQr } from './codigoQr.js';
 
 // ── Barras ────────────────────────────────────────────────────────────────────────────────────
 
@@ -123,8 +124,8 @@ export interface BarrasDeEtiqueta {
 }
 
 /**
- * Las barras de un código con la simbología pedida: EAN-13 si lo es (si no, Code 128), Code 128
- * si se puede. QR, mientras llega I10b, como Code 128. Nulo si no hay código o no se puede codificar.
+ * Las barras (1D) de un código: EAN-13 si lo es (si no, Code 128), Code 128 si se puede. Para QR
+ * pide Code 128 (la etiqueta usa `codigoQr`). Nulo si no hay código o no se puede codificar.
  */
 export function barrasDe(simbologia: BarcodeSymbology, codigo: string | null | undefined): BarrasDeEtiqueta | null {
     const valor = (codigo ?? '').trim();
@@ -243,7 +244,17 @@ export interface BarrasEnEtiqueta {
     readonly textoPt: number;
 }
 
-export type ElementoDeEtiqueta = TextoDeEtiqueta | BarrasEnEtiqueta;
+/** I10b · Un QR: la matriz (sin silencio) y dónde empieza su primer módulo. */
+export interface QrEnEtiqueta {
+    readonly tipo: 'qr';
+    readonly valor: string;
+    readonly modulos: readonly string[];
+    readonly xMm: number;
+    readonly yMm: number;
+    readonly moduloMm: number;
+}
+
+export type ElementoDeEtiqueta = TextoDeEtiqueta | BarrasEnEtiqueta | QrEnEtiqueta;
 
 export interface PlantillaParaDibujar {
     readonly widthMm: number;
@@ -274,9 +285,24 @@ export function disenoDeEtiqueta(t: PlantillaParaDibujar, d: DatosDeEtiqueta): E
     const ancho = w - 2 * pad;
     const elementos: ElementoDeEtiqueta[] = [];
 
-    const barras = t.fields.includes('BARCODE') ? barrasDe(t.symbology, d.barcode ?? d.code) : null;
+    const codigo = (d.barcode ?? d.code ?? '').trim();
+    const qr = t.fields.includes('BARCODE') && t.symbology === 'QR' && codigo ? codigoQr(codigo) : null;
+    const barras = t.fields.includes('BARCODE') && !qr ? barrasDe(t.symbology, codigo) : null;
     let bloque = 0;
-    if (barras) {
+    if (qr) {
+        // Cuadrado al pie, centrado, con dos módulos de silencio por lado.
+        const lado = Math.min(r2(acotar((h - 2 * pad) * 0.4, 4, 25)) + (h >= 20 ? 2.5 : 0), ancho);
+        bloque = lado;
+        const modulo = Math.round((lado / (qr.modulos.length + 4)) * 10000) / 10000;
+        elementos.push({
+            tipo: 'qr',
+            valor: codigo,
+            modulos: qr.modulos,
+            xMm: r2(w / 2 - (qr.modulos.length * modulo) / 2),
+            yMm: r2(h - pad - lado + 2 * modulo),
+            moduloMm: modulo,
+        });
+    } else if (barras) {
         const textoAlto = h >= 20 ? 2.5 : 0;
         const alto = r2(acotar((h - 2 * pad) * 0.4, 4, 25));
         bloque = alto + textoAlto;
