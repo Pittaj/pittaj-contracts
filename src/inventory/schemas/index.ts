@@ -20,6 +20,7 @@ export * from './inventorySettings.schema.js';
 export * from './inventoryAlert.schema.js';
 export * from './inventoryReports.schema.js';
 export * from './labelPrint.schema.js';
+export * from './reglasDeEtiquetas.js';
 export * from './warehouse.schema.js';
 export * from './inventoryAccounting.schema.js';
 export * from './reportesDeInventario.js';
