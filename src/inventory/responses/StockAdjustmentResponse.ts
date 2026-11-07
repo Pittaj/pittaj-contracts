@@ -42,7 +42,17 @@ export interface StockAdjustmentLineResponse {
     /** Rastreo (1.18.0, opcional). */
     readonly lotId?: string | null;
     readonly lotNumber?: string | null;
-    readonly lots?: readonly { readonly lotId: string; readonly lotNumber: string; readonly quantity: number }[];
+    /**
+     * I8b-2 · De qué lotes sale el renglón, o en cuáles entra (Σ ≤ |cantidad|; lo demás va sin lote o
+     * por la regla). Una entrada a un lote nuevo lleva sus fechas: el lote nace al aplicar.
+     */
+    readonly lots?: readonly {
+        readonly lotId: string;
+        readonly lotNumber: string;
+        readonly quantity: number;
+        readonly expiresAt?: string | null;
+        readonly manufacturedAt?: string | null;
+    }[];
     readonly serialNumbers?: readonly string[];
     readonly note?: string | null;
 }

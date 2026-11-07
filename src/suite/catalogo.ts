@@ -119,6 +119,8 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
             { ruta: 'categorias', nombre: 'Categorías' },
             { ruta: 'bodegas', nombre: 'Bodegas' },
             { ruta: 'unidades', nombre: 'Unidades de Medida' },
+            // I10a · Plantillas e impresión de etiquetas (precio, código de barras, lote, serie).
+            { ruta: 'etiquetas', nombre: 'Etiquetas' },
             { ruta: 'reportes/existencias', nombre: 'Existencias a una fecha' },
             { ruta: 'reportes/kardex', nombre: 'Kardex' },
             { ruta: 'reportes/valuacion', nombre: 'Valuación' },

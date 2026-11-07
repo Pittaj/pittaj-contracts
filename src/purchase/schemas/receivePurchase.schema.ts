@@ -37,6 +37,12 @@ export const receivePurchaseLineSchema = z.object({
         )
         .max(50)
         .optional(),
+    /**
+     * I8c · Si el producto se rastrea por serie: las series de las piezas que llegaron (una por
+     * pieza en unidad base; menos = el resto sin serie capturada). Una serie que ya está en
+     * existencia para el producto no puede volver a entrar.
+     */
+    serialNumbers: z.array(z.string().trim().min(1).max(80)).max(2000).optional(),
 });
 
 export const receivePurchaseSchema = z.object({

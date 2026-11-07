@@ -133,3 +133,122 @@ export function numeroDeLoteAutomatico(patron: string, hoy: string, n: number): 
         .split('{n}').join(String(n))
         .slice(0, 60);
 }
+
+// ── I8b · El lote en los demás movimientos ────────────────────────────────────────────────────
+//
+// Dos reglas cubren todo lo que no es venta ni compra:
+//
+// - **Una salida interna** (traspaso, ajuste, diferencia de conteo) toma de **todos** los lotes con
+//   saldo, no solo de los vendibles: si la mercancía salió físicamente, salió de algún lote. Toma
+//   primero el grupo que prefiere el motivo —los vendibles, o los que ya no lo son (caducados, en
+//   cuarentena, retirados) cuando se da de baja una merma— y dentro de cada grupo, FEFO.
+// - **Un movimiento que espeja a otro** (la entrada del traspaso, la devolución de una venta, la
+//   reversa de una recepción) **sigue** los lotes del original, en su orden. Lo que el original
+//   movió sin lote, o lo que exceda, va sin lote.
+
+/** De qué lotes sale primero una salida interna. */
+export type PreferenciaDeSalida = 'VENDIBLES' | 'NO_VENDIBLES';
+
+/**
+ * El motivo de un ajuste decide de dónde sale: dar de baja lo caducado, dañado o mermado busca
+ * primero lo que ya no se puede vender; lo demás (robo, consumo, corrección, conteo) sale como la
+ * venta, de lo vendible.
+ */
+export function preferenciaDeAjuste(reason: string): PreferenciaDeSalida {
+    return reason === 'EXPIRED' || reason === 'DAMAGE' || reason === 'SHRINKAGE' ? 'NO_VENDIBLES' : 'VENDIBLES';
+}
+
+/** Reparte una salida interna entre todos los lotes con saldo. Ver {@link PreferenciaDeSalida}. */
+export function asignarLotesInternos(
+    cantidad: number,
+    lotes: readonly LoteConSaldo[],
+    hoy: string,
+    preferir: PreferenciaDeSalida = 'VENDIBLES'
+): AsignacionDeLotes {
+    if (!(cantidad > 0)) return { asignados: [], sinLote: 0 };
+    const grupo = (l: LoteConSaldo) => (loteVendible(l, hoy, 0) === (preferir === 'VENDIBLES') ? 0 : 1);
+    const orden = lotes
+        .filter((l) => l.onHand > 0)
+        .sort((a, b) => {
+            const g = grupo(a) - grupo(b);
+            if (g !== 0) return g;
+            const ea = a.expiresAt?.slice(0, 10) ?? null;
+            const eb = b.expiresAt?.slice(0, 10) ?? null;
+            if (ea !== eb) {
+                if (ea === null) return 1;
+                if (eb === null) return -1;
+                return ea < eb ? -1 : 1;
+            }
+            return a.receivedAt < b.receivedAt ? -1 : a.receivedAt > b.receivedAt ? 1 : a.lotNumber < b.lotNumber ? -1 : a.lotNumber > b.lotNumber ? 1 : 0;
+        });
+    return tomarEnOrden(cantidad, orden.map((l) => ({ lotId: l.lotId, lotNumber: l.lotNumber, quantity: l.onHand })));
+}
+
+/** Un tramo de un movimiento original: de qué lote fue y cuánto. */
+export interface TramoDeLote {
+    readonly lotId: string;
+    readonly lotNumber: string;
+    readonly quantity: number;
+}
+
+/**
+ * Sigue los lotes de un movimiento original, en su orden: la entrada de un traspaso recibe del
+ * primer lote que salió, luego del segundo… La devolución de una venta regresa a los lotes de la
+ * venta. Lo que exceda al original va sin lote.
+ */
+export function seguirLotes(cantidad: number, origen: readonly TramoDeLote[]): AsignacionDeLotes {
+    if (!(cantidad > 0)) return { asignados: [], sinLote: 0 };
+    // Un mismo lote en dos tramos se junta: la regla es «cuánto de cada lote», no «cuántas filas».
+    const junto = new Map<string, TramoDeLote>();
+    for (const t of origen) {
+        const p = junto.get(t.lotId);
+        junto.set(t.lotId, p ? { ...p, quantity: r4(p.quantity + t.quantity) } : t);
+    }
+    return tomarEnOrden(cantidad, [...junto.values()]);
+}
+
+function tomarEnOrden(cantidad: number, tramos: readonly TramoDeLote[]): AsignacionDeLotes {
+    let falta = r4(cantidad);
+    const asignados: { lotId: string; lotNumber: string; quantity: number }[] = [];
+    for (const t of tramos) {
+        if (falta <= 0) break;
+        const toma = r4(Math.min(falta, t.quantity));
+        if (toma <= 0) continue;
+        asignados.push({ lotId: t.lotId, lotNumber: t.lotNumber, quantity: toma });
+        falta = r4(falta - toma);
+    }
+    return { asignados, sinLote: falta > 0 ? falta : 0 };
+}
+
+// ── I8b-2 · El lote elegido a mano en un documento ──────────────────────────────────────────
+
+/**
+ * Los lotes de un renglón no pueden mover más que el renglón, ni cantidades en cero, ni repetir lote.
+ * Devuelve el problema en una frase, o nulo si está bien. Lo que no cubran va por la regla.
+ */
+export function validarLotesDeRenglon(cantidad: number, lots: readonly { lotId?: string | null; lotNumber: string; quantity: number }[]): string | null {
+    const vistos = new Set<string>();
+    for (const l of lots) {
+        if (!(l.quantity > 0)) return `El lote ${l.lotNumber} lleva una cantidad en cero.`;
+        const k = l.lotId ?? normalizarNumeroDeLote(l.lotNumber);
+        if (vistos.has(k)) return `El lote ${l.lotNumber} está dos veces.`;
+        vistos.add(k);
+    }
+    const suma = r4(lots.reduce((s, l) => s + l.quantity, 0));
+    const tope = r4(Math.abs(cantidad));
+    return suma > tope ? `Los lotes suman ${suma} y el renglón mueve ${tope}.` : null;
+}
+
+/** Lo que llegó de cada lote de un traspaso: lo recibido, en el orden en que salieron. */
+export function recibidoPorLote(
+    lots: readonly { lotId: string; lotNumber: string; quantity: number }[],
+    recibido: number | null
+): (number | null)[] {
+    if (recibido === null) return lots.map(() => null);
+    let queda = r4(recibido);
+    return lots.map((l) => {
+        const t = r4(Math.max(0, Math.min(queda, l.quantity)));
+        queda = r4(queda - t);
+        return t;
+    });
+}
