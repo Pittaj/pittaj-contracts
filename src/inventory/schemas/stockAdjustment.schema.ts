@@ -139,6 +139,11 @@ const lineSchema = z
         lotId: z.string().uuid().nullish(),
         lots: z.array(lotAllocationSchema).max(50).optional(),
         incomingLots: z.array(incomingLotSchema).max(50).optional(),
+        /**
+         * Producto por serie. Ajuste: de cuáles sale o cuáles entran. Conteo: **las que se encontraron**
+         * (tantas como lo contado, `validarSeriesDelConteo`); al aplicar, las que faltan contra la
+         * bodega salen y las que sobran entran (`seriesDelConteo`).
+         */
         serialNumbers: serialNumbersSchema.optional(),
         /** Conteo: nota del renglón («caja abierta», «estaba en la otra bodega»). */
         note: z.string().trim().max(300).nullish(),
