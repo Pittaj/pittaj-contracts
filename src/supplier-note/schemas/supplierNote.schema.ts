@@ -16,6 +16,7 @@
 
 import { z } from 'zod';
 import { SUPPLIER_NOTE_KINDS, SUPPLIER_NOTE_STATUSES } from '../supplierNoteState.js';
+import { lotAllocationSchema, serialNumbersSchema } from '../../inventory/schemas/stockLot.schema.js';
 
 const ERROR_MESSAGES = {
     ID_INVALID_UUID: 'El ID debe ser un UUID válido',
@@ -53,6 +54,13 @@ export const supplierNoteLineInputSchema = z
 
         /** Motivo de este renglón, además del general. */
         reason: z.string().trim().max(300).nullish(),
+
+        /**
+         * Rastreo (2.81.0). Producto por lote: de cuáles sale (ausente = FEFO, lo vendible primero).
+         * Producto por serie: qué piezas salen (ausente = las que llevan más tiempo en la bodega).
+         */
+        lots: z.array(lotAllocationSchema).max(50).optional(),
+        serialNumbers: serialNumbersSchema.optional(),
     })
     .strict();
 

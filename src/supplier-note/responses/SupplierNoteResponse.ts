@@ -66,6 +66,11 @@ export interface SupplierNoteLineResponse {
     readonly taxBaseAmount: number;
     readonly taxAmount: number;
     readonly totalAmount: number;
+
+    /** Los lotes elegidos de los que sale (vacío = la regla). Viajan por sync. */
+    readonly lots: readonly { readonly lotId: string; readonly lotNumber: string; readonly quantity: number }[];
+    /** Las series elegidas que salen (vacío = la regla). */
+    readonly serialNumbers: readonly string[];
 }
 
 /** DTO de respuesta para sync de notas a proveedor. */
