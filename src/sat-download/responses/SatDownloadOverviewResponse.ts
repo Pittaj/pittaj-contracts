@@ -82,6 +82,11 @@ export interface SatDownloadOverviewResponse {
      * (docs §5.3). Null si nunca se ha conciliado (recién cargada, o en una computadora).
      */
     readonly lastReconciliation: SatReconciliationSummary | null;
+    /**
+     * Respuesta a incidentes · Pittaj pausó la descarga en la nube para todos (el backoffice). Sin
+     * firmas ni altas mientras dure; los días se recuperan al reanudar. Ausente en una nube anterior.
+     */
+    readonly cloudPaused?: boolean;
 }
 
 /** Lo que el cliente ve de la conciliación: qué día se revisó y si cuadró. */
