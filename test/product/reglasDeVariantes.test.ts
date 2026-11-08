@@ -1,6 +1,8 @@
 /** I9a · Variantes. Los mismos vectores que `ReglasDeVariantesTests` del escritorio. */
 import { describe, expect, it } from 'vitest';
 import {
+    opcionesDeVariante,
+    varianteElegida,
     codigoDeVariante,
     combinaciones,
     fragmentoDeCodigo,
@@ -73,5 +75,30 @@ describe('la matriz', () => {
     it('guardar crea, cambia y archiva', () => {
         expect(planDeVariantes(['a', 'b', 'c'], ['a', 'b', 'c'], ['a', 'd'])).toEqual({ crear: ['d'], cambiar: ['a'], archivar: ['b', 'c'] });
         expect(planDeVariantes([], new Set<string>(), ['x'])).toEqual({ crear: ['x'], cambiar: [], archivar: [] });
+    });
+});
+
+describe('elegir la variante en la caja (2.82.0)', () => {
+    const attrs = [
+        { name: 'Talla', values: ['CH', 'M', 'G'] },
+        { name: 'Color', values: ['Negro', 'Blanco'] },
+    ];
+    const vs = [
+        { id: 'ch-n', values: { Talla: 'CH', Color: 'Negro' }, active: true },
+        { id: 'ch-b', values: { Talla: 'CH', Color: 'Blanco' }, active: true },
+        { id: 'm-n', values: { Talla: 'M', Color: 'Negro' }, active: true },
+        { id: 'm-b', values: { Talla: 'M', Color: 'Blanco' }, active: false },
+        { id: 'g-n', values: { Talla: 'G', Color: 'Negro' }, active: false },
+        { id: 'g-b', values: { Talla: 'G', Color: 'Blanco' }, active: false },
+    ];
+    it('ofrece solo lo que lleva a una variante activa', () => {
+        expect(opcionesDeVariante(attrs, vs, {})).toEqual({ Talla: ['CH', 'M'], Color: ['Negro', 'Blanco'] });
+        expect(opcionesDeVariante(attrs, vs, { Talla: 'M' })).toEqual({ Talla: ['CH', 'M'], Color: ['Negro'] });
+        expect(opcionesDeVariante(attrs, vs, { Color: 'Blanco' })).toEqual({ Talla: ['CH'], Color: ['Negro', 'Blanco'] });
+    });
+    it('con todo elegido, la variante; si falta o está archivada, nada', () => {
+        expect(varianteElegida(attrs, vs, { Talla: 'CH', Color: 'Blanco' })).toBe('ch-b');
+        expect(varianteElegida(attrs, vs, { Talla: 'M' })).toBeNull();
+        expect(varianteElegida(attrs, vs, { Talla: 'M', Color: 'Blanco' })).toBeNull();
     });
 });
