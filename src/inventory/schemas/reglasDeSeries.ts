@@ -139,6 +139,29 @@ export function tomarSeries(cantidad: number, disponibles: readonly string[], or
     return [...new Set(fuente)].slice(0, n);
 }
 
+/**
+ * El conteo de un producto por serie: las series **encontradas** contra las que el kárdex dice que
+ * están en la bodega (`esperadas`, de la más antigua a la más reciente). Las que faltan salen (en el
+ * orden de `esperadas`) y las que sobran entran (en el orden en que se contaron).
+ */
+export function seriesDelConteo(esperadas: readonly string[], contadas: readonly string[]): { faltan: string[]; sobran: string[] } {
+    const hay = new Set(esperadas.map(normalizarSerie));
+    const vistas = new Set(contadas.map(normalizarSerie).filter((s) => s.length > 0));
+    return {
+        faltan: [...new Set(esperadas.map(normalizarSerie))].filter((s) => !vistas.has(s)),
+        sobran: [...vistas].filter((s) => !hay.has(s)),
+    };
+}
+
+/** Conteo: si se capturan series, tienen que ser tantas como piezas contadas (y sin repetir). */
+export function validarSeriesDelConteo(contado: number, series: readonly string[]): string | null {
+    if (series.length === 0) return null;
+    const problema = validarSeries(Number.MAX_SAFE_INTEGER, series);
+    if (problema) return problema;
+    const piezas = Math.round(contado * 10_000) / 10_000;
+    return series.length !== piezas ? `Contaste ${piezas} y capturaste ${series.length} ${series.length === 1 ? 'serie' : 'series'}.` : null;
+}
+
 /** Hasta cuándo tiene garantía una pieza vendida (`YYYY-MM-DD`), o nulo sin venta o sin meses. */
 export function garantiaHasta(soldAt: string | null, warrantyMonths: number | null | undefined): string | null {
     if (!soldAt || !warrantyMonths || warrantyMonths <= 0) return null;

@@ -6,3 +6,4 @@
 export * from './schemas';
 export * from './responses';
 export * from './supplierNoteState.js';
+export * from './salidaDeLaNota.js';

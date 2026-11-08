@@ -31,6 +31,8 @@
 import type { StockSourceType } from '../responses/StockMovementResponse.js';
 import type {
     CountAccuracyRow,
+    ExpiryRow,
+    ExpiryTotals,
     KardexRow,
     MovementSummaryRow,
     NoMovementRow,
@@ -39,6 +41,8 @@ import type {
     StockValuationRow,
 } from '../responses/InventoryReportsResponse.js';
 import type { AbcClass } from './countPlan.schema.js';
+import { diasACaducar, estadoVisibleDeLote } from './reglasDeLotes.js';
+import type { StockLotStatus } from './stockLot.schema.js';
 import { STOCK_ADJUSTMENT_REASON_LABELS, type StockAdjustmentReason } from './stockAdjustment.schema.js';
 
 const r2 = (n: number) => Math.round(n * 100) / 100;
@@ -550,6 +554,77 @@ export function armarSinMovimiento(
     return {
         rows,
         totals: { value: r2(rows.reduce((s, r) => s + r.value, 0)), products: new Set(rows.map((r) => r.productId)).size },
+    };
+}
+
+// ── Caducidades ──────────────────────────────────────────────────────────────────────────────
+
+/** Un lote con existencia en una bodega (saldo derivado de sus movimientos). */
+export interface LoteEnBodega {
+    readonly lotId: string;
+    readonly lotNumber: string;
+    readonly productId: string;
+    readonly productCode: string | null;
+    readonly productName: string;
+    readonly warehouseId: string;
+    readonly warehouseName: string;
+    /** El estado guardado; el que se enseña lo decide `estadoVisibleDeLote`. */
+    readonly status: StockLotStatus;
+    readonly expiresAt: string | null;
+    readonly onHand: number;
+    /** Promedio del producto en esa bodega. */
+    readonly averageCost: number;
+}
+
+/**
+ * EXPIRY: los lotes con existencia que caducan en `dias` o menos desde `hoy` (fecha civil del
+ * negocio) y, si `incluirCaducados`, los que ya caducaron. Un lote que no caduca no sale. El valor
+ * va al promedio del producto en la bodega (el lote no tiene costo propio). Orden: lo que caduca
+ * antes primero; a igual fecha, más dinero primero.
+ */
+export function armarCaducidades(
+    lotes: readonly LoteEnBodega[],
+    hoy: string,
+    dias: number,
+    incluirCaducados: boolean
+): { rows: ExpiryRow[]; totals: ExpiryTotals } {
+    const rows: ExpiryRow[] = [];
+    for (const l of lotes) {
+        if (r4(l.onHand) <= 0) continue;
+        const d = diasACaducar(l.expiresAt, hoy);
+        if (d === null || d > dias || (d < 0 && !incluirCaducados)) continue;
+        rows.push({
+            lotId: l.lotId,
+            lotNumber: l.lotNumber,
+            productId: l.productId,
+            productCode: l.productCode,
+            productName: l.productName,
+            warehouseId: l.warehouseId,
+            warehouseName: l.warehouseName,
+            expiresAt: l.expiresAt!.slice(0, 10),
+            daysToExpiry: d,
+            status: estadoVisibleDeLote(l.status, l.expiresAt, hoy),
+            onHand: r4(l.onHand),
+            value: r2(l.onHand * l.averageCost),
+        });
+    }
+    rows.sort(
+        (a, b) =>
+            a.daysToExpiry - b.daysToExpiry ||
+            b.value - a.value ||
+            a.productName.localeCompare(b.productName, 'es') ||
+            a.lotNumber.localeCompare(b.lotNumber, 'es') ||
+            a.warehouseName.localeCompare(b.warehouseName, 'es')
+    );
+    const vencidos = rows.filter((r) => r.daysToExpiry < 0);
+    return {
+        rows,
+        totals: {
+            lots: new Set(rows.map((r) => r.lotId)).size,
+            value: r2(rows.reduce((s, r) => s + r.value, 0)),
+            expiredLots: new Set(vencidos.map((r) => r.lotId)).size,
+            expiredValue: r2(vencidos.reduce((s, r) => s + r.value, 0)),
+        },
     };
 }
 

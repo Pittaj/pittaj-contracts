@@ -10,6 +10,7 @@ import type { InventoryReportKind } from '../schemas/inventoryReports.schema.js'
 import type { AbcClass } from '../schemas/countPlan.schema.js';
 import type { StockAdjustmentReason } from '../schemas/stockAdjustment.schema.js';
 import type { StockSourceType } from './StockMovementResponse.js';
+import type { StockLotStatus } from '../schemas/stockLot.schema.js';
 
 export interface InventoryReportResponse<Row, Totals = Record<string, number>> {
     readonly kind: InventoryReportKind;
@@ -82,12 +83,26 @@ export interface ExpiryRow {
     readonly lotId: string;
     readonly lotNumber: string;
     readonly productId: string;
+    readonly productCode: string | null;
     readonly productName: string;
+    readonly warehouseId: string;
     readonly warehouseName: string;
+    /** `YYYY-MM-DD`. */
     readonly expiresAt: string;
+    /** Negativo = ya caducó; 0 = caduca hoy. */
     readonly daysToExpiry: number;
+    /** El estado que se enseña (`estadoVisibleDeLote`): uno disponible ya vencido sale «Caducado». */
+    readonly status: StockLotStatus;
     readonly onHand: number;
+    /** A promedio del producto en esa bodega: el lote no tiene costo propio. */
     readonly value: number;
+}
+
+export interface ExpiryTotals {
+    readonly lots: number;
+    readonly value: number;
+    readonly expiredLots: number;
+    readonly expiredValue: number;
 }
 
 export interface ShrinkageRow {

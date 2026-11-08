@@ -35,6 +35,11 @@ export interface StockAdjustmentLineResponse {
     /** Conteo: lo contado. Nulo = sin contar (no escribe nada al aplicar). */
     readonly countedQuantity: number | null;
     /**
+     * Conteo (2.81.0): la primera cifra cuando el renglón se recontó. Nulo = no se ha recontado; con
+     * `requireRecountOnDiscrepancy`, un renglón con diferencia y sin recontar no deja aplicar.
+     */
+    readonly firstCountedQuantity?: number | null;
+    /**
      * Costo unitario. En borrador, el capturado para una entrada (o nulo = al promedio); una vez
      * aplicado, el que de verdad se usó.
      */
@@ -95,6 +100,13 @@ export interface StockAdjustmentResponse {
     readonly assigneeName?: string | null;
     /** (I6a) Cuándo se cerró la captura. En uno ciego, desde ahí se ven teórico y diferencia. */
     readonly captureClosedAt?: string | null;
+    /**
+     * (2.81.0) Quién aprobó el conteo y cuándo. Con `approvalThresholdValue`, una diferencia que llega al
+     * umbral no deja aplicar sin aprobación. Cambiar lo contado la borra.
+     */
+    readonly approvedAt?: string | null;
+    readonly approvedBy?: string | null;
+    readonly approvedByName?: string | null;
 
     /**
      * Contabilidad (1.19.0, opcional). La fecha que llevan sus movimientos, el hueco de la

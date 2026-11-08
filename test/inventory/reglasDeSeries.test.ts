@@ -5,9 +5,11 @@ import {
     estadosDeSeries,
     garantiaHasta,
     partirSeries,
+    seriesDelConteo,
     seriesEnBodega,
     tomarSeries,
     validarSeries,
+    validarSeriesDelConteo,
     type MovimientoDeSerie,
 } from '../../src/inventory/index.js';
 
@@ -75,5 +77,21 @@ describe('garantía', () => {
         expect(garantiaHasta('2026-11-02T10:00:00.000Z', 12)).toBe('2027-11-02');
         expect(garantiaHasta(null, 12)).toBeNull();
         expect(garantiaHasta('2026-11-02', 0)).toBeNull();
+    });
+});
+
+describe('seriesDelConteo', () => {
+    it('faltan las esperadas que no se encontraron (de la más antigua) y sobran las encontradas de más', () => {
+        expect(seriesDelConteo(['A1', 'A2', 'A3'], ['a3', 'B9', 'A1'])).toEqual({ faltan: ['A2'], sobran: ['B9'] });
+        expect(seriesDelConteo(['A1', 'A2'], [])).toEqual({ faltan: ['A1', 'A2'], sobran: [] });
+        expect(seriesDelConteo([], ['X1', 'x1'])).toEqual({ faltan: [], sobran: ['X1'] });
+    });
+
+    it('las series del conteo son tantas como lo contado', () => {
+        expect(validarSeriesDelConteo(2, [])).toBeNull();
+        expect(validarSeriesDelConteo(2, ['A1', 'A2'])).toBeNull();
+        expect(validarSeriesDelConteo(3, ['A1', 'A2'])).toBe('Contaste 3 y capturaste 2 series.');
+        expect(validarSeriesDelConteo(0, ['A1'])).toBe('Contaste 0 y capturaste 1 serie.');
+        expect(validarSeriesDelConteo(2, ['A1', 'a1'])).toBe('La serie A1 está dos veces.');
     });
 });

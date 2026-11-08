@@ -139,6 +139,11 @@ const lineSchema = z
         lotId: z.string().uuid().nullish(),
         lots: z.array(lotAllocationSchema).max(50).optional(),
         incomingLots: z.array(incomingLotSchema).max(50).optional(),
+        /**
+         * Producto por serie. Ajuste: de cuáles sale o cuáles entran. Conteo: **las que se encontraron**
+         * (tantas como lo contado, `validarSeriesDelConteo`); al aplicar, las que faltan contra la
+         * bodega salen y las que sobran entran (`seriesDelConteo`).
+         */
         serialNumbers: serialNumbersSchema.optional(),
         /** Conteo: nota del renglón («caja abierta», «estaba en la otra bodega»). */
         note: z.string().trim().max(300).nullish(),
@@ -243,7 +248,30 @@ export const closeStockCountCaptureSchema = z.object({
     version: z.number().int().min(1),
 });
 
-/** POST /:id/apply */
+/**
+ * POST /api/stock-counts/:id/recount (2.81.0) — recontar los renglones con diferencia. Manda la segunda
+ * cifra y queda la primera en `firstCountedQuantity`. Con `inventory.counts.requireRecountOnDiscrepancy`
+ * un renglón con diferencia y sin recontar no deja aplicar.
+ */
+export const recountStockCountSchema = z.object({
+    version: z.number().int().min(1),
+    lines: z
+        .array(z.object({ lineId: z.string().uuid(), countedQuantity: z.number().min(0, 'No se cuentan piezas negativas') }))
+        .min(1)
+        .max(2000),
+});
+
+/**
+ * POST /api/stock-counts/:id/approve (2.81.0) — aprobar un conteo cuya diferencia llega al umbral
+ * (`inventory.counts.approvalThresholdValue`). Pide el permiso `inventory.counts.approve`; cambiar lo
+ * contado después la borra.
+ */
+export const approveStockCountSchema = z.object({
+    version: z.number().int().min(1),
+    actorName: z.string().trim().max(200).nullish(),
+});
+
+/** POST /:id/apply *//** POST /:id/apply */
 export const applyStockAdjustmentSchema = z.object({
     version: z.number().int().min(1),
     actorName: z.string().trim().max(200).nullish(),
@@ -263,6 +291,8 @@ export const stockAdjustmentIdParamSchema = z.object({ id: z.string().uuid() });
 export type GetStockAdjustmentsQuery = z.infer<typeof getStockAdjustmentsSchema>;
 export type CreateStockAdjustmentRequest = z.infer<typeof createStockAdjustmentSchema>;
 export type UpdateStockAdjustmentRequest = z.infer<typeof updateStockAdjustmentSchema>;
+export type RecountStockCountRequest = z.infer<typeof recountStockCountSchema>;
+export type ApproveStockCountRequest = z.infer<typeof approveStockCountSchema>;
 export type ScanStockCountLineRequest = z.infer<typeof scanStockCountLineSchema>;
 export type ApplyStockAdjustmentRequest = z.infer<typeof applyStockAdjustmentSchema>;
 export type CancelStockAdjustmentRequest = z.infer<typeof cancelStockAdjustmentSchema>;
