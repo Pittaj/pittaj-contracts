@@ -96,6 +96,80 @@ export function bloqueoDeConteoCiego(conteo: {
         : null;
 }
 
+// ── Reconteo y aprobación (2.81.0) ──────────────────────────────────────────────────────────
+
+const r2 = (n: number) => Math.round(n * 100) / 100;
+
+/** Un renglón de conteo, lo que piden el reconteo y la aprobación. */
+export interface RenglonEnRevision {
+    readonly id: string;
+    readonly expectedQuantity: number | null;
+    readonly countedQuantity: number | null;
+    readonly firstCountedQuantity?: number | null;
+}
+
+/** Los renglones contados con diferencia que todavía no se recontaron. */
+export function renglonesPorRecontar(lineas: readonly RenglonEnRevision[]): string[] {
+    return lineas
+        .filter(
+            (l) =>
+                l.countedQuantity !== null &&
+                l.expectedQuantity !== null &&
+                r4(l.countedQuantity - l.expectedQuantity) !== 0 &&
+                (l.firstCountedQuantity === null || l.firstCountedQuantity === undefined)
+        )
+        .map((l) => l.id);
+}
+
+/**
+ * Recontar un renglón: manda la segunda cifra y se guarda la primera (la de la primera vez que se
+ * recontó; un tercer reconteo no la pisa).
+ */
+export function recontar(
+    previo: { readonly countedQuantity: number | null; readonly firstCountedQuantity?: number | null },
+    nuevo: number
+): { countedQuantity: number; firstCountedQuantity: number | null } {
+    return { countedQuantity: r4(nuevo), firstCountedQuantity: previo.firstCountedQuantity ?? previo.countedQuantity };
+}
+
+/** Cuánto vale la diferencia de un conteo: Σ |contado − teórico| × costo (lo que falta y lo que sobra). */
+export function valorDeLaDiferencia(lineas: readonly { readonly diferencia: number; readonly costo: number }[]): number {
+    return r2(lineas.reduce((s, l) => s + Math.abs(l.diferencia) * l.costo, 0));
+}
+
+/** ¿El valor de la diferencia pide aprobación? 0 = nunca. */
+export function pideAprobacion(valor: number, umbral: number): boolean {
+    return umbral > 0 && valor >= umbral;
+}
+
+/** `$1,234.50`: mismo texto en las dos puntas. */
+function pesos(n: number): string {
+    const [ent, dec] = r2(n).toFixed(2).split('.');
+    return `$${ent!.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}.${dec}`;
+}
+
+/**
+ * Por qué no se puede aplicar todavía un conteo según la configuración (`inventory.counts`), o `null`.
+ * Primero el reconteo (cambia la diferencia), después la aprobación.
+ */
+export function bloqueoDeRevision(p: {
+    readonly requireRecountOnDiscrepancy: boolean;
+    readonly approvalThresholdValue: number;
+    readonly porRecontar: number;
+    readonly valorDiferencia: number;
+    readonly aprobado: boolean;
+}): string | null {
+    if (p.requireRecountOnDiscrepancy && p.porRecontar > 0) {
+        return p.porRecontar === 1
+            ? 'Hay un renglón con diferencia por recontar antes de aplicar.'
+            : `Hay ${p.porRecontar} renglones con diferencia por recontar antes de aplicar.`;
+    }
+    if (!p.aprobado && pideAprobacion(p.valorDiferencia, p.approvalThresholdValue)) {
+        return `La diferencia vale ${pesos(p.valorDiferencia)} y el umbral es ${pesos(p.approvalThresholdValue)}: necesita aprobación antes de aplicar.`;
+    }
+    return null;
+}
+
 /** El nombre de cada alcance, para las dos pantallas. */
 export const STOCK_COUNT_SCOPE_LABELS: Readonly<Record<StockCountScope, string>> = {
     FULL: 'Toda la bodega',
