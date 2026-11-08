@@ -28,6 +28,18 @@ export const SAT_CONSENT_TEXT =
     'autorización cuando quiera desde Fiscal → e.firma.';
 
 /**
+ * Lo que Pittaj **nunca** pide. Una filtración de datos (RFC, correo, totales de venta) se vuelve
+ * robo de la e.firma cuando alguien se hace pasar por la plataforma y pide «volver a cargarla»: así
+ * lo advirtió Xubio a sus clientes tras su incidente de noviembre de 2026. Lo dicen con las mismas
+ * palabras los correos de la e.firma, Fiscal › e.firma y firma.pittaj.com; el escritorio lleva
+ * esta misma frase (`EfirmaPage.xaml.cs`). Si la cambias, cámbiala allá.
+ */
+export const EFIRMA_NUNCA_TE_PEDIREMOS =
+    'Pittaj nunca te pedirá tu archivo .key ni su contraseña por correo, teléfono, WhatsApp ni con un enlace. ' +
+    'La e.firma solo se carga desde Fiscal › e.firma, dentro de la app, y la página de carga siempre es ' +
+    'firma.pittaj.com. Si un mensaje te pide la e.firma, no la cargues y repórtalo a Pittaj.';
+
+/**
  * Cómo se envuelve la llave para el KMS: RSA-OAEP (3072, SHA-256) sobre una clave AES-256 efímera,
  * y AES-KWP (RFC 5649) con esa clave sobre la llave privada en PKCS#8 DER. Es el
  * `rsa-oaep-3072-sha256-aes-256` de Cloud KMS.
