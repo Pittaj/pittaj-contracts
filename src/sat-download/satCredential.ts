@@ -36,8 +36,9 @@ export const SAT_CONSENT_TEXT =
  */
 export const EFIRMA_NUNCA_TE_PEDIREMOS =
     'Pittaj nunca te pedirá tu archivo .key ni su contraseña por correo, teléfono, WhatsApp ni con un enlace. ' +
-    'La e.firma solo se carga desde Fiscal › e.firma, dentro de la app, y la página de carga siempre es ' +
-    'firma.pittaj.com. Si un mensaje te pide la e.firma, no la cargues y repórtalo a Pittaj.';
+    'La e.firma solo se carga desde Fiscal › e.firma, dentro de Pittaj: en la web, la página de carga siempre es ' +
+    'firma.pittaj.com; en una computadora, la app de escritorio. Si un mensaje te pide la e.firma, no la cargues ' +
+    'y repórtalo a Pittaj.';
 
 /**
  * Cómo se envuelve la llave para el KMS: RSA-OAEP (3072, SHA-256) sobre una clave AES-256 efímera,
