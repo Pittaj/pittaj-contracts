@@ -68,6 +68,8 @@ export interface LabelLineDataResponse {
     readonly lotNumber: string | null;
     readonly expiresAt: string | null;
     readonly variant: string | null;
+    /** (2.82.0) Ubicación en la bodega de la impresión (nivel del producto), o nulo. */
+    readonly location?: string | null;
     readonly serialNumbers: readonly string[];
     readonly copies: number;
 }
