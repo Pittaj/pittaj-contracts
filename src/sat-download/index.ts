@@ -8,5 +8,6 @@ export * from './satCredential.js';
 export * from './downloaderApi.js';
 export * from './selloDeImportacion.js';
 export * from './satLocalDownloader.js';
+export * from './emergencia.js';
 export * from './schemas/index.js';
 export * from './responses/index.js';
