@@ -154,7 +154,7 @@ export function planDeVariantes(
     };
 }
 
-// ── La caja (2.82.0) ──────────────────────────────────────────────────────────────────────────
+// ── La caja (2.84.0) ──────────────────────────────────────────────────────────────────────────
 
 /** Lo que la caja sabe de cada variante para elegirla. */
 export interface VarianteParaElegir {

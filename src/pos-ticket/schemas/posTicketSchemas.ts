@@ -109,7 +109,7 @@ export const completePosTicketSchema = z.object({
    */
   serialNumbers: z.record(z.string(), z.array(z.string().trim().min(1).max(80)).max(500)).optional(),
   /**
-   * (2.82.0) Combos con alternativas: por renglón (`lineId`), qué componente se llevó de cada grupo
+   * (2.84.0) Combos con alternativas: por renglón (`lineId`), qué componente se llevó de cada grupo
    * de sustitución (`substituteGroup` → `productId`). Sin elegir = el primero del grupo.
    */
   componentChoices: z.record(z.string(), z.record(z.string(), z.string().min(1))).optional(),

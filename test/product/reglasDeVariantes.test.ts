@@ -78,7 +78,7 @@ describe('la matriz', () => {
     });
 });
 
-describe('elegir la variante en la caja (2.82.0)', () => {
+describe('elegir la variante en la caja (2.84.0)', () => {
     const attrs = [
         { name: 'Talla', values: ['CH', 'M', 'G'] },
         { name: 'Color', values: ['Negro', 'Blanco'] },

@@ -17,7 +17,7 @@
  * - **Liberar** (`RELEASE`): el documento se canceló o dejó de comprometer. Las activas pasan a
  *   `RELEASED`.
  *
- * **Producción** (2.82.0): la orden **liberada** compromete sus insumos en su bodega; terminada,
+ * **Producción** (2.84.0): la orden **liberada** compromete sus insumos en su bodega; terminada,
  * salieron; borrador o cancelada, se sueltan. Un borrador es un plan, no un compromiso.
  */
 
@@ -53,7 +53,7 @@ export function accionDePedido(status: string): AccionDeReserva {
 }
 
 /**
- * (2.82.0) Orden de producción: liberada compromete los insumos (lo que se va a consumir) en su
+ * (2.84.0) Orden de producción: liberada compromete los insumos (lo que se va a consumir) en su
  * bodega; terminada, salieron; borrador o cancelada se sueltan.
  *
  * Ojo, quien mueva la orden: **de liberada a borrador** no se libera, se reserva con cero renglones

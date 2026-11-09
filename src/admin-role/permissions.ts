@@ -33,6 +33,8 @@ export const ADMIN_PERMISSIONS: readonly AdminPermissionDef[] = [
     { group: 'Uso y Límites', key: 'usage-limits.manage', label: 'Gestionar cuotas de timbres' },
     { group: 'Configuración', key: 'platform-config.view', label: 'Ver configuración' },
     { group: 'Configuración', key: 'platform-config.manage', label: 'Gestionar configuración' },
+    { group: 'e.firma en la nube', key: 'sat-emergency.view', label: 'Ver si la descarga del SAT está en pausa' },
+    { group: 'e.firma en la nube', key: 'sat-emergency.manage', label: 'Pausar la descarga y revocar e.firmas en bloque (incidentes)' },
     { group: 'Métricas', key: 'metrics.view', label: 'Ver métricas y dashboard' },
     { group: 'Anuncios', key: 'announcements.view', label: 'Ver anuncios' },
     { group: 'Anuncios', key: 'announcements.manage', label: 'Crear y publicar anuncios' },

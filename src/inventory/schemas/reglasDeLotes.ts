@@ -253,7 +253,7 @@ export function recibidoPorLote(
     });
 }
 
-// ── (2.82.0) El conteo por lote ─────────────────────────────────────────────────────────────
+// ── (2.84.0) El conteo por lote ─────────────────────────────────────────────────────────────
 
 /** Lo que mueve un conteo por lote: lo que sale de cada lote, lo que entra y el resto sin lote. */
 export interface ConteoPorLote {

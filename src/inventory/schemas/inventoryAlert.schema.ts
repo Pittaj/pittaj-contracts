@@ -483,7 +483,7 @@ export function armarTablero(e: EntradaDelTablero): InventoryHomeResponse {
     };
 }
 
-// ── Por correo (2.82.0) ───────────────────────────────────────────────────────────────────────
+// ── Por correo (2.84.0) ───────────────────────────────────────────────────────────────────────
 
 /** Lo que el correo necesita de una alerta sin revisar. */
 export interface AlertaParaCorreo {
@@ -508,7 +508,7 @@ export interface AvisoPorCorreo {
 export const RENGLONES_DEL_RESUMEN = 25;
 
 /**
- * (2.82.0) Los correos de alertas de un negocio (`inventory.alerts.emailUserIds` / `dailyDigest`).
+ * (2.84.0) Los correos de alertas de un negocio (`inventory.alerts.emailUserIds` / `dailyDigest`).
  *
  * - **Resumen diario** (`dailyDigest`): un correo con todo lo que sigue sin revisar, primero lo más
  *   grave y lo que más vale; nada si no hay nada.

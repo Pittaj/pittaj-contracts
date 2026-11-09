@@ -67,7 +67,7 @@ describe('qué mueve un combo', () => {
     });
 });
 
-describe('grupos de sustitución (2.82.0)', () => {
+describe('grupos de sustitución (2.84.0)', () => {
     const g = (id: string, q: number, grupo: string | null) => ({ productId: id, productName: id, unitId: null, quantity: q, substituteGroup: grupo });
     const comps = [g('pan', 1, null), g('cola', 1, 'refresco'), g('limon', 1, 'refresco'), g('papas', 1, 'guarnicion'), g('ensalada', 1, 'guarnicion')];
     it('se mueve uno por grupo: el elegido o el primero', () => {
@@ -89,7 +89,7 @@ describe('grupos de sustitución (2.82.0)', () => {
     });
 });
 
-describe('fusión de productos (2.82.0)', () => {
+describe('fusión de productos (2.84.0)', () => {
     const k = (id: string, q: number, unit: string | null = null, grupo: string | null = null) => ({ productId: id, productName: id, unitId: unit, quantity: q, substituteGroup: grupo });
     const f = new Map([['caja-12', 12], ['six', 6]]);
     it('re-apunta en unidad base, o suma al que ya estaba en su unidad', () => {

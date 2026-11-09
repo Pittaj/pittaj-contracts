@@ -173,13 +173,13 @@ export function proximaTanda(weekdays: readonly number[], ultima: string | null,
     return null;
 }
 
-/** (2.82.0) La semilla del id del conteo de la tanda automática de un plan en un día civil. */
+/** (2.84.0) La semilla del id del conteo de la tanda automática de un plan en un día civil. */
 export function semillaDeTandaAutomatica(planId: string, fecha: string): string {
     return `stock:count-plan-run:${planId}:${fecha}`;
 }
 
 /**
- * (2.82.0) ¿Le toca hoy su tanda automática? Activo, con `autoRun`, hoy es uno de sus días y la
+ * (2.84.0) ¿Le toca hoy su tanda automática? Activo, con `autoRun`, hoy es uno de sus días y la
  * última tanda no fue hoy. La nube y el escritorio lo preguntan igual; quien llegue segundo
  * encuentra el conteo por su id determinista y no crea otro.
  */

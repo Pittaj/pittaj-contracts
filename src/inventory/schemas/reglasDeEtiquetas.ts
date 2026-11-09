@@ -185,7 +185,7 @@ export interface DatosDeEtiqueta {
     readonly variant: string | null;
     readonly serialNumber: string | null;
     readonly companyName: string | null;
-    /** (2.82.0) La ubicación en la bodega (pasillo/anaquel). Opcional: quien no la sabe, no la pone. */
+    /** (2.84.0) La ubicación en la bodega (pasillo/anaquel). Opcional: quien no la sabe, no la pone. */
     readonly location?: string | null;
 }
 
@@ -506,7 +506,7 @@ export const PLANTILLAS_SUGERIDAS: readonly PlantillaSugerida[] = [
         output: 'PDF_SHEET', symbology: 'CODE128', fields: ['NAME', 'VARIANT', 'PRICE', 'BARCODE'],
     },
     {
-        // (2.82.0) La etiqueta de anaquel: dónde va, además de qué es y cuánto cuesta.
+        // (2.84.0) La etiqueta de anaquel: dónde va, además de qué es y cuánto cuesta.
         clave: 'ANAQUEL_UBICACION', name: 'Anaquel con ubicación, A4 24 por hoja (70 × 37)', widthMm: 70, heightMm: 37, columns: 3, rows: 8,
         pageSize: 'A4', marginTopMm: 0.5, marginLeftMm: 0, gapXMm: 0, gapYMm: 0,
         output: 'PDF_SHEET', symbology: 'CODE128', fields: ['NAME', 'PRICE', 'LOCATION', 'BARCODE'],

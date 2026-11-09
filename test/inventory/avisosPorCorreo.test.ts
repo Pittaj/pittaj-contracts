@@ -1,4 +1,4 @@
-/** (2.82.0) Las alertas de inventario por correo: resumen diario o una por alerta nueva. */
+/** (2.84.0) Las alertas de inventario por correo: resumen diario o una por alerta nueva. */
 import { describe, expect, it } from 'vitest';
 import { avisosPorCorreo, RENGLONES_DEL_RESUMEN, type AlertaParaCorreo } from '../../src/inventory/schemas/inventoryAlert.schema.js';
 

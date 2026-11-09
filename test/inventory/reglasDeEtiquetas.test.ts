@@ -104,7 +104,7 @@ describe('trabajo', () => {
     });
 });
 
-describe('ubicación en la etiqueta de anaquel (2.82.0)', () => {
+describe('ubicación en la etiqueta de anaquel (2.84.0)', () => {
     const base = {
         name: 'Arroz', code: 'ARR', barcode: null, price: 25, priceWholesale: null, currency: 'MXN', unitName: null, categoryName: null,
         lotNumber: null, expiresAt: null, variant: null, serialNumber: null, companyName: null,

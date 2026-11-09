@@ -30,7 +30,7 @@ export const LABEL_FIELDS = [
     'SERIAL',
     'VARIANT',
     'COMPANY',
-    /** (2.82.0) Dónde va en la bodega (pasillo/anaquel), la del nivel del producto en la bodega de la impresión. */
+    /** (2.84.0) Dónde va en la bodega (pasillo/anaquel), la del nivel del producto en la bodega de la impresión. */
     'LOCATION',
 ] as const;
 export type LabelField = (typeof LABEL_FIELDS)[number];
@@ -98,7 +98,7 @@ export const printLabelsSchema = z.object({
     skipPositions: z.number().int().min(0).max(299).optional().default(0),
     /** Sucursal cuya lista de precios manda si la plantilla no fija una (como en la caja). */
     locationId: z.string().uuid().nullish(),
-    /** (2.82.0) Bodega cuya ubicación de anaquel va en el campo `LOCATION`. Sin bodega, ese campo sale vacío. */
+    /** (2.84.0) Bodega cuya ubicación de anaquel va en el campo `LOCATION`. Sin bodega, ese campo sale vacío. */
     warehouseId: z.string().uuid().nullish(),
 });
 

@@ -50,7 +50,7 @@ const stockLevelBody = z
         /** Cuánto pedir de una vez (múltiplo de compra: cajas de 12). Nulo = lo que falte al máximo. */
         reorderQuantity: nivel.nullish(),
         source: z.enum(STOCK_LEVEL_SOURCES).optional().default('WAREHOUSE'),
-        /** (2.82.0) Dónde va en la bodega: pasillo, anaquel, nivel («A-03-2»). Texto libre; vacío = sin ubicación. */
+        /** (2.84.0) Dónde va en la bodega: pasillo, anaquel, nivel («A-03-2»). Texto libre; vacío = sin ubicación. */
         location: z.string().trim().max(40).nullish(),
     })
     .strict();

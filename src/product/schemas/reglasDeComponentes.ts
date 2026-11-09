@@ -14,7 +14,7 @@
  *   desarmarlo es su propio documento (I9c). Sus componentes sirven para eso y para saber cuántos
  *   alcanzan.
  *
- * **Grupos de sustitución** (2.82.0): los componentes con el mismo `substituteGroup` son
+ * **Grupos de sustitución** (2.84.0): los componentes con el mismo `substituteGroup` son
  * alternativas —refresco de cola **o** de limón—, no se suman. Al vender se mueve **uno** por grupo:
  * el que eligió el cajero o, si no eligió, el primero de la lista. El costo cuenta el primero; cuántos
  * alcanzan suma lo que alcanzan las alternativas del grupo.
@@ -80,7 +80,7 @@ export function bloqueoDeComponentes(
 /** Por grupo de sustitución, el componente elegido (`substituteGroup` → `productId`). */
 export type EleccionDeComponentes = Readonly<Record<string, string>>;
 
-/** (2.82.0) Los grupos con más de una alternativa, en el orden de la lista: lo que la caja deja elegir. */
+/** (2.84.0) Los grupos con más de una alternativa, en el orden de la lista: lo que la caja deja elegir. */
 export function gruposDeSustitucion(componentes: readonly ComponenteDeProducto[]): { group: string; options: ComponenteDeProducto[] }[] {
     const grupos = new Map<string, ComponenteDeProducto[]>();
     for (const c of componentes) {
@@ -91,7 +91,7 @@ export function gruposDeSustitucion(componentes: readonly ComponenteDeProducto[]
 }
 
 /**
- * (2.82.0) Los componentes que de verdad se mueven: los que no tienen grupo, y uno por grupo (el
+ * (2.84.0) Los componentes que de verdad se mueven: los que no tienen grupo, y uno por grupo (el
  * elegido si es de ese grupo; si no, el primero). En el orden de la lista.
  */
 export function componentesQueSeMueven(
@@ -165,7 +165,7 @@ export function cuantosAlcanzan(
 }
 
 /**
- * (2.82.0) Fusión de productos: la lista de componentes con el duplicado re-apuntado al que queda.
+ * (2.84.0) Fusión de productos: la lista de componentes con el duplicado re-apuntado al que queda.
  * La cantidad del duplicado pasa a unidad base (su unidad era suya, no del superviviente); si el que
  * queda ya estaba en la lista, se le suma en **su** unidad. Nulo si el duplicado no estaba.
  */

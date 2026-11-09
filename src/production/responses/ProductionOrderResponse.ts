@@ -21,7 +21,7 @@
  */
 
 /**
- * Estado de la orden: borrador (un plan) → liberada (compromete sus insumos: reserva, 2.82.0) →
+ * Estado de la orden: borrador (un plan) → liberada (compromete sus insumos: reserva, 2.84.0) →
  * completada y bloqueada. Una abierta (borrador o liberada) puede cancelarse; la liberada puede
  * volver a borrador y suelta lo reservado.
  */

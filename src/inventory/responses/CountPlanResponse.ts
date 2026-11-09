@@ -36,7 +36,7 @@ export interface CountPlanResponse {
     readonly includeLastDiscrepancies: boolean;
     readonly includeNegatives: boolean;
     readonly blind: boolean;
-    /** (2.82.0) La tanda se genera sola en sus días. Opcional: un plan anterior no lo trae (= false). */
+    /** (2.84.0) La tanda se genera sola en sus días. Opcional: un plan anterior no lo trae (= false). */
     readonly autoRun?: boolean;
     readonly assigneeUserId: string | null;
     readonly assigneeName: string | null;

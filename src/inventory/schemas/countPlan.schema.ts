@@ -68,7 +68,7 @@ const countPlanBody = z.object({
     /** Conteo ciego: el que cuenta no ve el teórico (ver `StockAdjustment.blind`). */
     blind: z.boolean().optional().default(true),
     /**
-     * (2.82.0) Generar la tanda sola en sus días, sin que nadie pulse «Generar». La nube la crea
+     * (2.84.0) Generar la tanda sola en sus días, sin que nadie pulse «Generar». La nube la crea
      * temprano en la mañana y el escritorio al abrir; el id del conteo es el de `semillaDeTandaAutomatica`,
      * así que las dos puntas crean el mismo y nunca sale doble.
      */

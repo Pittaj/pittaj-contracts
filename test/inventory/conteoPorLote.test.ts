@@ -1,4 +1,4 @@
-/** (2.82.0) El conteo por lote. Mismos vectores que `ConteoPorLoteTests` del escritorio. */
+/** (2.84.0) El conteo por lote. Mismos vectores que `ConteoPorLoteTests` del escritorio. */
 import { describe, expect, it } from 'vitest';
 import { conteoPorLote } from '../../src/inventory/index.js';
 

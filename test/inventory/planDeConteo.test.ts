@@ -115,7 +115,7 @@ describe('cobertura', () => {
     });
 });
 
-describe('tanda automática (2.82.0)', () => {
+describe('tanda automática (2.84.0)', () => {
     const plan = { status: 'ACTIVE', autoRun: true, weekdays: [1, 3] };
     it('toca en sus días, una vez al día', () => {
         expect(tocaTandaAutomatica(plan, null, '2026-11-02')).toBe(true); // lunes

@@ -56,7 +56,7 @@ describe('plan de reservas', () => {
     });
 });
 
-describe('producción (2.82.0)', () => {
+describe('producción (2.84.0)', () => {
     it('liberada reserva; terminada surte; borrador o cancelada suelta', () => {
         expect(['DRAFT', 'RELEASED', 'COMPLETED', 'CANCELLED'].map(accionDeProduccion)).toEqual(['RELEASE', 'RESERVE', 'FULFILL', 'RELEASE']);
     });

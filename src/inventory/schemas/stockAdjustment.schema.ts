@@ -133,7 +133,7 @@ const lineSchema = z
         unitCost: z.number().min(0).nullish(),
         /**
          * Rastreo (1.18.0). Producto por lote: una ENTRADA dice en qué lote(s) nace o se suma
-         * (`incomingLots`); una SALIDA, de cuáles sale (`lots`; ausente = FEFO/FIFO). (2.82.0) En un
+         * (`incomingLots`); una SALIDA, de cuáles sale (`lots`; ausente = FEFO/FIFO). (2.84.0) En un
          * conteo, `lots` es **lo que se encontró de cada lote** (suman como mucho lo contado; el resto se
          * contó sin lote): al aplicar, cada lote queda en lo contado y uno con saldo que no viene no se
          * encontró (`conteoPorLote`). Sin `lots`, el conteo es del producto entero.
