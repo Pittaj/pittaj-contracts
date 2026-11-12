@@ -49,10 +49,11 @@ describe('configuración de Inventario como claves', () => {
         expect(doc.negativeStock.policy).toBe('WARN');
         expect(doc.costing.costDecimals).toBe(4);
         expect(doc.abc.cutoffA).toBe(80);
-        expect(doc.accounting.crossCompanyTransfers).toBe('BLOCK');
+        expect(doc.accounting.crossCompanyTransfers).toBe('INTERCOMPANY_SALE');
+        expect(doc.accounting.intercompanyMarginPercent).toBe(0);
     });
 
-    it('el PUT exige cortes en orden y no deja encender la venta entre empresas', () => {
+    it('el PUT exige cortes en orden y (2.86.0) deja encender la venta entre empresas', () => {
         const base = INVENTORY_SETTINGS_DEFAULT;
         expect(updateInventorySettingsSchema.safeParse(base).success).toBe(true);
         expect(
@@ -67,7 +68,14 @@ describe('configuración de Inventario como claves', () => {
                 accounting: {
                     ...base.accounting,
                     crossCompanyTransfers: 'INTERCOMPANY_SALE',
+                    intercompanyMarginPercent: 12.5,
                 },
+            }).success,
+        ).toBe(true);
+        expect(
+            updateInventorySettingsSchema.safeParse({
+                ...base,
+                accounting: { ...base.accounting, intercompanyMarginPercent: -1 },
             }).success,
         ).toBe(false);
     });

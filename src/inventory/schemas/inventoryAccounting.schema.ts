@@ -21,7 +21,8 @@
  *    el traspaso entre bodegas con hueco distinto sí se postea (reclasificación al costo).
  * 3. **Traspaso entre empresas.** Dos empresas son dos contribuyentes: mover mercancía de una a
  *    otra es una **venta**, con CFDI, no un traspaso. Por defecto se bloquea
- *    ({@link CROSS_COMPANY_TRANSFER_POLICIES}); la venta entre empresas es trabajo futuro.
+ *    ({@link CROSS_COMPANY_TRANSFER_POLICIES}); con `INTERCOMPANY_SALE` (2.86.0) el traspaso
+ *    genera la venta y la compra ({@link precioEntreEmpresas}).
  * 4. **Periodo cerrado.** Un ajuste o conteo con fecha de un mes cerrado no se aplica: el kárdex
  *    lo aceptaría, pero la póliza no tendría dónde caer y el libro dejaría de cuadrar con el
  *    inventario ({@link CLOSED_PERIOD_POLICIES}).
@@ -142,11 +143,52 @@ export function diferenciaDeArmado(movimientos: readonly { direction: 'IN' | 'OU
 
 /**
  * Qué hacer con un traspaso cuyo origen y destino pertenecen a empresas distintas.
- * `INTERCOMPANY_SALE` (futuro): el traspaso genera una venta en la empresa origen (con CFDI) y
- * una compra en la destino, al costo o con margen.
+ * - `BLOCK` (por defecto): no se envía (`INVENTORY_CROSS_COMPANY_TRANSFER`).
+ * - `INTERCOMPANY_SALE` (2.86.0): se envía como cualquier traspaso y, al recibirlo, la nube genera
+ *   una **venta sin caja** en la empresa origen (el CFDI lo timbra el usuario desde ahí) y una
+ *   **compra recibida** en la destino, a {@link precioEntreEmpresas}. La mercancía la mueve el
+ *   traspaso: ni la venta ni la compra vuelven a tocar el kárdex.
  */
 export const CROSS_COMPANY_TRANSFER_POLICIES = ['BLOCK', 'INTERCOMPANY_SALE'] as const;
 export type CrossCompanyTransferPolicy = (typeof CROSS_COMPANY_TRANSFER_POLICIES)[number];
+
+// ── Venta entre empresas (2.86.0) ─────────────────────────────────────────────────────────────
+
+/**
+ * El precio unitario de la venta entre empresas: el costo promedio en origen más el margen, a cuatro
+ * decimales (los del costo). Es también el costo con que la mercancía **entra** a la empresa destino:
+ * para ella es una compra. Espejo: `VentaEntreEmpresas.Precio` en el escritorio.
+ */
+export function precioEntreEmpresas(costoUnitario: number, margenPorciento: number): number {
+    const m = Number.isFinite(margenPorciento) && margenPorciento > 0 ? margenPorciento : 0;
+    return Math.round(costoUnitario * (1 + m / 100) * 10000) / 10000;
+}
+
+/** Semilla del id de la venta sin caja que genera un traspaso entre empresas. */
+export function semillaDeVentaEntreEmpresas(transferId: string): string {
+    return `intercompany:sale:${transferId}`;
+}
+
+/** Semilla del id de la compra que genera un traspaso entre empresas en la empresa destino. */
+export function semillaDeCompraEntreEmpresas(transferId: string): string {
+    return `intercompany:purchase:${transferId}`;
+}
+
+/**
+ * Lo que un traspaso entre empresas recuerda de sí mismo, estampado **al enviar** (el margen de ese
+ * día, aunque luego cambie la configuración). Los ids de la venta y la compra se llenan al recibir.
+ */
+export interface IntercompanyTransferInfo {
+    readonly fromCompanyId: string;
+    readonly toCompanyId: string;
+    readonly marginPercent: number;
+    readonly saleId?: string | null;
+    readonly saleNumber?: string | null;
+    readonly purchaseId?: string | null;
+    readonly purchaseNumber?: string | null;
+    /** Si generar los documentos falló, por qué: se reintenta al volver a abrir el traspaso. */
+    readonly error?: string | null;
+}
 
 /**
  * Un documento con fecha en un periodo contable cerrado.
