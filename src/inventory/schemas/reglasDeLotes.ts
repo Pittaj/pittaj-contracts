@@ -252,3 +252,52 @@ export function recibidoPorLote(
         return t;
     });
 }
+
+// ── (2.84.0) El conteo por lote ─────────────────────────────────────────────────────────────
+
+/** Lo que mueve un conteo por lote: lo que sale de cada lote, lo que entra y el resto sin lote. */
+export interface ConteoPorLote {
+    readonly sale: readonly TramoDeLote[];
+    readonly entra: readonly TramoDeLote[];
+    readonly saleSinLote: number;
+    readonly entraSinLote: number;
+}
+
+/**
+ * Un renglón de conteo de un producto por lote dice **cuánto se encontró de cada lote**
+ * (`contados`). Cada lote queda en lo contado: si había más, la diferencia sale de ese lote; si
+ * había menos, entra a él. Un lote con saldo que no se contó **no se encontró** (sale todo). Lo que
+ * no cuadre con la diferencia del renglón (`diferencia`, contado − teórico) se mueve sin lote, así
+ * que el total del producto queda igual que en un conteo sin lotes.
+ *
+ * Mismos vectores que `ReglasDeLotes.ConteoPorLote` del escritorio.
+ */
+export function conteoPorLote(
+    contados: readonly TramoDeLote[],
+    saldos: readonly { lotId: string; lotNumber: string; onHand: number }[],
+    diferencia: number
+): ConteoPorLote {
+    const sale: TramoDeLote[] = [];
+    const entra: TramoDeLote[] = [];
+    const vistos = new Set<string>();
+    let suma = 0;
+    const mover = (lotId: string, lotNumber: string, d: number) => {
+        d = r4(d);
+        if (d < 0) sale.push({ lotId, lotNumber, quantity: -d });
+        else if (d > 0) entra.push({ lotId, lotNumber, quantity: d });
+        suma = r4(suma + d);
+    };
+    for (const s of saldos) {
+        if (vistos.has(s.lotId)) continue;
+        vistos.add(s.lotId);
+        const contado = contados.filter((c) => c.lotId === s.lotId).reduce((t, c) => t + c.quantity, 0);
+        mover(s.lotId, s.lotNumber, contado - Math.max(0, s.onHand));
+    }
+    for (const c of contados) {
+        if (vistos.has(c.lotId)) continue;
+        vistos.add(c.lotId);
+        mover(c.lotId, c.lotNumber, contados.filter((x) => x.lotId === c.lotId).reduce((t, x) => t + x.quantity, 0));
+    }
+    const resto = r4(diferencia - suma);
+    return { sale, entra, saleSinLote: resto < 0 ? -resto : 0, entraSinLote: resto > 0 ? resto : 0 };
+}

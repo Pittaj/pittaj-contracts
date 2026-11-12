@@ -185,6 +185,8 @@ export interface DatosDeEtiqueta {
     readonly variant: string | null;
     readonly serialNumber: string | null;
     readonly companyName: string | null;
+    /** (2.84.0) La ubicación en la bodega (pasillo/anaquel). Opcional: quien no la sabe, no la pone. */
+    readonly location?: string | null;
 }
 
 /** El texto de un campo (vacío = no va). BARCODE no es texto: son las barras. */
@@ -201,6 +203,7 @@ export function textoDeCampo(campo: LabelField, d: DatosDeEtiqueta): string {
         case 'SERIAL': return d.serialNumber ? `S/N ${d.serialNumber}` : '';
         case 'VARIANT': return d.variant ?? '';
         case 'COMPANY': return d.companyName ?? '';
+        case 'LOCATION': return d.location ? `Ubic. ${d.location}` : '';
         case 'BARCODE': return '';
     }
 }
@@ -503,6 +506,12 @@ export const PLANTILLAS_SUGERIDAS: readonly PlantillaSugerida[] = [
         output: 'PDF_SHEET', symbology: 'CODE128', fields: ['NAME', 'VARIANT', 'PRICE', 'BARCODE'],
     },
     {
+        // (2.84.0) La etiqueta de anaquel: dónde va, además de qué es y cuánto cuesta.
+        clave: 'ANAQUEL_UBICACION', name: 'Anaquel con ubicación, A4 24 por hoja (70 × 37)', widthMm: 70, heightMm: 37, columns: 3, rows: 8,
+        pageSize: 'A4', marginTopMm: 0.5, marginLeftMm: 0, gapXMm: 0, gapYMm: 0,
+        output: 'PDF_SHEET', symbology: 'CODE128', fields: ['NAME', 'PRICE', 'LOCATION', 'BARCODE'],
+    },
+    {
         clave: 'TERMICA_50x25', name: 'Térmica 50 × 25', widthMm: 50, heightMm: 25, columns: 1, rows: 1,
         pageSize: 'LETTER', marginTopMm: null, marginLeftMm: null, gapXMm: 0, gapYMm: 0,
         output: 'ZPL', symbology: 'CODE128', fields: ['NAME', 'PRICE', 'BARCODE'],
@@ -513,6 +522,7 @@ export const PLANTILLAS_SUGERIDAS: readonly PlantillaSugerida[] = [
 export const LABEL_FIELD_LABELS: Readonly<Record<LabelField, string>> = {
     NAME: 'Nombre', CODE: 'Código', BARCODE: 'Código de barras', PRICE: 'Precio', PRICE_WHOLESALE: 'Precio de mayoreo',
     UNIT: 'Unidad', CATEGORY: 'Categoría', LOT: 'Lote', EXPIRY: 'Caducidad', SERIAL: 'Número de serie', VARIANT: 'Variante', COMPANY: 'Empresa',
+    LOCATION: 'Ubicación',
 };
 export const LABEL_OUTPUT_LABELS: Readonly<Record<LabelOutput, string>> = { PDF_SHEET: 'Hoja (PDF)', ZPL: 'Térmica ZPL', EPL: 'Térmica EPL' };
 export const BARCODE_SYMBOLOGY_LABELS: Readonly<Record<BarcodeSymbology, string>> = { CODE128: 'Code 128', EAN13: 'EAN-13', QR: 'QR' };

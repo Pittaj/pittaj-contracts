@@ -19,6 +19,8 @@ export interface StockLevelResponse {
     readonly maxStock: number;
     readonly reorderQuantity: number | null;
     readonly source: StockLevelSource;
+    /** (2.84.0) Dónde va en la bodega («A-03-2»), o nulo. */
+    readonly location?: string | null;
 
     /** Lectura: la existencia de hoy, para que la hoja enseñe contra qué se compara. */
     readonly onHand?: number;

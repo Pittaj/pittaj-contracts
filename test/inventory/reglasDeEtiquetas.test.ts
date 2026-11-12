@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import {
     CODE128_ANCHOS,
+    textoDeCampo,
     barrasCode128,
     barrasDe,
     barrasEan13,
@@ -100,5 +101,16 @@ describe('trabajo', () => {
         expect(r[0]!.companyName).toBe('Mi tienda');
         expect(validarTrabajo([{ serialNumbers: [], copies: 0 }])).toBe('No hay etiquetas que imprimir.');
         expect(validarTrabajo([{ serialNumbers: [], copies: 5001 }])).toBe('Son 5001 etiquetas; el tope por impresión es 5000.');
+    });
+});
+
+describe('ubicación en la etiqueta de anaquel (2.84.0)', () => {
+    const base = {
+        name: 'Arroz', code: 'ARR', barcode: null, price: 25, priceWholesale: null, currency: 'MXN', unitName: null, categoryName: null,
+        lotNumber: null, expiresAt: null, variant: null, serialNumber: null, companyName: null,
+    };
+    it('con ubicación dice dónde va; sin ella, nada', () => {
+        expect(textoDeCampo('LOCATION', { ...base, location: 'A-03-2' })).toBe('Ubic. A-03-2');
+        expect(textoDeCampo('LOCATION', base)).toBe('');
     });
 });

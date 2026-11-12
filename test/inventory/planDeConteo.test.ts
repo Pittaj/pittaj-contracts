@@ -8,6 +8,8 @@ import {
     diaDeLaSemana,
     fnv1a,
     proximaTanda,
+    semillaDeTandaAutomatica,
+    tocaTandaAutomatica,
     tandaDelPlan,
     type PlanParaTanda,
     type ProductoDelPlan,
@@ -110,5 +112,23 @@ describe('cobertura', () => {
             { abcClass: 'B', products: 3, countedOnTime: 1, overdue: 2, accuracy: 0.5 },
             { abcClass: 'C', products: 2, countedOnTime: 1, overdue: 1, accuracy: 1 },
         ]);
+    });
+});
+
+describe('tanda automática (2.84.0)', () => {
+    const plan = { status: 'ACTIVE', autoRun: true, weekdays: [1, 3] };
+    it('toca en sus días, una vez al día', () => {
+        expect(tocaTandaAutomatica(plan, null, '2026-11-02')).toBe(true); // lunes
+        expect(tocaTandaAutomatica(plan, '2026-11-02', '2026-11-02')).toBe(false); // ya se generó hoy
+        expect(tocaTandaAutomatica(plan, '2026-10-28', '2026-11-03')).toBe(false); // martes
+        expect(tocaTandaAutomatica(plan, '2026-11-02', '2026-11-04')).toBe(true); // miércoles
+    });
+    it('sin autoRun o en pausa, nunca', () => {
+        expect(tocaTandaAutomatica({ ...plan, autoRun: false }, null, '2026-11-02')).toBe(false);
+        expect(tocaTandaAutomatica({ ...plan, status: 'PAUSED' }, null, '2026-11-02')).toBe(false);
+        expect(tocaTandaAutomatica({ status: 'ACTIVE', weekdays: [1] }, null, '2026-11-02')).toBe(false);
+    });
+    it('la semilla del conteo', () => {
+        expect(semillaDeTandaAutomatica('p1', '2026-11-02')).toBe('stock:count-plan-run:p1:2026-11-02');
     });
 });

@@ -20,8 +20,12 @@
  * @module Contracts/Production
  */
 
-/** Estado de la orden: borrador editable → completada y bloqueada. */
-export type ProductionOrderStatus = 'DRAFT' | 'COMPLETED';
+/**
+ * Estado de la orden: borrador (un plan) → liberada (compromete sus insumos: reserva, 2.84.0) →
+ * completada y bloqueada. Una abierta (borrador o liberada) puede cancelarse; la liberada puede
+ * volver a borrador y suelta lo reservado.
+ */
+export type ProductionOrderStatus = 'DRAFT' | 'RELEASED' | 'COMPLETED' | 'CANCELLED';
 
 /** Consumo de una orden de producción. */
 export interface ProductionOrderLineResponse {

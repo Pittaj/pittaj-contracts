@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
     accionDeApartado,
     accionDePedido,
+    accionDeProduccion,
     accionDeTraspaso,
     agruparRenglones,
     planDeReservas,
@@ -52,5 +53,11 @@ describe('plan de reservas', () => {
         const ex = [e('a', 'p1', 2), e('b', 'p2', 1, 'RELEASED')];
         expect(planDeReservas(ex, [], 'FULFILL').cerrar).toEqual([{ id: 'a', status: 'FULFILLED' }]);
         expect(planDeReservas(ex, [r('p1', 2)], 'RELEASE').cerrar).toEqual([{ id: 'a', status: 'RELEASED' }]);
+    });
+});
+
+describe('producción (2.84.0)', () => {
+    it('liberada reserva; terminada surte; borrador o cancelada suelta', () => {
+        expect(['DRAFT', 'RELEASED', 'COMPLETED', 'CANCELLED'].map(accionDeProduccion)).toEqual(['RELEASE', 'RESERVE', 'FULFILL', 'RELEASE']);
     });
 });

@@ -17,8 +17,8 @@
  * - **Liberar** (`RELEASE`): el documento se canceló o dejó de comprometer. Las activas pasan a
  *   `RELEASED`.
  *
- * Producción no reserva todavía: su orden solo tiene borrador y terminada, y un borrador es un plan,
- * no un compromiso. Reservará cuando exista la orden liberada.
+ * **Producción** (2.84.0): la orden **liberada** compromete sus insumos en su bodega; terminada,
+ * salieron; borrador o cancelada, se sueltan. Un borrador es un plan, no un compromiso.
  */
 
 import type { StockReservationSource, StockReservationStatus } from './stockReservation.schema.js';
@@ -49,6 +49,20 @@ export function accionDeTraspaso(status: StockTransferStatus): AccionDeReserva {
 export function accionDePedido(status: string): AccionDeReserva {
     if (status === 'CONFIRMED' || status === 'PREPARING' || status === 'READY') return 'RESERVE';
     if (status === 'SHIPPED' || status === 'DELIVERED' || status === 'COMPLETED') return 'FULFILL';
+    return 'RELEASE';
+}
+
+/**
+ * (2.84.0) Orden de producción: liberada compromete los insumos (lo que se va a consumir) en su
+ * bodega; terminada, salieron; borrador o cancelada se sueltan.
+ *
+ * Ojo, quien mueva la orden: **de liberada a borrador** no se libera, se reserva con cero renglones
+ * (la reserva queda en cero, activa). El id es determinista y una cerrada no se reabre, así que
+ * liberarla otra vez no podría revivirla.
+ */
+export function accionDeProduccion(status: string): AccionDeReserva {
+    if (status === 'RELEASED') return 'RESERVE';
+    if (status === 'COMPLETED') return 'FULFILL';
     return 'RELEASE';
 }
 

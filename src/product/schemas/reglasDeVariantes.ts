@@ -153,3 +153,45 @@ export function planDeVariantes(
         archivar: anteriores.filter((id) => !quedan.has(id) && existe.has(id)),
     };
 }
+
+// ── La caja (2.84.0) ──────────────────────────────────────────────────────────────────────────
+
+/** Lo que la caja sabe de cada variante para elegirla. */
+export interface VarianteParaElegir {
+    readonly id: string;
+    readonly values: Readonly<Record<string, string>>;
+    readonly active: boolean;
+}
+
+/** ¿La variante cuadra con lo elegido en todos los atributos menos `salvo`? */
+function cuadra(v: VarianteParaElegir, elegidos: Readonly<Record<string, string>>, salvo: string | null): boolean {
+    return Object.entries(elegidos).every(([k, val]) => k === salvo || val === '' || v.values[k] === val);
+}
+
+/**
+ * Para cada atributo, los valores que todavía llevan a una variante **activa**, dado lo elegido en
+ * los demás atributos. En el orden de la matriz. Una combinación archivada no se ofrece.
+ */
+export function opcionesDeVariante(
+    attributes: readonly AtributoDeVariante[],
+    variants: readonly VarianteParaElegir[],
+    elegidos: Readonly<Record<string, string>>
+): Record<string, string[]> {
+    const activas = variants.filter((v) => v.active);
+    const r: Record<string, string[]> = {};
+    for (const a of attributes) {
+        const posibles = new Set(activas.filter((v) => cuadra(v, elegidos, a.name)).map((v) => v.values[a.name]));
+        r[a.name] = a.values.filter((val) => posibles.has(val));
+    }
+    return r;
+}
+
+/** La variante activa que corresponde a lo elegido, o nulo si falta un atributo o no existe. */
+export function varianteElegida(
+    attributes: readonly AtributoDeVariante[],
+    variants: readonly VarianteParaElegir[],
+    elegidos: Readonly<Record<string, string>>
+): string | null {
+    if (attributes.some((a) => !elegidos[a.name])) return null;
+    return variants.find((v) => v.active && attributes.every((a) => v.values[a.name] === elegidos[a.name]))?.id ?? null;
+}

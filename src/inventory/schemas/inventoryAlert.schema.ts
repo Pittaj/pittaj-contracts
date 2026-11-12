@@ -482,3 +482,64 @@ export function armarTablero(e: EntradaDelTablero): InventoryHomeResponse {
             .sort((a, b) => b.value - a.value || a.warehouseName.localeCompare(b.warehouseName)),
     };
 }
+
+// ── Por correo (2.84.0) ───────────────────────────────────────────────────────────────────────
+
+/** Lo que el correo necesita de una alerta sin revisar. */
+export interface AlertaParaCorreo {
+    readonly id: string;
+    readonly kind: InventoryAlertKind;
+    readonly severity: InventoryAlertSeverity;
+    readonly message: string;
+    readonly valueAtRisk: number;
+    /** Desde cuándo está así (ISO). */
+    readonly since: string;
+}
+
+/** Un correo de alertas: su asunto y sus renglones, ya en texto. */
+export interface AvisoPorCorreo {
+    readonly asunto: string;
+    readonly renglones: readonly string[];
+    /** Alertas que cubre (para «y N más»). */
+    readonly total: number;
+}
+
+/** Renglones que entran en un resumen; lo demás se dice como «y N más». */
+export const RENGLONES_DEL_RESUMEN = 25;
+
+/**
+ * (2.84.0) Los correos de alertas de un negocio (`inventory.alerts.emailUserIds` / `dailyDigest`).
+ *
+ * - **Resumen diario** (`dailyDigest`): un correo con todo lo que sigue sin revisar, primero lo más
+ *   grave y lo que más vale; nada si no hay nada.
+ * - **Uno por alerta**: un correo por cada alerta que **apareció en las últimas 24 horas** (lo que
+ *   ya se avisó ayer no se repite). Como mucho `RENGLONES_DEL_RESUMEN`.
+ *
+ * Lo revisado no llega aquí: se filtra antes con `estaRevisada`.
+ */
+export function avisosPorCorreo(alertas: readonly AlertaParaCorreo[], dailyDigest: boolean, ahora: Date): AvisoPorCorreo[] {
+    const orden = [...alertas].sort(
+        (x, y) => SEVERIDAD_ORDEN[x.severity] - SEVERIDAD_ORDEN[y.severity] || y.valueAtRisk - x.valueAtRisk || x.id.localeCompare(y.id)
+    );
+    if (!dailyDigest) {
+        const hace24 = ahora.getTime() - 86_400_000;
+        return orden
+            .filter((a) => Date.parse(a.since) > hace24)
+            .slice(0, RENGLONES_DEL_RESUMEN)
+            .map((a) => ({ asunto: `Inventario: ${a.message}`, renglones: [a.message], total: 1 }));
+    }
+    if (orden.length === 0) return [];
+    const altas = orden.filter((a) => a.severity === 'HIGH').length;
+    const porTipo = INVENTORY_ALERT_KINDS.map((k) => [k, orden.filter((a) => a.kind === k).length] as const)
+        .filter(([, n]) => n > 0)
+        .map(([k, n]) => `${INVENTORY_ALERT_KIND_LABELS[k]}: ${n}`)
+        .join(' · ');
+    const renglones = [porTipo, ...orden.slice(0, RENGLONES_DEL_RESUMEN).map((a) => a.message)];
+    if (orden.length > RENGLONES_DEL_RESUMEN) renglones.push(`y ${orden.length - RENGLONES_DEL_RESUMEN} más`);
+    const n = orden.length;
+    return [{
+        asunto: `Inventario: ${n} ${n === 1 ? 'alerta' : 'alertas'} sin revisar${altas > 0 ? ` (${altas} ${altas === 1 ? 'grave' : 'graves'})` : ''}`,
+        renglones,
+        total: n,
+    }];
+}
