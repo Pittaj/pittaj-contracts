@@ -186,9 +186,51 @@ export const writeOffEvidenceSchema = z
         date: z.coerce.date().nullish(),
         /** Id del archivo adjunto (almacenamiento de documentos), si se subió. */
         fileId: z.string().uuid().nullish(),
+        /** (2.85.0) Nombre del archivo, para enseñarlo y descargarlo con su nombre. */
+        fileName: z.string().trim().max(200).nullish(),
     })
     .strict();
 export type WriteOffEvidenceInput = z.infer<typeof writeOffEvidenceSchema>;
+
+/**
+ * (2.85.0) Las bajas que piden soporte fiscal cuando pasan del umbral
+ * (`accounting.requireEvidenceAboveValue`): robo, caducidad y daño. Una merma ordinaria o un
+ * consumo interno no: no hay aviso que presentar.
+ */
+export const MOTIVOS_QUE_PIDEN_EVIDENCIA = ['THEFT', 'EXPIRED', 'DAMAGE'] as const;
+
+/** (2.85.0) Las etiquetas de cada tipo de soporte, para las dos pantallas. */
+export const WRITE_OFF_EVIDENCE_LABELS: Readonly<Record<WriteOffEvidenceKind, string>> = {
+    DESTRUCTION_NOTICE: 'Aviso de destrucción (SAT)',
+    POLICE_REPORT: 'Denuncia o acta ante el MP',
+    DONATION: 'Donación con CFDI',
+    INTERNAL_RECORD: 'Acta interna o fotos',
+};
+
+/**
+ * (2.85.0) Si a una baja le falta su soporte: un ajuste (no un conteo) por robo, caducidad o daño
+ * cuya salida vale más que el umbral (`valorDeLaBaja` = Σ cantidad × costo promedio de lo que sale)
+ * y no trae ningún soporte. Devuelve la frase para el usuario, o nulo. Umbral 0 = nunca se pide.
+ */
+export function evidenciaFaltante(p: {
+    kind: 'ADJUSTMENT' | 'COUNT';
+    reason: string;
+    valorDeLaBaja: number;
+    umbral: number;
+    evidencias: number;
+}): string | null {
+    if (p.kind !== 'ADJUSTMENT' || !(p.umbral > 0) || p.evidencias > 0) return null;
+    if (!(MOTIVOS_QUE_PIDEN_EVIDENCIA as readonly string[]).includes(p.reason)) return null;
+    const valor = Math.round(p.valorDeLaBaja * 100) / 100;
+    if (!(valor > p.umbral)) return null;
+    return `Esta baja vale $${pesos(valor)} y la configuración pide soporte arriba de $${pesos(p.umbral)}: agrega el aviso de destrucción, la denuncia o el acta antes de aplicarla.`;
+}
+
+/** `1,500.00`: sin depender del `Intl` del entorno (el escritorio formatea igual). */
+function pesos(n: number): string {
+    const [ent, dec] = (Math.round(n * 100) / 100).toFixed(2).split('.');
+    return `${ent!.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}.${dec}`;
+}
 
 /** Estado de la póliza de un documento de inventario. Lectura: lo escribe Contabilidad. */
 export const INVENTORY_POSTING_STATUSES = [
