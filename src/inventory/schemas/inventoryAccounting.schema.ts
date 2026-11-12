@@ -124,6 +124,23 @@ export function cuentaDeInventarioDeBodega(bodega: {
 export const HUECO_FALTANTE_DE_TRASPASO: InventoryPostingSlot = 'INVENTORY_SHRINKAGE';
 
 /**
+ * (2.85.0) A dónde va la diferencia de un armado o desarmado de kits: lo que entró al kárdex vale
+ * distinto de lo que salió. Al armar casi nunca pasa (el kit entra a la suma de sus componentes);
+ * al desarmar sí: el kit sale a su promedio y los componentes entran a los suyos. Es una
+ * diferencia de valuación, no una merma.
+ */
+export const HUECO_DIFERENCIA_DE_ARMADO: InventoryPostingSlot = 'INVENTORY_ADJUSTMENT';
+
+/**
+ * (2.85.0) La diferencia de un armado: lo que entró menos lo que salió, al costo de cada movimiento,
+ * en centavos redondeados. Positiva = el inventario ganó valor. Cero = no hay póliza.
+ */
+export function diferenciaDeArmado(movimientos: readonly { direction: 'IN' | 'OUT'; quantity: number; unitCost: number }[]): number {
+    const centavos = movimientos.reduce((s, m) => s + (m.direction === 'IN' ? 1 : -1) * m.quantity * m.unitCost, 0);
+    return Math.round(centavos * 100) / 100;
+}
+
+/**
  * Qué hacer con un traspaso cuyo origen y destino pertenecen a empresas distintas.
  * `INTERCOMPANY_SALE` (futuro): el traspaso genera una venta en la empresa origen (con CFDI) y
  * una compra en la destino, al costo o con margen.
