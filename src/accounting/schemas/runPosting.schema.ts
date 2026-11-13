@@ -38,6 +38,8 @@ export const POSTING_SWEEPS = [
     { key: 'stock-movements', label: 'Merma, ajuste, conteo e inicial' },
     // I4b: el traspaso recibido entre bodegas de cuentas distintas (reclasificación) o con faltante.
     { key: 'stock-transfers', label: 'Traspasos entre cuentas de inventario y faltantes' },
+    // (2.85.0) El armado o desarmado de kits: solo la diferencia entre lo que entró y lo que salió.
+    { key: 'kit-assemblies', label: 'Diferencias de armado y desarmado de kits' },
     { key: 'cash-movements', label: 'Movimientos de efectivo' },
     { key: 'supplier-notes', label: 'Notas de proveedor' },
     { key: 'sales-returns', label: 'Devoluciones de venta' },

@@ -21,7 +21,8 @@
  *    el traspaso entre bodegas con hueco distinto sí se postea (reclasificación al costo).
  * 3. **Traspaso entre empresas.** Dos empresas son dos contribuyentes: mover mercancía de una a
  *    otra es una **venta**, con CFDI, no un traspaso. Por defecto se bloquea
- *    ({@link CROSS_COMPANY_TRANSFER_POLICIES}); la venta entre empresas es trabajo futuro.
+ *    ({@link CROSS_COMPANY_TRANSFER_POLICIES}); con `INTERCOMPANY_SALE` (2.86.0) el traspaso
+ *    genera la venta y la compra ({@link precioEntreEmpresas}).
  * 4. **Periodo cerrado.** Un ajuste o conteo con fecha de un mes cerrado no se aplica: el kárdex
  *    lo aceptaría, pero la póliza no tendría dónde caer y el libro dejaría de cuadrar con el
  *    inventario ({@link CLOSED_PERIOD_POLICIES}).
@@ -124,12 +125,70 @@ export function cuentaDeInventarioDeBodega(bodega: {
 export const HUECO_FALTANTE_DE_TRASPASO: InventoryPostingSlot = 'INVENTORY_SHRINKAGE';
 
 /**
+ * (2.85.0) A dónde va la diferencia de un armado o desarmado de kits: lo que entró al kárdex vale
+ * distinto de lo que salió. Al armar casi nunca pasa (el kit entra a la suma de sus componentes);
+ * al desarmar sí: el kit sale a su promedio y los componentes entran a los suyos. Es una
+ * diferencia de valuación, no una merma.
+ */
+export const HUECO_DIFERENCIA_DE_ARMADO: InventoryPostingSlot = 'INVENTORY_ADJUSTMENT';
+
+/**
+ * (2.85.0) La diferencia de un armado: lo que entró menos lo que salió, al costo de cada movimiento,
+ * en centavos redondeados. Positiva = el inventario ganó valor. Cero = no hay póliza.
+ */
+export function diferenciaDeArmado(movimientos: readonly { direction: 'IN' | 'OUT'; quantity: number; unitCost: number }[]): number {
+    const centavos = movimientos.reduce((s, m) => s + (m.direction === 'IN' ? 1 : -1) * m.quantity * m.unitCost, 0);
+    return Math.round(centavos * 100) / 100;
+}
+
+/**
  * Qué hacer con un traspaso cuyo origen y destino pertenecen a empresas distintas.
- * `INTERCOMPANY_SALE` (futuro): el traspaso genera una venta en la empresa origen (con CFDI) y
- * una compra en la destino, al costo o con margen.
+ * - `BLOCK` (por defecto): no se envía (`INVENTORY_CROSS_COMPANY_TRANSFER`).
+ * - `INTERCOMPANY_SALE` (2.86.0): se envía como cualquier traspaso y, al recibirlo, la nube genera
+ *   una **venta sin caja** en la empresa origen (el CFDI lo timbra el usuario desde ahí) y una
+ *   **compra recibida** en la destino, a {@link precioEntreEmpresas}. La mercancía la mueve el
+ *   traspaso: ni la venta ni la compra vuelven a tocar el kárdex.
  */
 export const CROSS_COMPANY_TRANSFER_POLICIES = ['BLOCK', 'INTERCOMPANY_SALE'] as const;
 export type CrossCompanyTransferPolicy = (typeof CROSS_COMPANY_TRANSFER_POLICIES)[number];
+
+// ── Venta entre empresas (2.86.0) ─────────────────────────────────────────────────────────────
+
+/**
+ * El precio unitario de la venta entre empresas: el costo promedio en origen más el margen, a cuatro
+ * decimales (los del costo). Es también el costo con que la mercancía **entra** a la empresa destino:
+ * para ella es una compra. Espejo: `VentaEntreEmpresas.Precio` en el escritorio.
+ */
+export function precioEntreEmpresas(costoUnitario: number, margenPorciento: number): number {
+    const m = Number.isFinite(margenPorciento) && margenPorciento > 0 ? margenPorciento : 0;
+    return Math.round(costoUnitario * (1 + m / 100) * 10000) / 10000;
+}
+
+/** Semilla del id de la venta sin caja que genera un traspaso entre empresas. */
+export function semillaDeVentaEntreEmpresas(transferId: string): string {
+    return `intercompany:sale:${transferId}`;
+}
+
+/** Semilla del id de la compra que genera un traspaso entre empresas en la empresa destino. */
+export function semillaDeCompraEntreEmpresas(transferId: string): string {
+    return `intercompany:purchase:${transferId}`;
+}
+
+/**
+ * Lo que un traspaso entre empresas recuerda de sí mismo, estampado **al enviar** (el margen de ese
+ * día, aunque luego cambie la configuración). Los ids de la venta y la compra se llenan al recibir.
+ */
+export interface IntercompanyTransferInfo {
+    readonly fromCompanyId: string;
+    readonly toCompanyId: string;
+    readonly marginPercent: number;
+    readonly saleId?: string | null;
+    readonly saleNumber?: string | null;
+    readonly purchaseId?: string | null;
+    readonly purchaseNumber?: string | null;
+    /** Si generar los documentos falló, por qué: se reintenta al volver a abrir el traspaso. */
+    readonly error?: string | null;
+}
 
 /**
  * Un documento con fecha en un periodo contable cerrado.
@@ -169,9 +228,51 @@ export const writeOffEvidenceSchema = z
         date: z.coerce.date().nullish(),
         /** Id del archivo adjunto (almacenamiento de documentos), si se subió. */
         fileId: z.string().uuid().nullish(),
+        /** (2.85.0) Nombre del archivo, para enseñarlo y descargarlo con su nombre. */
+        fileName: z.string().trim().max(200).nullish(),
     })
     .strict();
 export type WriteOffEvidenceInput = z.infer<typeof writeOffEvidenceSchema>;
+
+/**
+ * (2.85.0) Las bajas que piden soporte fiscal cuando pasan del umbral
+ * (`accounting.requireEvidenceAboveValue`): robo, caducidad y daño. Una merma ordinaria o un
+ * consumo interno no: no hay aviso que presentar.
+ */
+export const MOTIVOS_QUE_PIDEN_EVIDENCIA = ['THEFT', 'EXPIRED', 'DAMAGE'] as const;
+
+/** (2.85.0) Las etiquetas de cada tipo de soporte, para las dos pantallas. */
+export const WRITE_OFF_EVIDENCE_LABELS: Readonly<Record<WriteOffEvidenceKind, string>> = {
+    DESTRUCTION_NOTICE: 'Aviso de destrucción (SAT)',
+    POLICE_REPORT: 'Denuncia o acta ante el MP',
+    DONATION: 'Donación con CFDI',
+    INTERNAL_RECORD: 'Acta interna o fotos',
+};
+
+/**
+ * (2.85.0) Si a una baja le falta su soporte: un ajuste (no un conteo) por robo, caducidad o daño
+ * cuya salida vale más que el umbral (`valorDeLaBaja` = Σ cantidad × costo promedio de lo que sale)
+ * y no trae ningún soporte. Devuelve la frase para el usuario, o nulo. Umbral 0 = nunca se pide.
+ */
+export function evidenciaFaltante(p: {
+    kind: 'ADJUSTMENT' | 'COUNT';
+    reason: string;
+    valorDeLaBaja: number;
+    umbral: number;
+    evidencias: number;
+}): string | null {
+    if (p.kind !== 'ADJUSTMENT' || !(p.umbral > 0) || p.evidencias > 0) return null;
+    if (!(MOTIVOS_QUE_PIDEN_EVIDENCIA as readonly string[]).includes(p.reason)) return null;
+    const valor = Math.round(p.valorDeLaBaja * 100) / 100;
+    if (!(valor > p.umbral)) return null;
+    return `Esta baja vale $${pesos(valor)} y la configuración pide soporte arriba de $${pesos(p.umbral)}: agrega el aviso de destrucción, la denuncia o el acta antes de aplicarla.`;
+}
+
+/** `1,500.00`: sin depender del `Intl` del entorno (el escritorio formatea igual). */
+function pesos(n: number): string {
+    const [ent, dec] = (Math.round(n * 100) / 100).toFixed(2).split('.');
+    return `${ent!.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}.${dec}`;
+}
 
 /** Estado de la póliza de un documento de inventario. Lectura: lo escribe Contabilidad. */
 export const INVENTORY_POSTING_STATUSES = [

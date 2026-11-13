@@ -239,7 +239,31 @@ export const updateStockAdjustmentSchema = z.object({
     /** (I6a) Reasignar el conteo. Ausente = no cambia; `null` = sin asignar. */
     assigneeUserId: z.string().uuid().nullish(),
     assigneeName: z.string().trim().max(200).nullish(),
+    /** (2.85.0) El soporte de la baja. Ausente = no cambia. */
+    evidence: z.array(writeOffEvidenceSchema).max(10).optional(),
 });
+
+/**
+ * PUT /api/stock-adjustments/:id/evidence (2.85.0) — el soporte de una baja, también ya aplicada (el
+ * aviso de destrucción o la denuncia llegan días después). Reemplaza la lista entera.
+ */
+export const setStockAdjustmentEvidenceSchema = z.object({
+    version: z.number().int().min(1),
+    evidence: z.array(writeOffEvidenceSchema).max(10),
+});
+export type SetStockAdjustmentEvidenceInput = z.infer<typeof setStockAdjustmentEvidenceSchema>;
+
+/**
+ * POST /api/stock-adjustments/evidence-files (2.85.0) — sube el archivo del soporte (PDF o foto, hasta
+ * 10 MB) y devuelve su id, que va en `evidence[].fileId`. Se sube antes de guardar el ajuste, así un
+ * borrador del escritorio puede llevarlo aunque el documento suba después por el sync.
+ */
+export interface EvidenceFileResponse {
+    readonly fileId: string;
+    readonly fileName: string | null;
+}
+export const EVIDENCE_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'] as const;
+export const EVIDENCE_FILE_MAX_BYTES = 10 * 1024 * 1024;
 
 /**
  * POST /api/stock-counts/:id/close-capture (I6a) — terminar de contar. En un conteo ciego es lo que

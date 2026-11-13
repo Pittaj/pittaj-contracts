@@ -115,10 +115,13 @@ export const inventorySettingsSchema = z.object({
         .object({
             closedPeriodPolicy: z.enum(CLOSED_PERIOD_POLICIES).default('BLOCK'),
             /**
-             * Hoy solo `BLOCK`: la venta entre empresas no existe aún. El enum completo se queda en
-             * `inventoryAccounting.schema.ts` para no cambiar la forma el día que exista.
+             * Traspasos entre bodegas de empresas distintas. `BLOCK` los impide; (2.86.0)
+             * `INTERCOMPANY_SALE` los deja pasar y al recibirlos genera la venta en la empresa origen
+             * y la compra en la destino, a `precioEntreEmpresas` (costo + margen).
              */
             crossCompanyTransfers: z.enum(CROSS_COMPANY_TRANSFER_POLICIES).default('BLOCK'),
+            /** (2.86.0) Margen sobre el costo de la venta entre empresas, en porcentaje. 0 = al costo. */
+            intercompanyMarginPercent: z.number().min(0).max(1000).default(0),
             /** Bajas por robo, caducidad o daño que pasen de este valor piden soporte fiscal. 0 = nunca. */
             requireEvidenceAboveValue: z.number().min(0).default(0),
         })
@@ -140,10 +143,6 @@ export const updateInventorySettingsSchema = inventorySettingsSchema
     .refine((v) => v.abc.cutoffA < v.abc.cutoffB, {
         message: 'El corte de la clase A tiene que ser menor que el de la B.',
         path: ['abc', 'cutoffA'],
-    })
-    .refine((v) => v.accounting.crossCompanyTransfers === 'BLOCK', {
-        message: 'La venta entre empresas todavía no existe: los traspasos entre empresas se impiden.',
-        path: ['accounting', 'crossCompanyTransfers'],
     });
 
 export type InventorySettings = z.infer<typeof inventorySettingsSchema>;
@@ -212,9 +211,6 @@ export function deClavesDeInventario(claves: Readonly<Record<string, string | nu
         crudo[seccion] = valores;
     }
     const doc = inventorySettingsSchema.parse(crudo);
-    // Lo que el PUT no deja guardar tampoco se lee: un valor futuro escrito por otra versión no
-    // enciende aquí algo que esta versión no sabe hacer.
-    if (doc.accounting.crossCompanyTransfers !== 'BLOCK') doc.accounting.crossCompanyTransfers = 'BLOCK';
     if (doc.abc.cutoffA >= doc.abc.cutoffB)
         doc.abc = {
             ...doc.abc,
