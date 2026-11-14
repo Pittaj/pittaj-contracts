@@ -199,6 +199,53 @@ export interface IntercompanyTransferInfo {
 export const CLOSED_PERIOD_POLICIES = ['BLOCK', 'POST_IN_OPEN'] as const;
 export type ClosedPeriodPolicy = (typeof CLOSED_PERIOD_POLICIES)[number];
 
+// ── Los meses cerrados, para quien no tiene Contabilidad (2.87.0) ──────────────────────────────
+//
+// El escritorio no lleva los periodos contables (F6), pero tiene que respetar el candado del mes
+// cerrado igual que la web. La nube publica los meses cerrados de cada empresa en el canal de
+// configuración (`inventory.closedPeriods.<companyId>`), que ya baja al escritorio, cada vez que
+// se cierra o reabre un mes. Sin red, el escritorio decide con lo último que bajó.
+
+/** Prefijo de las claves de meses cerrados: `inventory.closedPeriods.<companyId>`. */
+export const PREFIJO_MESES_CERRADOS = 'inventory.closedPeriods.' as const;
+
+export function claveDeMesesCerrados(companyId: string): string {
+    return `${PREFIJO_MESES_CERRADOS}${companyId}`;
+}
+
+/** Un mes cerrado: fechas civiles `YYYY-MM-DD`, los dos extremos incluidos. */
+export interface MesCerrado {
+    readonly start: string;
+    readonly end: string;
+}
+
+/** El valor de la clave: los meses cerrados, en orden. */
+export function escribirMesesCerrados(meses: readonly MesCerrado[]): string {
+    return JSON.stringify([...meses].sort((a, b) => a.start.localeCompare(b.start)).map((m) => ({ start: m.start, end: m.end })));
+}
+
+const FECHA_CIVIL = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Lee el valor de la clave; lo que no se entienda no cierra nada. Espejo: `MesesCerrados.Leer`. */
+export function leerMesesCerrados(json: string | null | undefined): MesCerrado[] {
+    if (!json) return [];
+    try {
+        const v = JSON.parse(json) as unknown;
+        if (!Array.isArray(v)) return [];
+        return v.filter(
+            (m): m is MesCerrado =>
+                !!m && typeof m === 'object' && FECHA_CIVIL.test(String((m as MesCerrado).start)) && FECHA_CIVIL.test(String((m as MesCerrado).end))
+        );
+    } catch {
+        return [];
+    }
+}
+
+/** ¿La fecha civil `YYYY-MM-DD` cae en un mes cerrado? Espejo: `MesesCerrados.Cerrado`. */
+export function fechaEnMesCerrado(meses: readonly MesCerrado[], fecha: string): boolean {
+    return meses.some((m) => m.start <= fecha && fecha <= m.end);
+}
+
 /** Código de error que devuelven aplicar/enviar/recibir/armar cuando la fecha cae en un periodo cerrado. */
 export const INVENTORY_PERIOD_CLOSED = 'INVENTORY_PERIOD_CLOSED' as const;
 /** Código de error de un traspaso entre empresas con la política en `BLOCK`. */
