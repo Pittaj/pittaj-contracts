@@ -130,6 +130,7 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
             { ruta: 'reportes/rotacion-abc', nombre: 'Rotación y ABC' },
             { ruta: 'reportes/exactitud-conteos', nombre: 'Exactitud de Conteos' },
             { ruta: 'reportes/caducidades', nombre: 'Caducidades' },
+            { ruta: 'reportes/contra-libro', nombre: 'Inventario contra libro' },
             { ruta: 'configuracion/costeo', nombre: 'Método de Costeo' },
             { ruta: 'configuracion/niveles-stock', nombre: 'Stock Mín/Máx' },
             { ruta: 'configuracion/alertas', nombre: 'Alertas' },
