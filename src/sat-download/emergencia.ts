@@ -47,8 +47,44 @@ export interface SatCloudPauseResponse {
     readonly resumeReason: string | null;
 }
 
+/**
+ * Si la e.firma **en la nube** se ofrece (decisión del dueño, 2026-11-15: la recomendada es el
+ * escritorio hasta que la nube pase una auditoría externa). Sin cambios registrados está APAGADA.
+ * `PILOTO` la abre solo para unos negocios, para probarla antes de abrirla a todos.
+ */
+export const SAT_CLOUD_MODES = ['APAGADA', 'PILOTO', 'ENCENDIDA'] as const;
+export type SatCloudMode = (typeof SAT_CLOUD_MODES)[number];
+
+/** POST /api/admin/sat/availability */
+export const setSatCloudAvailabilitySchema = z
+    .object({
+        mode: z.enum(SAT_CLOUD_MODES),
+        /** Con PILOTO, los negocios que sí la ven (al menos uno). Con los otros dos, nada. */
+        tenantIds: z.array(z.string().uuid()).max(100).optional(),
+        reason: motivo,
+    })
+    .strict()
+    .refine((b) => (b.mode === 'PILOTO' ? (b.tenantIds?.length ?? 0) > 0 : !b.tenantIds?.length), {
+        message: 'El piloto necesita al menos un negocio; apagada o encendida no lleva negocios.',
+        path: ['tenantIds'],
+    });
+export type SetSatCloudAvailabilityRequest = z.infer<typeof setSatCloudAvailabilitySchema>;
+
+export interface SatCloudAvailabilityResponse {
+    readonly mode: SatCloudMode;
+    readonly tenantIds: readonly string[];
+    /** Null si nunca se ha cambiado (está apagada de fábrica). */
+    readonly changedAt: string | null;
+    readonly changedByName: string | null;
+    readonly reason: string | null;
+}
+
 /** GET /api/admin/sat/emergency */
 export interface SatEmergencyStatusResponse {
+    /** Si la e.firma en la nube se ofrece, y a quién. */
+    readonly availability: SatCloudAvailabilityResponse;
+    /** Los últimos cambios de disponibilidad, el más reciente primero. */
+    readonly availabilityHistory: readonly SatCloudAvailabilityResponse[];
     /** La pausa vigente, o null si la nube está corriendo. */
     readonly pause: SatCloudPauseResponse | null;
     /** Las últimas pausas, la más reciente primero. */
