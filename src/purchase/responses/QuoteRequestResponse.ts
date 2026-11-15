@@ -75,7 +75,9 @@ export interface QuoteRequestResponse {
 
 export interface GetQuoteRequestsResponse {
     readonly items: readonly QuoteRequestResponse[];
-    /** Cuántas siguen esperando respuestas. */
+    /** Cuántas da el filtro entero (pagina). Opcional para no romper a un servidor viejo. */
+    readonly total?: number;
+    /** Cuántas siguen esperando respuestas (sobre el filtro entero, no la página). */
     readonly pidiendoPrecios: number;
 }
 

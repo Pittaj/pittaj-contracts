@@ -10,6 +10,8 @@ export const getPurchaseRequestsSchema = z.object({
     status: z.enum(['BORRADOR', 'PENDIENTE', 'ATENDIDA', 'RECHAZADA']).optional(),
     locationId: z.string().uuid().optional(),
     limit: z.coerce.number().int().min(1).max(300).optional().default(100),
+    /** Desde qué fila (paginación; la lista se carga sola al bajar). */
+    offset: z.coerce.number().int().min(0).optional().default(0),
 });
 
 export const createPurchaseRequestSchema = z.object({

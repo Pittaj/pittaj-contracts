@@ -68,6 +68,9 @@ export interface PurchaseRequestResponse {
 
 export interface GetPurchaseRequestsResponse {
     readonly items: readonly PurchaseRequestResponse[];
+    /** Cuántas da el filtro entero (pagina). Opcional para no romper a un servidor viejo. */
+    readonly total?: number;
+    /** Las pendientes del filtro entero, no solo de la página. */
     readonly pendientes: number;
     /** Cuántas de las pendientes se pueden resolver con lo que ya hay en otra bodega. */
     readonly resolublesConTraspaso: number;
