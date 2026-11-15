@@ -8,6 +8,8 @@ import { z } from 'zod';
 export const getQuoteRequestsSchema = z.object({
     status: z.enum(['DRAFT', 'REQUESTING', 'CLOSED', 'CANCELLED']).optional(),
     limit: z.coerce.number().int().min(1).max(300).optional().default(100),
+    /** Desde qué fila (paginación; la lista se carga sola al bajar). */
+    offset: z.coerce.number().int().min(0).optional().default(0),
 });
 
 const lineaSchema = z

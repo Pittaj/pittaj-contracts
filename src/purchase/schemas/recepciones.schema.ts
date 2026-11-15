@@ -21,6 +21,8 @@ export const getRecepcionesSchema = z.object({
     /** Incluir las revertidas. Apagado: la pregunta normal es qué entró y sigue en pie. */
     incluirRevertidas: z.coerce.boolean().optional().default(false),
     limit: z.coerce.number().int().min(1).max(500).optional().default(200),
+    /** Desde qué fila (paginación; la lista se carga sola al bajar). */
+    offset: z.coerce.number().int().min(0).optional().default(0),
 });
 
 export const setRemittanceSchema = z.object({
