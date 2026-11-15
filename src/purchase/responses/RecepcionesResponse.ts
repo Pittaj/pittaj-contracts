@@ -51,7 +51,12 @@ export interface RecepcionResponse {
 
 export interface GetRecepcionesResponse {
     readonly items: readonly RecepcionResponse[];
-    /** Cuántas entregas en el rango, sin contar las revertidas. */
+    /**
+     * Cuántas filas da el filtro entero (con las revertidas si se piden): lo que pagina.
+     * Opcional solo para no romper a un servidor viejo; el de hoy siempre lo manda.
+     */
+    readonly filas?: number;
+    /** Cuántas entregas en el rango, sin contar las revertidas (sobre el filtro entero, no la página). */
     readonly total: number;
     /** Suma de lo que entró, sin las revertidas. */
     readonly importeTotal: number;
