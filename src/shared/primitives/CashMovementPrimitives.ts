@@ -1,7 +1,21 @@
 export interface CashMovementPrimitives {
   readonly id: string;
   readonly type: 'CASH_IN' | 'CASH_OUT';
-  readonly reason: 'OPENING_FUND' | 'SALE' | 'REFUND' | 'EXPENSE' | 'WITHDRAWAL' | 'DEPOSIT' | 'CORRECTION' | 'TIP' | 'OTHER';
+  readonly reason:
+    | 'OPENING_FUND'
+    | 'SALE'
+    | 'REFUND'
+    | 'EXPENSE'
+    | 'WITHDRAWAL'
+    | 'DEPOSIT'
+    | 'CORRECTION'
+    | 'TIP'
+    | 'OTHER'
+    | 'CHANGE_FUND'
+    | 'LAYAWAY_PAYMENT'
+    | 'SUPPLIER_PAYMENT'
+    | 'OWNER_DRAW'
+    | 'CUSTOMER_PAYMENT';
   readonly amount: number;
   readonly currency: string;
   readonly description: string | null;
