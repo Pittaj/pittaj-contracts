@@ -11,7 +11,7 @@
  */
 
 import { z } from 'zod';
-import type { SatClaimStatus } from './downloaderApi.js';
+import { satSignatureEntrySchema, type SatClaimStatus } from './downloaderApi.js';
 import type { SatDownloadKind, SatDownloadPayload } from './satDownloadPlan.js';
 
 /**
@@ -88,7 +88,15 @@ export interface SatLocalPlanResponse {
     readonly toDownload: readonly SatLocalClaimWork[];
 }
 
-/** Un paso de un tramo, reportado por el equipo. Lo mismo que `reportClaimSchema`, sin firmas ni credencial. */
+/**
+ * Un paso de un tramo, reportado por el equipo. Lo mismo que `reportClaimSchema`, sin credencial.
+ *
+ * `signatures` (2.90.0, revisión de robustez y seguridad del escritorio): las veces que el equipo
+ * firmó con la e.firma para mover el tramo. Van a la misma bitácora que ve el cliente, para que el
+ * Propietario vea cuándo se usa su llave también si vive en una computadora. Opcional: un escritorio
+ * anterior no las manda. Como el reporte puede llegar tarde (se guarda si no hay red), la nube acepta
+ * horas de hasta 31 días atrás y descarta —sin rechazar el reporte— las que no cuadren.
+ */
 export const reportLocalClaimSchema = z
     .object({
         deviceId: deviceIdSchema.optional(),
@@ -98,6 +106,7 @@ export const reportLocalClaimSchema = z
         packageIds: z.array(z.string().trim().min(1).max(100)).max(500).optional(),
         cfdiCount: z.number().int().min(0).max(2_000_000).optional(),
         error: z.string().trim().max(1_000).optional(),
+        signatures: z.array(satSignatureEntrySchema).max(500).optional(),
     })
     .strict();
 export type ReportLocalClaimRequest = z.infer<typeof reportLocalClaimSchema>;
