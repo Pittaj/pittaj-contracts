@@ -87,6 +87,12 @@ export interface SatDownloadOverviewResponse {
      * firmas ni altas mientras dure; los días se recuperan al reanudar. Ausente en una nube anterior.
      */
     readonly cloudPaused?: boolean;
+    /**
+     * Si este negocio puede cargar su e.firma **en la nube** (lo decide Pittaj desde el backoffice;
+     * de fábrica, no). Sin ella, la que se ofrece es la de una computadora. Ausente en una nube
+     * anterior: se trata como `true`.
+     */
+    readonly cloudAvailable?: boolean;
 }
 
 /** Lo que el cliente ve de la conciliación: qué día se revisó y si cuadró. */
