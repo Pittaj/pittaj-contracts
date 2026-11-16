@@ -93,6 +93,13 @@ export const BANKING_CONSTANTS = {
      * las tres y un reintento no las duplica.
      */
     'PSP_SETTLEMENT',
+    /**
+     * E2 de plan-efectivo · La otra pata de un movimiento del cajón: el retiro que entra a la caja
+     * fuerte, la entrega del corte, el cambio que sale de ella. El id de origen es el del movimiento
+     * de caja (o el del cierre, en la entrega). **No postea**: la póliza la hace el movimiento de
+     * caja o el corte, y postear las dos patas metería el mismo peso dos veces.
+     */
+    'CASH_SESSION',
   ] as const,
 
   /** Tipo de contraparte de un movimiento. */

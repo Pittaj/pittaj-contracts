@@ -99,3 +99,32 @@ export const CASH_MOVEMENT_REASON_LABELS: Record<CashMovementReason, string> = {
   OWNER_DRAW: 'Retiro del dueño',
   CUSTOMER_PAYMENT: 'Cobro a cliente',
 };
+
+/**
+ * E2 de plan-efectivo · Semillas de los ids de las patas en Bancos (la otra mitad de un movimiento
+ * del cajón). Se derivan con `deterministicUuidV4` (nube) e `IdDeterminista.DeSemilla` (escritorio):
+ * la misma semilla da el mismo id, así que la pata que escribe el escritorio y la que escribiría la
+ * nube son una sola.
+ */
+export const semillaDeLaPataDeCaja = (movementId: string): string => `cash-movement-leg:${movementId}`;
+
+/** La entrega del corte a la caja fuerte. */
+export const semillaDeLaEntregaDelCorte = (cashClosureId: string): string => `cash-closure-safe:${cashClosureId}`;
+
+/**
+ * El fondo que se queda en el cajón al cerrar: lo contado en efectivo menos lo que se entregó a la
+ * caja fuerte. Es con lo que debería abrir el siguiente turno.
+ */
+export function fondoQueQuedo(contadoEnEfectivo: number, entregado: number): number {
+  return Math.max(0, Math.round((contadoEnEfectivo - entregado) * 100) / 100);
+}
+
+/**
+ * ¿El fondo con el que se abre es el que dejó el último corte? Devuelve la diferencia (positiva =
+ * se abre con más) o `null` si cuadra o no hay corte anterior. Avisa; no bloquea: el turno abre igual.
+ */
+export function diferenciaDeFondo(fondoDeApertura: number, fondoAnterior: number | null): number | null {
+  if (fondoAnterior === null) return null;
+  const d = Math.round((fondoDeApertura - fondoAnterior) * 100) / 100;
+  return Math.abs(d) < 0.005 ? null : d;
+}

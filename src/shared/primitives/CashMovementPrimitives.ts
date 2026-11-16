@@ -27,4 +27,9 @@ export interface CashMovementPrimitives {
    * viejo: si un push no trae la llave, la nube conserva el que tenía.
    */
   readonly expenseConceptId?: string | null;
+  /**
+   * E2 de plan-efectivo · La cuenta de Bancos del otro lado: a dónde fue un retiro (caja fuerte,
+   * caja chica, «en manos de») o de dónde vino el cambio. Nulo en lo demás y en el histórico.
+   */
+  readonly cashAccountId?: string | null;
 }

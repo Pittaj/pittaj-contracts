@@ -89,6 +89,13 @@ export const addCashMovementSchema = z
         description: z.string().max(LIMITS.MAX_MOVEMENT_DESCRIPTION).nullable().optional(),
         /** Concepto de gasto (F6.7). Solo en un gasto de caja; nulo = Otros gastos. */
         expenseConceptId: z.string().uuid().nullable().optional(),
+        /**
+         * E2 · La cuenta de efectivo del otro lado: la caja fuerte o la caja chica a la que va un
+         * retiro, o de la que viene el cambio.
+         */
+        cashAccountId: z.string().uuid().nullable().optional(),
+        /** E2 · O la persona que se lleva el retiro: va a su cuenta «en manos de». */
+        custodianUserId: z.string().uuid().nullable().optional(),
     })
     .refine((m) => !m.expenseConceptId || (m.reason === 'EXPENSE' && m.type === 'CASH_OUT'), {
         message: 'El concepto de gasto solo va en una salida de caja con motivo «Gasto».',
@@ -99,6 +106,19 @@ export const addCashMovementSchema = z
     .refine((m) => esMotivoManual(m.type as CashMovementType, m.reason), {
         message: 'Ese motivo no se captura a mano: lo registra su documento (venta, abono, pago o cobro).',
         path: ['reason'],
+    })
+    // E2 · Un retiro dice a dónde va: el efectivo no desaparece al salir del cajón.
+    .refine((m) => m.reason !== 'WITHDRAWAL' || Boolean(m.cashAccountId) !== Boolean(m.custodianUserId), {
+        message: 'Di a dónde va el retiro: la caja fuerte, una caja chica o las manos de alguien.',
+        path: ['cashAccountId'],
+    })
+    .refine((m) => !m.custodianUserId || m.reason === 'WITHDRAWAL', {
+        message: 'Solo un retiro se le entrega a una persona.',
+        path: ['custodianUserId'],
+    })
+    .refine((m) => !m.cashAccountId || m.reason === 'WITHDRAWAL' || m.reason === 'CHANGE_FUND', {
+        message: 'La cuenta de efectivo va en un retiro (a dónde) o en una entrada de cambio (de dónde).',
+        path: ['cashAccountId'],
     });
 
 export const updateNotesSchema = z.object({
