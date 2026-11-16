@@ -52,6 +52,19 @@ describe('E3 · movimientos de efectivo', () => {
     expect(() => createTransferSchema.parse({ ...base, kind: 'OTRO' })).toThrow();
   });
 
+  it('una recolección puede ir a manos de una persona, y solo una recolección', () => {
+    const { toAccountId: _, ...sinDestino } = {
+      fromAccountId: '11111111-1111-4111-8111-111111111111',
+      toAccountId: '',
+      amount: 10,
+      date: '2026-11-16',
+    };
+    const persona = { custodianUserId: '33333333-3333-4333-8333-333333333333', custodianName: 'José' };
+    expect(createTransferSchema.parse({ ...sinDestino, ...persona, kind: 'COLLECTION' }).custodianUserId).toBe(persona.custodianUserId);
+    expect(() => createTransferSchema.parse({ ...sinDestino, ...persona, kind: 'DEPOSIT' })).toThrow();
+    expect(() => createTransferSchema.parse({ ...sinDestino, kind: 'COLLECTION' })).toThrow();
+  });
+
   it('el faltante a cargo es una categoría de sistema en 113-01', () => {
     expect(BANKING_SYSTEM_CATEGORIES.find((c) => c.code === 'FALTANTE_A_CARGO')?.ledgerAccountCode).toBe('113-01');
   });

@@ -212,7 +212,8 @@ export const createTransferSchema = z
   .object({
     id: z.string().uuid().optional(),
     fromAccountId: z.string().uuid(),
-    toAccountId: z.string().uuid(),
+    /** Opcional solo en una recolección «a manos de» alguien: entonces va `custodianUserId`. */
+    toAccountId: z.string().uuid().optional(),
     amount: z.number().positive().max(LIMITS.MAX_AMOUNT),
     date: isoDateSchema,
     notes: z.string().trim().max(LIMITS.MAX_NOTES_LENGTH).nullish(),
@@ -221,6 +222,20 @@ export const createTransferSchema = z
      * (`DEPOSIT`) salen de una cuenta de efectivo y no pueden llevarse más de lo que hay en ella.
      */
     kind: z.enum(TRANSFER_KINDS).optional(),
+    /**
+     * E3: una recolección puede decir «a manos de esta persona» en lugar de la cuenta: la nube asegura
+     * su cuenta «en manos de» (la crea si no existe) y la usa de destino.
+     */
+    custodianUserId: z.string().uuid().optional(),
+    custodianName: z.string().trim().max(100).optional(),
+  })
+  .refine((v) => (v.toAccountId ? 1 : 0) + (v.custodianUserId ? 1 : 0) === 1, {
+    message: 'Indique la cuenta destino o la persona que recibe el efectivo',
+    path: ['toAccountId'],
+  })
+  .refine((v) => !v.custodianUserId || v.kind === 'COLLECTION', {
+    message: 'Solo una recolección se entrega a una persona',
+    path: ['custodianUserId'],
   })
   .refine((v) => v.fromAccountId !== v.toAccountId, {
     message: 'La cuenta origen y destino deben ser distintas',
