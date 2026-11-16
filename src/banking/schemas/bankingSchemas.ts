@@ -6,6 +6,7 @@
 
 import { z } from 'zod';
 import { BANKING_CONSTANTS } from '../constants/index.js';
+import { TRANSFER_KINDS } from '../lugares/movimientosDeEfectivo.js';
 
 const { LIMITS } = BANKING_CONSTANTS;
 
@@ -215,6 +216,11 @@ export const createTransferSchema = z
     amount: z.number().positive().max(LIMITS.MAX_AMOUNT),
     date: isoDateSchema,
     notes: z.string().trim().max(LIMITS.MAX_NOTES_LENGTH).nullish(),
+    /**
+     * E3 de plan-efectivo: qué clase de traspaso es. Una recolección (`COLLECTION`) y un depósito
+     * (`DEPOSIT`) salen de una cuenta de efectivo y no pueden llevarse más de lo que hay en ella.
+     */
+    kind: z.enum(TRANSFER_KINDS).optional(),
   })
   .refine((v) => v.fromAccountId !== v.toAccountId, {
     message: 'La cuenta origen y destino deben ser distintas',

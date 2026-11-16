@@ -130,6 +130,8 @@ export const BANKING_CONSTANTS = {
     'EXACT_REFERENCE',
     'AMOUNT_AND_DATE',
     'CASH_CLOSURE',
+    /** E3 de plan-efectivo: el depósito de efectivo que alguien llevó al banco (un traspaso DEPOSIT). */
+    'CASH_DEPOSIT',
     'TPV_SETTLEMENT',
     'RULE',
     'MANUAL',
@@ -501,6 +503,13 @@ export const BANKING_SYSTEM_CATEGORIES: readonly SystemCategoryDef[] = [
   { code: 'PRESTAMO_A_SOCIO', name: 'Préstamo al socio', flow: 'OUT', ledgerAccountCode: '113-03' },
   { code: 'REPARTO_UTILIDADES', name: 'Reparto de utilidades', flow: 'OUT', ledgerAccountCode: '304-01' },
   { code: 'SUELDO_SOCIO', name: 'Sueldo del socio', flow: 'OUT', ledgerAccountCode: '601-01' },
+
+  /**
+   * E3 de plan-efectivo: la diferencia de un depósito de efectivo que paga quien lo llevó. Se crea
+   * al conciliar el depósito; 113-01 es lo que esa persona le debe al negocio (o, si el banco
+   * recibió de más, lo que el negocio le debe a ella). `BOTH` por eso.
+   */
+  { code: 'FALTANTE_A_CARGO', name: 'Faltante a cargo de quien depositó', flow: 'BOTH', ledgerAccountCode: '113-01' },
 
   /**
    * El cajón de «no sé qué es esto», y **se queda sin cuenta a propósito**. Darle una convertiría
