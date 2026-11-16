@@ -162,6 +162,16 @@ export function excedeElTope(maxExpense: number | null | undefined, monto: numbe
     return maxExpense != null && maxExpense > 0 && aCentavos(monto) > aCentavos(maxExpense);
 }
 
+/**
+ * Tanda 4: el tope de una caja chica es **por gasto**. No aplica al retiro del dueño (se rige por su permiso), a la
+ * diferencia de un arqueo ni a un traspaso: ninguno es un gasto, y topearlos impedía registrar lo que ya pasó.
+ */
+export const CATEGORIAS_FUERA_DEL_TOPE = ['TRASPASO', 'FALTANTE_A_CARGO', 'PRESTAMO_A_SOCIO', 'REPARTO_UTILIDADES'] as const;
+
+export function aplicaElTopeDeCajaChica(categoryCode: string | null | undefined): boolean {
+    return !categoryCode || !(CATEGORIAS_FUERA_DEL_TOPE as readonly string[]).includes(categoryCode);
+}
+
 /** Días enteros entre dos fechas ISO (YYYY-MM-DD), `hasta` − `desde`. */
 export function diasEntre(desde: string, hasta: string): number {
     return Math.round((Date.parse(`${hasta}T00:00:00Z`) - Date.parse(`${desde}T00:00:00Z`)) / 86_400_000);

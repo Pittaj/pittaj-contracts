@@ -78,6 +78,16 @@ const vivo = (m: MovimientoParaReporte): boolean => m.status !== 'VOID';
 const ORDEN: readonly RolDeEfectivo[] = ['SAFE', 'CUSTODY', 'PETTY', 'GENERAL'];
 const rolDe = (l: LugarParaReporte): RolDeEfectivo => l.cashRole ?? 'GENERAL';
 
+/**
+ * Tanda 4: desde cuándo existe un lugar para los reportes. La caja fuerte y «en manos de» nacen el día que el sistema
+ * los necesita y aceptan movimientos anteriores: «abren» con su primer movimiento si es más viejo que su apertura.
+ */
+export function aperturaEfectiva(l: LugarParaReporte, movimientos: readonly MovimientoParaReporte[]): string {
+  let a = l.openingDate;
+  for (const m of movimientos) if (m.accountId === l.id && m.status !== 'VOID' && m.date < a) a = m.date;
+  return a;
+}
+
 // ── ¿Dónde está el efectivo? ────────────────────────────────────────────────
 
 export interface LugarAlCorte {
@@ -114,7 +124,7 @@ export function dondeEstaElEfectivo(
   const hasta = movimientos.filter((m) => vivo(m) && m.date <= alCorte);
   const grupos = ORDEN.map((rol) => {
     const delRol = lugares
-      .filter((l) => rolDe(l) === rol && l.openingDate <= alCorte)
+      .filter((l) => rolDe(l) === rol && aperturaEfectiva(l, movimientos) <= alCorte)
       .map((l): LugarAlCorte => {
         const propios = hasta.filter((m) => m.accountId === l.id);
         const saldo = p(c(l.openingBalance) + propios.reduce((s, m) => s + (m.direction === 'IN' ? c(m.amount) : -c(m.amount)), 0));
@@ -186,7 +196,7 @@ export function porDepositar(
   const donde = dondeEstaElEfectivo(lugares, movimientos, alCorte, diasEnManos);
   const hasta = movimientos.filter((m) => vivo(m) && m.date <= alCorte);
   const enManos = lugares
-    .filter((l) => rolDe(l) === 'CUSTODY' && l.openingDate <= alCorte)
+    .filter((l) => rolDe(l) === 'CUSTODY' && aperturaEfectiva(l, movimientos) <= alCorte)
     .map((l) => {
       const propios = hasta.filter((m) => m.accountId === l.id);
       const fifo = asignarFifo(
