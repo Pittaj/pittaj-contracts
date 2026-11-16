@@ -16,7 +16,10 @@ export const PERMISOS_DE_EFECTIVO = {
     arquear: 'cash.count',
     /** Gastar de una caja chica y reponerla. */
     cajaChica: 'cash.petty',
-    /** El retiro del dueño (préstamo al socio o reparto), desde un lugar o desde el cajón. */
+    /**
+     * El retiro del dueño (préstamo al socio o reparto) desde un lugar de efectivo. El del cajón NO lo pide: ahí el
+     * cajero anota que el dueño se llevó dinero —un hecho que ya pasó— y basta `checkout.withdrawal`.
+     */
     retiroDelDueno: 'cash.owner-draw',
 } as const;
 
