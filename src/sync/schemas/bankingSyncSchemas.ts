@@ -80,7 +80,7 @@ export const bankTransferSyncSchema = z.object({
     date: fechaCivil,
     notes: texto(LIMITS.MAX_NOTES_LENGTH).nullish(),
     /** E3 de plan-efectivo. Ausente = `TRANSFER` (lo que suba un escritorio viejo). */
-    kind: z.enum(['TRANSFER', 'COLLECTION', 'DEPOSIT']).nullish(),
+    kind: z.enum(['TRANSFER', 'COLLECTION', 'DEPOSIT', 'REPLENISHMENT']).nullish(),
     version: z.number().int().min(1),
 });
 

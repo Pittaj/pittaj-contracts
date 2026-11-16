@@ -16,7 +16,7 @@ export interface BankTransferResponse {
   readonly date: string;
   readonly notes: string | null;
   /** E3 de plan-efectivo: traspaso, recolección o depósito de efectivo. */
-  readonly kind: 'TRANSFER' | 'COLLECTION' | 'DEPOSIT';
+  readonly kind: 'TRANSFER' | 'COLLECTION' | 'DEPOSIT' | 'REPLENISHMENT';
   /**
    * Las dos piernas del traspaso vía cuenta puente: OUT en la cuenta origen
    * e IN en la destino (nacen juntas, atómicamente).

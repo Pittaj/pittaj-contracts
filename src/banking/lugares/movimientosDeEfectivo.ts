@@ -12,13 +12,15 @@
  */
 
 /** Qué clase de traspaso es. `TRANSFER` es el de siempre, entre cuentas propias. */
-export const TRANSFER_KINDS = ['TRANSFER', 'COLLECTION', 'DEPOSIT'] as const;
+/** `REPLENISHMENT` (E4): reponer una caja chica a su fondo fijo. */
+export const TRANSFER_KINDS = ['TRANSFER', 'COLLECTION', 'DEPOSIT', 'REPLENISHMENT'] as const;
 export type TransferKind = (typeof TRANSFER_KINDS)[number];
 
 export const ETIQUETA_DEL_TIPO_DE_TRASPASO: Record<TransferKind, string> = {
   TRANSFER: 'Traspaso',
   COLLECTION: 'Recolección',
   DEPOSIT: 'Depósito de efectivo',
+  REPLENISHMENT: 'Reposición de caja chica',
 };
 
 /**
@@ -106,4 +108,61 @@ export function asignarFifo(
     pendientes: restos.filter((e) => e.resto > 0).map((e) => ({ entradaId: e.id, amount: e.resto / 100 })),
     sinCubrir: sinCubrir / 100,
   };
+}
+
+// ── E4 de plan-efectivo: arqueo y caja chica ────────────────────────────────
+
+const aCentavos = (n: number): number => Math.round(n * 100);
+
+export interface ResultadoDelArqueo {
+    /** contado − esperado: negativo es faltante. */
+    readonly diferencia: number;
+    /** La diferencia pasa del umbral y no trae explicación: no se registra. */
+    readonly faltaExplicacion: boolean;
+}
+
+/**
+ * Lo que un arqueo deja: la diferencia entre lo contado y lo que el ledger dice que hay. Si pasa de
+ * `explicarArriba` (ajuste `cash.count.explainAbove`) hay que decir por qué; si no, el arqueo no entra.
+ */
+export function resultadoDelArqueo(
+    esperado: number,
+    contado: number,
+    explicarArriba: number,
+    explicacion?: string | null,
+): ResultadoDelArqueo {
+    const diferencia = (aCentavos(contado) - aCentavos(esperado)) / 100;
+    const faltaExplicacion =
+        aCentavos(Math.abs(diferencia)) > aCentavos(explicarArriba) && !(explicacion ?? '').trim();
+    return { diferencia, faltaExplicacion };
+}
+
+/** Suma de lo contado por denominación. */
+export function sumaDeDenominaciones(denominaciones: readonly { value: number; quantity: number }[]): number {
+    return denominaciones.reduce((s, d) => s + aCentavos(d.value) * d.quantity, 0) / 100;
+}
+
+/**
+ * Cuánto hay que reponer a una caja chica: lo que le falta para volver a su fondo fijo. Cero si no
+ * tiene fondo o ya está completa. Se repone **exactamente** eso (la nube y el escritorio lo exigen).
+ */
+export function propuestaDeReposicion(fondoFijo: number | null | undefined, saldo: number): number {
+    if (fondoFijo == null || fondoFijo <= 0) return 0;
+    return Math.max(0, aCentavos(fondoFijo) - aCentavos(saldo)) / 100;
+}
+
+/** ¿La caja chica bajó del porcentaje de su fondo (`cash.petty.lowBalancePercent`)? */
+export function cajaChicaBaja(fondoFijo: number | null | undefined, saldo: number, porcentaje: number): boolean {
+    if (fondoFijo == null || fondoFijo <= 0) return false;
+    return aCentavos(saldo) * 100 < aCentavos(fondoFijo) * porcentaje;
+}
+
+/** ¿El gasto pasa del tope por gasto de la caja chica? Sin tope, nunca. */
+export function excedeElTope(maxExpense: number | null | undefined, monto: number): boolean {
+    return maxExpense != null && maxExpense > 0 && aCentavos(monto) > aCentavos(maxExpense);
+}
+
+/** Días enteros entre dos fechas ISO (YYYY-MM-DD), `hasta` − `desde`. */
+export function diasEntre(desde: string, hasta: string): number {
+    return Math.round((Date.parse(`${hasta}T00:00:00Z`) - Date.parse(`${desde}T00:00:00Z`)) / 86_400_000);
 }
