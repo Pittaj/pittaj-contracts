@@ -23,7 +23,7 @@ describe('MODULOS_APAGADOS_EN_BANCOS_SENCILLO', () => {
         const visibles = appDeLaSuite('bancos')!
             .modulos.filter((m) => moduloVisible(v, 'bancos', m.ruta))
             .map((m) => m.ruta);
-        expect(visibles).toEqual(['cuentas', 'movimientos', 'efectivo', 'reportes/saldos', 'reportes/categorias', 'categorias', 'configuracion/efectivo']);
+        expect(visibles).toEqual(['cuentas', 'movimientos', 'efectivo', 'reportes/saldos', 'reportes/categorias', 'reportes/efectivo', 'categorias', 'configuracion/efectivo']);
     });
 
     it('Flujo de efectivo se apaga con Calendario: sin pagos programados no proyecta nada', () => {
