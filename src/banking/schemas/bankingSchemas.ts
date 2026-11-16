@@ -14,6 +14,9 @@ const { LIMITS } = BANKING_CONSTANTS;
 // ============================================================
 
 const accountKindEnum = z.enum(BANKING_CONSTANTS.ACCOUNT_KINDS);
+/** Lo que se da de alta a mano: la caja fuerte y «en manos de» las crea el sistema. */
+const manualCashRoleEnum = z.enum(['GENERAL', 'PETTY']);
+const montoDeEfectivo = z.number().positive().max(LIMITS.MAX_AMOUNT);
 const statusEnum = z.enum(BANKING_CONSTANTS.STATUSES);
 const flowEnum = z.enum(BANKING_CONSTANTS.CATEGORY_FLOWS);
 const directionEnum = z.enum(BANKING_CONSTANTS.DIRECTIONS);
@@ -85,7 +88,35 @@ export const createBankAccountSchema = z.object({
   businessLineId: z.string().uuid().nullish(),
   ledgerAccountCode: z.string().trim().max(20).nullish(),
   creditCard: creditCardConfigSchema.nullish(),
-});
+  /** E1 · Qué lugar de efectivo es (solo `kind: CASH`). Sin él, `GENERAL`. */
+  cashRole: manualCashRoleEnum.optional(),
+  /** E1 · Quién responde por el efectivo de esta cuenta. */
+  responsibleUserId: z.string().uuid().nullish(),
+  /** E1 · Caja chica: el fondo fijo al que se repone. */
+  fixedFund: montoDeEfectivo.nullish(),
+  /** E1 · Caja chica: el gasto más grande que se paga de ella. */
+  maxExpense: montoDeEfectivo.nullish(),
+}).superRefine((c, ctx) => revisarEfectivo(c, ctx));
+
+/**
+ * Reglas de un lugar de efectivo (E1 de plan-efectivo). Compartidas por el alta y la edición.
+ * Una caja chica es de una sucursal y tiene fondo fijo; el tope no puede pasar del fondo.
+ */
+function revisarEfectivo(
+  c: { kind?: string; cashRole?: string; locationId?: string | null; fixedFund?: number | null; maxExpense?: number | null },
+  ctx: z.RefinementCtx,
+): void {
+  if (c.cashRole && c.kind && c.kind !== 'CASH') {
+    ctx.addIssue({ code: 'custom', path: ['cashRole'], message: 'Solo una cuenta de efectivo tiene rol de efectivo.' });
+  }
+  if (c.cashRole === 'PETTY') {
+    if (!c.locationId) ctx.addIssue({ code: 'custom', path: ['locationId'], message: 'Una caja chica es de una sucursal.' });
+    if (!c.fixedFund) ctx.addIssue({ code: 'custom', path: ['fixedFund'], message: 'Una caja chica necesita su fondo fijo.' });
+  }
+  if (c.fixedFund && c.maxExpense && c.maxExpense > c.fixedFund) {
+    ctx.addIssue({ code: 'custom', path: ['maxExpense'], message: 'El tope de un gasto no puede pasar del fondo.' });
+  }
+}
 
 /** PUT /api/bank-accounts/:id — Actualizar cuenta (SaveBankAccount, modo update). */
 export const updateBankAccountSchema = z.object({
@@ -103,7 +134,12 @@ export const updateBankAccountSchema = z.object({
   businessLineId: z.string().uuid().nullish(),
   ledgerAccountCode: z.string().trim().max(20).nullish(),
   creditCard: creditCardConfigSchema.nullish(),
-});
+  /** E1 · Solo entre `GENERAL` y `PETTY`; la caja fuerte y «en manos de» no cambian de rol. */
+  cashRole: manualCashRoleEnum.optional(),
+  responsibleUserId: z.string().uuid().nullish(),
+  fixedFund: montoDeEfectivo.nullish(),
+  maxExpense: montoDeEfectivo.nullish(),
+}).superRefine((c, ctx) => revisarEfectivo(c, ctx));
 
 /**
  * PUT /api/transaction-categories/:id/ledger-account — asignar (o quitar) su cuenta contable.

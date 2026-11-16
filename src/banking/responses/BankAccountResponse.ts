@@ -34,6 +34,17 @@ export interface BankAccountResponse {
    * día del calendario del usuario, y sobre un aviso de cinco días eso no cambia ninguna decisión.
    */
   readonly creditCardCycle: CreditCardCyclePrimitives | null;
+  /**
+   * E1 de plan-efectivo · Qué lugar de efectivo es: `GENERAL | SAFE | PETTY | CUSTODY`. `null` si
+   * la cuenta no es de efectivo. Opcional para no romper a un cliente viejo.
+   */
+  readonly cashRole?: string | null;
+  /** E1 · Quién responde por el efectivo (el gerente, quien maneja la caja chica, la persona). */
+  readonly responsibleUserId?: string | null;
+  /** E1 · Caja chica: el fondo fijo al que se repone. */
+  readonly fixedFund?: number | null;
+  /** E1 · Caja chica: el gasto más grande que se paga de ella. */
+  readonly maxExpense?: number | null;
   /** Cuenta creada por el sistema (TRANSIT): oculta y no editable. */
   readonly isSystem: boolean;
   readonly status: string;

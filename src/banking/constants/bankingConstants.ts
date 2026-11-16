@@ -45,6 +45,18 @@ export const BANKING_CONSTANTS = {
   /** Tipos de cuenta. TRANSIT = cuenta puente del sistema ("Fondos en tránsito"). */
   ACCOUNT_KINDS: ['BANK', 'CASH', 'CREDIT_CARD', 'PSP', 'TRANSIT'] as const,
 
+  /**
+   * Qué lugar de efectivo es una cuenta `CASH` (E1 de plan-efectivo).
+   *
+   * - `GENERAL`: efectivo sin más (lo que había antes del 2026-11-15).
+   * - `SAFE`: la caja fuerte de una sucursal. Una por sucursal; la crea el sistema.
+   * - `PETTY`: caja chica, con fondo fijo y responsable.
+   * - `CUSTODY`: el efectivo «en manos de» una persona. Una por persona; la crea el sistema.
+   *
+   * La caja registradora NO es una de estas: el cajón es del turno (`PosSession`).
+   */
+  CASH_ROLES: ['GENERAL', 'SAFE', 'PETTY', 'CUSTODY'] as const,
+
   /** Estados de cuenta y de categoría. */
   STATUSES: ['ACTIVE', 'INACTIVE'] as const,
 
@@ -345,6 +357,7 @@ export const BANKING_CONSTANTS = {
 } as const;
 
 export type BankAccountKindValue = (typeof BANKING_CONSTANTS.ACCOUNT_KINDS)[number];
+export type CashRoleValue = (typeof BANKING_CONSTANTS.CASH_ROLES)[number];
 export type BankingStatusValue = (typeof BANKING_CONSTANTS.STATUSES)[number];
 export type CategoryFlowValue = (typeof BANKING_CONSTANTS.CATEGORY_FLOWS)[number];
 export type TransactionDirectionValue = (typeof BANKING_CONSTANTS.DIRECTIONS)[number];
