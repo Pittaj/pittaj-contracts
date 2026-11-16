@@ -80,11 +80,18 @@ export interface LugarAlCorte {
   readonly diasPendiente: number | null;
   /** Lleva más días que `diasEnManos`. */
   readonly vencido: boolean;
+  /**
+   * Tanda 1: el saldo quedó bajo cero. Pasa cuando dos equipos sin red sacan de la misma caja: no se
+   * bloquea (sería perder un registro), se avisa para que se arquee.
+   */
+  readonly negativo: boolean;
 }
 
 export interface DondeEstaElEfectivo {
   readonly alCorte: string;
   readonly total: number;
+  /** Los lugares que quedaron bajo cero al corte: hay que arquearlos. */
+  readonly enNegativo: readonly { readonly id: string; readonly name: string; readonly saldo: number }[];
   readonly grupos: readonly { readonly rol: RolDeEfectivo; readonly total: number; readonly lugares: readonly LugarAlCorte[] }[];
 }
 
@@ -112,12 +119,21 @@ export function dondeEstaElEfectivo(
           pendienteDesde = primera ? propios.find((m) => m.id === primera.entradaId)?.date ?? null : null;
         }
         const diasPendiente = pendienteDesde ? diasEntre(pendienteDesde, alCorte) : null;
-        return { id: l.id, name: l.name, saldo, pendienteDesde, diasPendiente, vencido: diasPendiente != null && diasPendiente > diasEnManos };
+        return {
+          id: l.id,
+          name: l.name,
+          saldo,
+          pendienteDesde,
+          diasPendiente,
+          vencido: diasPendiente != null && diasPendiente > diasEnManos,
+          negativo: c(saldo) < 0,
+        };
       })
       .sort((a, b) => a.name.localeCompare(b.name, 'es'));
     return { rol, total: p(delRol.reduce((s, l) => s + c(l.saldo), 0)), lugares: delRol };
   }).filter((g) => g.lugares.length > 0);
-  return { alCorte, total: p(grupos.reduce((s, g) => s + c(g.total), 0)), grupos };
+  const enNegativo = grupos.flatMap((g) => g.lugares.filter((l) => l.negativo).map((l) => ({ id: l.id, name: l.name, saldo: l.saldo })));
+  return { alCorte, total: p(grupos.reduce((s, g) => s + c(g.total), 0)), enNegativo, grupos };
 }
 
 // ── Por depositar ───────────────────────────────────────────────────────────
@@ -135,7 +151,20 @@ export interface PorDepositar {
   readonly enCajasFuertes: number;
   /** Depósitos de efectivo que el banco todavía no confirma (pierna de banco en tránsito). */
   readonly enTransito: readonly { readonly date: string; readonly amount: number; readonly dias: number }[];
+  /**
+   * Tanda 1: cortes anteriores a E2 (no entregaron a la caja fuerte) cuyo «a depositar» nadie ha
+   * ligado a un depósito. Es la parte histórica de 103-01, aparte para que no se confunda con lo de hoy.
+   */
+  readonly cortesAnteriores: readonly { readonly closureId: string; readonly date: string; readonly amount: number; readonly dias: number }[];
   readonly total: number;
+}
+
+/** Un corte anterior a E2 con efectivo a depositar que nadie ligó a un depósito. */
+export interface CorteSinDeposito {
+  readonly closureId: string;
+  /** YYYY-MM-DD */
+  readonly date: string;
+  readonly amount: number;
 }
 
 export function porDepositar(
@@ -143,6 +172,7 @@ export function porDepositar(
   movimientos: readonly MovimientoParaReporte[],
   alCorte: string,
   diasEnManos: number,
+  cortesSinDeposito: readonly CorteSinDeposito[] = [],
 ): PorDepositar {
   const donde = dondeEstaElEfectivo(lugares, movimientos, alCorte, diasEnManos);
   const hasta = movimientos.filter((m) => vivo(m) && m.date <= alCorte);
@@ -171,10 +201,17 @@ export function porDepositar(
     .filter((m) => m.transferKind === 'DEPOSIT' && m.direction === 'IN' && !efectivo.has(m.accountId) && m.status === 'PENDING')
     .map((m) => ({ date: m.date, amount: m.amount, dias: diasEntre(m.date, alCorte) }))
     .sort((a, b) => (a.date < b.date ? -1 : 1));
+  const cortesAnteriores = cortesSinDeposito
+    .filter((x) => x.date <= alCorte && c(x.amount) > 0)
+    .map((x) => ({ closureId: x.closureId, date: x.date, amount: x.amount, dias: diasEntre(x.date, alCorte) }))
+    .sort((a, b) => (a.date === b.date ? (a.closureId < b.closureId ? -1 : 1) : a.date < b.date ? -1 : 1));
   const total = p(
-    enManos.reduce((s, x) => s + c(x.total), 0) + c(enCajasFuertes) + enTransito.reduce((s, x) => s + c(x.amount), 0),
+    enManos.reduce((s, x) => s + c(x.total), 0) +
+      c(enCajasFuertes) +
+      enTransito.reduce((s, x) => s + c(x.amount), 0) +
+      cortesAnteriores.reduce((s, x) => s + c(x.amount), 0),
   );
-  return { alCorte, enManos, enCajasFuertes, enTransito, total };
+  return { alCorte, enManos, enCajasFuertes, enTransito, cortesAnteriores, total };
 }
 
 // ── Diferencias ─────────────────────────────────────────────────────────────

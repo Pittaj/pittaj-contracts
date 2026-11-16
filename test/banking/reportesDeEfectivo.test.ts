@@ -45,12 +45,18 @@ describe('E5 · ¿Dónde está el efectivo?', () => {
     ]);
     expect(r.total).toBe(42229.5);
     const jose = r.grupos[1]!.lugares[0]!;
-    expect(jose).toMatchObject({ saldo: 40350, pendienteDesde: '2026-11-10', diasPendiente: 2, vencido: false });
+    expect(jose).toMatchObject({ saldo: 40350, pendienteDesde: '2026-11-10', diasPendiente: 2, vencido: false, negativo: false });
   });
 
   it('el corte importa: al 9 nov solo había lo del Norte', () => {
     const r = dondeEstaElEfectivo(lugares, movs, '2026-11-09', 7);
     expect(r.total).toBe(22000);
+  });
+
+  it('un lugar bajo cero se marca para arquear', () => {
+    const r = dondeEstaElEfectivo(lugares, movs, '2026-11-14', 7);
+    expect(r.enNegativo).toEqual([{ id: 'centro', name: 'Caja fuerte · Centro', saldo: -100 }]);
+    expect(dondeEstaElEfectivo(lugares, movs, '2026-11-12', 7).enNegativo).toEqual([]);
   });
 
   it('lo que lleva más días que el ajuste se marca', () => {
@@ -82,6 +88,16 @@ describe('E5 · Por depositar', () => {
     expect(r.enTransito).toEqual([{ date: '2026-11-13', amount: 40350, dias: 1 }]);
     expect(r.enCajasFuertes).toBe(-100);
     expect(r.total).toBe(40250);
+    expect(r.cortesAnteriores).toEqual([]);
+  });
+
+  it('suma aparte los cortes anteriores sin depósito (lo histórico de 103-01)', () => {
+    const r = porDepositar(lugares, movs, '2026-11-14', 7, [
+      { closureId: 'viejo', date: '2026-10-28', amount: 1200 },
+      { closureId: 'futuro', date: '2026-11-20', amount: 999 },
+    ]);
+    expect(r.cortesAnteriores).toEqual([{ closureId: 'viejo', date: '2026-10-28', amount: 1200, dias: 17 }]);
+    expect(r.total).toBe(41450);
   });
 });
 
