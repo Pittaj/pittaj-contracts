@@ -228,6 +228,11 @@ export const createTransferSchema = z
      */
     custodianUserId: z.string().uuid().optional(),
     custodianName: z.string().trim().max(100).optional(),
+    /** Tanda 4: el número de la bolsa sellada en que viaja el efectivo (recolección o depósito). */
+    bagNumber: z.string().trim().max(40).nullish(),
+    /** Tanda 4: la evidencia (foto de la bolsa, ficha del banco), ya subida a `POST /api/bank-transfers/evidence-files`. */
+    evidenceFileId: z.string().uuid().nullish(),
+    evidenceFileName: z.string().trim().max(200).nullish(),
   })
   .refine((v) => (v.toAccountId ? 1 : 0) + (v.custodianUserId ? 1 : 0) === 1, {
     message: 'Indique la cuenta destino o la persona que recibe el efectivo',

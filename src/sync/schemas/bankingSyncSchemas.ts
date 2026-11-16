@@ -81,6 +81,10 @@ export const bankTransferSyncSchema = z.object({
     notes: texto(LIMITS.MAX_NOTES_LENGTH).nullish(),
     /** E3 de plan-efectivo. Ausente = `TRANSFER` (lo que suba un escritorio viejo). */
     kind: z.enum(['TRANSFER', 'COLLECTION', 'DEPOSIT', 'REPLENISHMENT']).nullish(),
+    /** Tanda 4: la bolsa y la evidencia del traslado. */
+    bagNumber: z.string().trim().max(40).nullish(),
+    evidenceFileId: z.string().uuid().nullish(),
+    evidenceFileName: z.string().trim().max(200).nullish(),
     version: z.number().int().min(1),
 });
 
