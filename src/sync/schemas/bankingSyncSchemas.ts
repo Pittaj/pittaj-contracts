@@ -48,6 +48,14 @@ export const bankAccountSyncSchema = z.object({
     businessLineId: z.string().uuid().nullish(),
     ledgerAccountCode: texto(20).nullish(),
     creditCard: tarjetaSchema.nullish(),
+    /**
+     * E1 de plan-efectivo (2.92.0). Opcionales: un escritorio viejo no los manda y la nube
+     * conserva los que tenía. La caja fuerte y «en manos de» no cambian de rol desde fuera.
+     */
+    cashRole: z.enum(BANKING_CONSTANTS.CASH_ROLES).nullish(),
+    responsibleUserId: z.string().uuid().nullish(),
+    fixedFund: importe.nullish(),
+    maxExpense: importe.nullish(),
     status: z.enum(BANKING_CONSTANTS.STATUSES),
     version: z.number().int().min(1),
 });
