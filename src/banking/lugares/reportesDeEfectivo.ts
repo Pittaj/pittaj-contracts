@@ -14,6 +14,7 @@
 
 import { z } from 'zod';
 import { asignarFifo, diasEntre } from './movimientosDeEfectivo.js';
+import type { SeguimientoDelEfectivo, TramoDelEfectivo } from './seguimientoDelEfectivo.js';
 
 export type RolDeEfectivo = 'SAFE' | 'PETTY' | 'GENERAL' | 'CUSTODY';
 
@@ -44,6 +45,12 @@ export interface MovimientoParaReporte {
   readonly transferKind: string | null;
   readonly counterpartyName: string | null;
   readonly notes: string | null;
+  /** Tanda 3: el traspaso del que es pierna (empareja la salida de un lugar con la entrada del otro). */
+  readonly transferId?: string | null;
+  /** Tanda 3: cuándo se registró (ISO, UTC). Ordena el día y permite el corte con hora. */
+  readonly momento?: string | null;
+  /** Tanda 3: de dónde nació (`CASH_CLOSURE` = la entrega de un corte). */
+  readonly sourceType?: string | null;
 }
 
 /** Un retiro del dueño hecho desde el cajón de la caja (E0: motivo `OWNER_DRAW`). */
@@ -61,6 +68,8 @@ export interface DiferenciaDeCorte {
   readonly date: string;
   readonly cashierName: string;
   readonly difference: number;
+  /** Tanda 3: la sucursal del corte, para acotar por sucursal. */
+  readonly locationId?: string | null;
 }
 
 const c = (n: number): number => Math.round(n * 100);
@@ -314,6 +323,51 @@ export function retirosDelDueno(
 
 // ── La respuesta del endpoint ───────────────────────────────────────────────
 
+/** Un corte, una recolección o un depósito del periodo, para abrir su seguimiento. */
+export interface DocumentoDeSeguimiento {
+  readonly tipo: 'CORTE' | 'RECOLECCION' | 'DEPOSITO';
+  /** Para un corte, el movimiento de su entrega (origen); para los otros, el traspaso. */
+  readonly id: string;
+  /** YYYY-MM-DD */
+  readonly date: string;
+  readonly amount: number;
+  /** Corte: a dónde entró. Recolección y depósito: de dónde salió. */
+  readonly lugar: string;
+  readonly quien: string | null;
+}
+
+/** Tanda 3: los documentos del periodo y los tramos que los tocan (el resumen lo hace `seguimientoDeUnOrigen`/`DeUnTraspaso`). */
+export function seguimientoDelPeriodo(
+  lugares: readonly LugarParaReporte[],
+  movimientos: readonly MovimientoParaReporte[],
+  seguimiento: SeguimientoDelEfectivo,
+  desde: string,
+  hasta: string,
+): { readonly documentos: readonly DocumentoDeSeguimiento[]; readonly tramos: readonly TramoDelEfectivo[] } {
+  const nombre = new Map(lugares.map((l) => [l.id, l.name]));
+  const efectivo = new Set(lugares.map((l) => l.id));
+  const enPeriodo = movimientos.filter((m) => vivo(m) && efectivo.has(m.accountId) && m.date >= desde && m.date <= hasta);
+  const documentos: DocumentoDeSeguimiento[] = [
+    ...enPeriodo
+      .filter((m) => m.direction === 'IN' && m.sourceType === 'CASH_CLOSURE')
+      .map((m) => ({ tipo: 'CORTE' as const, id: m.id, date: m.date, amount: m.amount, lugar: nombre.get(m.accountId) ?? '', quien: null })),
+    ...enPeriodo
+      .filter((m) => m.direction === 'OUT' && m.transferId && (m.transferKind === 'COLLECTION' || m.transferKind === 'DEPOSIT'))
+      .map((m) => ({
+        tipo: m.transferKind === 'COLLECTION' ? ('RECOLECCION' as const) : ('DEPOSITO' as const),
+        id: m.transferId!,
+        date: m.date,
+        amount: m.amount,
+        lugar: nombre.get(m.accountId) ?? '',
+        quien: m.counterpartyName,
+      })),
+  ].sort((a, b) => (a.date === b.date ? (a.tipo < b.tipo ? -1 : 1) : a.date > b.date ? -1 : 1));
+  const origenes = new Set(documentos.filter((d) => d.tipo === 'CORTE').map((d) => d.id));
+  const traspasos = new Set(documentos.filter((d) => d.tipo !== 'CORTE').map((d) => d.id));
+  const tramos = seguimiento.tramos.filter((t) => origenes.has(t.origenId) || t.camino.some((x) => traspasos.has(x.transferId)));
+  return { documentos, tramos };
+}
+
 /** GET /api/bank-reports/cash?asOf=&from=&to= — los cuatro reportes de una vez. */
 export interface CashReportsResponse {
   readonly dondeEsta: DondeEstaElEfectivo;
@@ -322,6 +376,18 @@ export interface CashReportsResponse {
   readonly retirosDelDueno: RetirosDelDueno;
   readonly desde: string;
   readonly hasta: string;
+  /** Tanda 3: seguimiento de los cortes, recolecciones y depósitos del periodo. */
+  readonly seguimiento: {
+    readonly documentos: readonly DocumentoDeSeguimiento[];
+    readonly tramos: readonly TramoDelEfectivo[];
+    readonly sinOrigen: SeguimientoDelEfectivo['sinOrigen'];
+  };
+  /** Tanda 3: lo que el banco dice que entró en efectivo y nadie ligó a un depósito. */
+  readonly depositosSinOrigen: readonly { readonly id: string; readonly accountId: string; readonly date: string; readonly description: string; readonly amount: number }[];
+  /** Tanda 3: el instante del corte, si se pidió con hora. */
+  readonly alInstante: string | null;
+  /** Tanda 3: la sucursal a la que se acotó (null = todas). Sin «en manos de» cuando hay sucursal. */
+  readonly locationId: string | null;
 }
 
 
@@ -332,4 +398,8 @@ export const getCashReportsSchema = z.object({
   asOf: fechaCivil.optional(),
   from: fechaCivil.optional(),
   to: fechaCivil.optional(),
+  /** Tanda 3: el corte con hora, como instante ISO (el cliente lo arma en su zona). */
+  asOfInstant: z.string().datetime({ offset: true }).optional(),
+  /** Tanda 3: acotar a una sucursal. */
+  locationId: z.string().uuid().optional(),
 });
