@@ -100,6 +100,12 @@ export const BANKING_CONSTANTS = {
      * caja o el corte, y postear las dos patas metería el mismo peso dos veces.
      */
     'CASH_SESSION',
+    /**
+     * C0 de plan-caja-sin-salir · El reembolso de una devolución por transferencia: la salida del
+     * banco que cierra la puente 103-04 que la póliza de la devolución abonó. El id de origen es el de
+     * la devolución. **Sí postea** (banco contra la puente, al conciliar), igual que un cobro.
+     */
+    'SALES_RETURN',
   ] as const,
 
   /** Tipo de contraparte de un movimiento. */
