@@ -178,6 +178,16 @@ export const stampSaleCfdiSchema = z.object({
      * I y J.
      */
     desgloseIeps: z.boolean().optional(),
+    /**
+     * (2.116.0) Correo del cliente: timbrada la factura, la nube le manda el XML y el PDF. El escritorio lo pide al
+     * facturar sin conexión, porque el cliente ya no está cuando la factura se timbra.
+     */
+    email: z.string().trim().email().max(254).optional(),
+    /**
+     * (2.116.0) Cuándo se pidió la factura (la cola del escritorio). «De otro mes» se juzga con esta fecha si cae
+     * entre la venta y ahora (`instanteParaElMes`).
+     */
+    solicitadaEn: z.string().datetime().optional(),
 });
 
 /**

@@ -23,3 +23,22 @@ describe('motivoParaNoFacturar', () => {
         expect(motivoParaNoFacturar(venta, new Date('2026-11-02T18:00:00Z'))).toBe('de-otro-mes');
     });
 });
+
+describe('instanteParaElMes', () => {
+    const ahora = new Date('2026-12-01T16:00:00Z');
+    const venta = new Date('2026-11-30T20:00:00Z');
+    it('sin fecha de solicitud, ahora', async () => {
+        const { instanteParaElMes } = await import('../../src/sales-cfdi/facturarDesdeLaCaja');
+        expect(instanteParaElMes({ completedAt: venta }, ahora)).toEqual(ahora);
+    });
+    it('pedida sin conexión el 30 y timbrada el 1: cuenta el 30', async () => {
+        const { instanteParaElMes } = await import('../../src/sales-cfdi/facturarDesdeLaCaja');
+        const pedida = new Date('2026-11-30T21:00:00Z');
+        expect(instanteParaElMes({ solicitadaEn: pedida.toISOString(), completedAt: venta }, ahora)).toEqual(pedida);
+    });
+    it('una fecha antes de la venta o en el futuro no cuenta', async () => {
+        const { instanteParaElMes } = await import('../../src/sales-cfdi/facturarDesdeLaCaja');
+        expect(instanteParaElMes({ solicitadaEn: '2026-10-01T00:00:00Z', completedAt: venta }, ahora)).toEqual(ahora);
+        expect(instanteParaElMes({ solicitadaEn: '2027-01-01T00:00:00Z', completedAt: venta }, ahora)).toEqual(ahora);
+    });
+});

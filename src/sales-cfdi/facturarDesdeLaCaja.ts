@@ -36,3 +36,23 @@ export function motivoParaNoFacturar(
     }
     return null;
 }
+
+/**
+ * Tanda 1 de pendientes de «Caja sin salir» · El instante con el que se juzga «de otro mes». Una factura pedida sin
+ * conexión el día 31 y timbrada el 1 se juzga por cuándo se pidió, no por cuándo llegó la red. La fecha que manda el
+ * escritorio solo cuenta entre la venta y ahora: ni antes de la venta ni en el futuro. La global timbrada sigue
+ * bloqueando aparte.
+ */
+export function instanteParaElMes(
+    entrada: { readonly solicitadaEn?: Date | string | null; readonly completedAt?: Date | string | null },
+    ahora: Date = new Date(),
+): Date {
+    if (!entrada.solicitadaEn) return ahora;
+    const pedida = new Date(entrada.solicitadaEn);
+    if (Number.isNaN(pedida.getTime()) || pedida.getTime() > ahora.getTime()) return ahora;
+    if (entrada.completedAt) {
+        const venta = new Date(entrada.completedAt);
+        if (!Number.isNaN(venta.getTime()) && pedida.getTime() < venta.getTime()) return ahora;
+    }
+    return pedida;
+}
