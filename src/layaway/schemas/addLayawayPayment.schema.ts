@@ -26,6 +26,17 @@ export const addLayawayPaymentSchema = z.object({
     /** Con qué forma de pago abonó. Opcional: si no viene, se asume efectivo. */
     paymentMethodId: z.string().optional(),
     paymentMethodName: z.string().max(100).optional(),
+    /**
+     * C5 de plan-caja-sin-salir · Tipo de la forma de pago (`CASH`, `CARD`, `TRANSFER`…). **Solo el efectivo entra al
+     * cajón**: un abono con tarjeta se contabiliza contra su cuenta puente, pero el corte no debe esperarlo en
+     * efectivo. Si no viene, se asume efectivo (lo que hacían todos los clientes hasta C5).
+     */
+    paymentMethodType: z.string().max(20).optional(),
 });
+
+/** C5 · ¿El abono entra al cajón? Solo el efectivo (y el abono sin tipo, que siempre fue efectivo). */
+export function abonoEntraAlCajon(paymentMethodType: string | null | undefined): boolean {
+    return !paymentMethodType || paymentMethodType.toUpperCase() === 'CASH';
+}
 
 export type AddLayawayPaymentBody = z.infer<typeof addLayawayPaymentSchema>;
