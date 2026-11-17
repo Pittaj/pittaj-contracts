@@ -78,7 +78,8 @@ export const removeLineSchema = z.object({
 export const addPaymentSchema = z.object({
   paymentMethodId: z.string().uuid(),
   paymentMethodName: z.string().min(1).max(100),
-  paymentMethodType: z.enum(['CASH', 'CARD', 'TRANSFER', 'CREDIT', 'OTHER']),
+  /** `CREDIT_NOTE` (C4): el pago con una nota de crédito; `paymentMethodId` es el id de la nota. La póliza del corte lo lleva a 206-02. */
+  paymentMethodType: z.enum(['CASH', 'CARD', 'TRANSFER', 'CREDIT', 'OTHER', 'CREDIT_NOTE']),
   amountPaid: z.number().min(0.01),
   currency: z.string().length(3).optional(),
   reference: z.string().max(200).nullable().optional(),
