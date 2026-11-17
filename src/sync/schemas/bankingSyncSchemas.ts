@@ -129,6 +129,27 @@ export const bankTransactionSyncSchema = z.object({
     version: z.number().int().min(1),
 });
 
+/**
+ * Tanda 5 de plan-efectivo: el arqueo de un lugar de efectivo como documento (`cash-count`). Inmutable: lo contado y lo
+ * esperado en ese momento, con su desglose. La diferencia, si la hubo, es un `bank-transaction` aparte (su id viaja aquí).
+ */
+export const cashCountSyncSchema = z.object({
+    id: z.string().uuid(),
+    countNumber: z.string().trim().min(1).max(40),
+    accountId: z.string().uuid(),
+    date: fechaCivil,
+    expected: importe,
+    counted: importe.min(0),
+    difference: importe,
+    denominations: z.array(z.object({ value: z.number().positive(), quantity: z.number().int().min(0) })).max(40).nullish(),
+    explanation: texto(400).nullish(),
+    responsibleUserId: z.string().uuid().nullish(),
+    responsibleName: texto(150).nullish(),
+    transactionId: z.string().uuid().nullish(),
+    version: z.number().int().min(1),
+});
+
+export type CashCountSync = z.infer<typeof cashCountSyncSchema>;
 export type BankAccountSync = z.infer<typeof bankAccountSyncSchema>;
 export type TransactionCategorySync = z.infer<typeof transactionCategorySyncSchema>;
 export type BankTransferSync = z.infer<typeof bankTransferSyncSchema>;

@@ -51,6 +51,75 @@ export interface MovimientoParaReporte {
   readonly momento?: string | null;
   /** Tanda 3: de dónde nació (`CASH_CLOSURE` = la entrega de un corte). */
   readonly sourceType?: string | null;
+  /**
+   * Tanda 5: el documento de origen. La diferencia de un depósito al conciliar (`FALTANTE_A_CARGO` en el banco)
+   * nace con `sourceType = TRANSFER` y aquí el id del depósito.
+   */
+  readonly sourceId?: string | null;
+}
+
+// ── Ventana de lectura ──────────────────────────────────────────────────────
+
+/**
+ * Tanda 5: cuántos días antes del periodo se leen los movimientos. Lo de antes se resume en un saldo por lugar (ver
+ * {@link lugaresDesdeLaVentana}), así el lector no carga la historia entera. Es más largo que cualquier antigüedad que
+ * se avise en «en manos de», así que una entrada vieja sigue saliendo como vieja.
+ */
+export const VENTANA_DE_LECTURA_DIAS = 400;
+
+/** El primer día que se lee para un periodo que empieza en `desde` (y un corte en `alCorte`). */
+export function inicioDeLaVentana(desde: string, alCorte: string): string {
+  const base = desde < alCorte ? desde : alCorte;
+  const d = new Date(`${base}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - VENTANA_DE_LECTURA_DIAS);
+  return d.toISOString().slice(0, 10);
+}
+
+/** Lo que pasó en un lugar antes de la ventana: neto de los movimientos no anulados y la fecha del más viejo. */
+export interface SaldoPrevio {
+  readonly accountId: string;
+  /** entradas − salidas */
+  readonly neto: number;
+  /** YYYY-MM-DD */
+  readonly desde: string;
+}
+
+/**
+ * Tanda 5: los lugares con lo anterior a la ventana dentro de su saldo de apertura. Para todo reporte da lo mismo que
+ * leer la historia entera: el saldo es apertura + movimientos, y el seguimiento trata la apertura como un lote más (con
+ * la fecha del movimiento más viejo, para que la antigüedad no se acorte).
+ */
+export function lugaresDesdeLaVentana(lugares: readonly LugarParaReporte[], previos: readonly SaldoPrevio[]): LugarParaReporte[] {
+  const porLugar = new Map(previos.map((x) => [x.accountId, x]));
+  return lugares.map((l) => {
+    const x = porLugar.get(l.id);
+    if (!x) return l;
+    return {
+      ...l,
+      openingBalance: Math.round((l.openingBalance + x.neto) * 100) / 100,
+      // Lo que queda de antes de la ventana se fecha con el movimiento más viejo de entonces (con apertura propia, la más
+      // vieja de las dos). Puede envejecer de más lo que reste, pero todo eso ya pasa de la ventana: está vencido igual.
+      openingDate: c(l.openingBalance) > 0 && l.openingDate < x.desde ? l.openingDate : x.desde,
+    };
+  });
+}
+
+/** Las entradas de un lugar para el FIFO, con su saldo de apertura como la primera (tanda 5: ahí cae lo anterior a la ventana). */
+function entradasConApertura(l: LugarParaReporte, propios: readonly MovimientoParaReporte[]) {
+  const entradas = propios.filter((m) => m.direction === 'IN').map((m) => ({ id: m.id, date: m.date, amount: m.amount }));
+  return c(l.openingBalance) > 0 ? [{ id: `apertura:${l.id}`, date: l.openingDate, amount: l.openingBalance }, ...entradas] : entradas;
+}
+
+const fechaDeEntrada = (l: LugarParaReporte, propios: readonly MovimientoParaReporte[], id: string): string | null =>
+  id === `apertura:${l.id}` ? l.openingDate : propios.find((m) => m.id === id)?.date ?? null;
+
+/** Tanda 5: un arqueo, para saber cuándo se contó cada lugar por última vez. */
+export interface ArqueoParaReporte {
+  readonly accountId: string;
+  /** YYYY-MM-DD */
+  readonly date: string;
+  /** contado − esperado */
+  readonly difference: number;
 }
 
 /** Un retiro del dueño hecho desde el cajón de la caja (E0: motivo `OWNER_DRAW`). */
@@ -104,6 +173,10 @@ export interface LugarAlCorte {
    * bloquea (sería perder un registro), se avisa para que se arquee.
    */
   readonly negativo: boolean;
+  /** Tanda 5: el último arqueo hasta el corte (null = nunca se ha arqueado). */
+  readonly ultimoArqueo: string | null;
+  /** Tanda 5: el último arqueo que cuadró (diferencia cero). */
+  readonly ultimoArqueoQueCuadro: string | null;
 }
 
 export interface DondeEstaElEfectivo {
@@ -120,8 +193,15 @@ export function dondeEstaElEfectivo(
   movimientos: readonly MovimientoParaReporte[],
   alCorte: string,
   diasEnManos: number,
+  arqueos: readonly ArqueoParaReporte[] = [],
 ): DondeEstaElEfectivo {
   const hasta = movimientos.filter((m) => vivo(m) && m.date <= alCorte);
+  const ultimo = (id: string, cuadro: boolean): string | null => {
+    let u: string | null = null;
+    for (const a of arqueos)
+      if (a.accountId === id && a.date <= alCorte && (!cuadro || c(a.difference) === 0) && (u == null || a.date > u)) u = a.date;
+    return u;
+  };
   const grupos = ORDEN.map((rol) => {
     const delRol = lugares
       .filter((l) => rolDe(l) === rol && aperturaEfectiva(l, movimientos) <= alCorte)
@@ -131,11 +211,11 @@ export function dondeEstaElEfectivo(
         let pendienteDesde: string | null = null;
         if (rol === 'CUSTODY') {
           const fifo = asignarFifo(
-            propios.filter((m) => m.direction === 'IN').map((m) => ({ id: m.id, date: m.date, amount: m.amount })),
+            entradasConApertura(l, propios),
             propios.filter((m) => m.direction === 'OUT').map((m) => ({ id: m.id, date: m.date, amount: m.amount })),
           );
           const primera = fifo.pendientes[0];
-          pendienteDesde = primera ? propios.find((m) => m.id === primera.entradaId)?.date ?? null : null;
+          pendienteDesde = primera ? fechaDeEntrada(l, propios, primera.entradaId) : null;
         }
         const diasPendiente = pendienteDesde ? diasEntre(pendienteDesde, alCorte) : null;
         return {
@@ -146,6 +226,8 @@ export function dondeEstaElEfectivo(
           diasPendiente,
           vencido: diasPendiente != null && diasPendiente > diasEnManos,
           negativo: c(saldo) < 0,
+          ultimoArqueo: ultimo(l.id, false),
+          ultimoArqueoQueCuadro: ultimo(l.id, true),
         };
       })
       .sort((a, b) => a.name.localeCompare(b.name, 'es'));
@@ -200,11 +282,11 @@ export function porDepositar(
     .map((l) => {
       const propios = hasta.filter((m) => m.accountId === l.id);
       const fifo = asignarFifo(
-        propios.filter((m) => m.direction === 'IN').map((m) => ({ id: m.id, date: m.date, amount: m.amount })),
+        entradasConApertura(l, propios),
         propios.filter((m) => m.direction === 'OUT').map((m) => ({ id: m.id, date: m.date, amount: m.amount })),
       );
       const pendientes = fifo.pendientes.map((x) => {
-        const date = propios.find((m) => m.id === x.entradaId)?.date ?? alCorte;
+        const date = fechaDeEntrada(l, propios, x.entradaId) ?? alCorte;
         const dias = diasEntre(date, alCorte);
         return { date, amount: x.amount, dias, vencido: dias > diasEnManos };
       });
@@ -391,6 +473,8 @@ export interface CashReportsResponse {
     readonly documentos: readonly DocumentoDeSeguimiento[];
     readonly tramos: readonly TramoDelEfectivo[];
     readonly sinOrigen: SeguimientoDelEfectivo['sinOrigen'];
+    /** Tanda 5: lo que el banco reportó distinto al conciliar cada depósito. */
+    readonly diferenciasDeDeposito: SeguimientoDelEfectivo['diferenciasDeDeposito'];
   };
   /** Tanda 3: lo que el banco dice que entró en efectivo y nadie ligó a un depósito. */
   readonly depositosSinOrigen: readonly { readonly id: string; readonly accountId: string; readonly date: string; readonly description: string; readonly amount: number }[];

@@ -130,6 +130,10 @@ export const registerCashCountSchema = z.object({
 export type RegisterCashCountRequest = z.infer<typeof registerCashCountSchema>;
 
 export interface CashCountResponse {
+    /** Tanda 5: el arqueo es un documento propio (`cash_counts`). */
+    readonly id: string;
+    /** `ARQ-W-######` en la web, `ARQ-<equipo>-######` en cada escritorio. */
+    readonly countNumber: string;
     readonly accountId: string;
     readonly expected: number;
     readonly counted: number;
@@ -137,4 +141,29 @@ export interface CashCountResponse {
     readonly difference: number;
     /** El movimiento de la diferencia, si la hubo. */
     readonly transactionId: string | null;
+}
+
+/** Tanda 5: serie de folios de los arqueos hechos en la web. */
+export const CASH_COUNT_WEB_PREFIX = 'ARQ-W-';
+
+/** Tanda 5: la semilla del id del movimiento de la diferencia de un arqueo (la misma en las dos puntas). */
+export const semillaDeDiferenciaDeArqueo = (cashCountId: string): string => `cash-count-difference:${cashCountId}`;
+
+/** GET /api/bank-accounts/cash-counts?accountId= — un arqueo de la lista (lo más nuevo primero). */
+export interface CashCountListItem {
+    readonly id: string;
+    readonly countNumber: string;
+    readonly accountId: string;
+    /** YYYY-MM-DD */
+    readonly date: string;
+    readonly expected: number;
+    readonly counted: number;
+    readonly difference: number;
+    readonly denominations: readonly { readonly value: number; readonly quantity: number }[] | null;
+    readonly explanation: string | null;
+    readonly responsibleName: string | null;
+    readonly transactionId: string | null;
+    readonly createdBy: string | null;
+    /** ISO */
+    readonly createdAt: string;
 }

@@ -119,6 +119,11 @@ export interface SeguimientoDelEfectivo {
   readonly tramos: readonly TramoDelEfectivo[];
   /** Salidas que no encontraron efectivo de dónde salir (el lugar estaba en cero): un registro que falta o un arqueo pendiente. */
   readonly sinOrigen: readonly { readonly salidaId: string; readonly lugarId: string; readonly date: string; readonly amount: number }[];
+  /**
+   * Tanda 5: la diferencia que el banco reportó al conciliar cada depósito (el `FALTANTE_A_CARGO` que nace ligado a él).
+   * `amount` negativo es faltante (a cargo de `quien`); positivo, sobrante.
+   */
+  readonly diferenciasDeDeposito: readonly { readonly transferId: string; readonly movimientoId: string; readonly date: string; readonly amount: number; readonly quien: string | null }[];
 }
 
 interface Lote {
@@ -230,7 +235,17 @@ export function seguimientoDelEfectivo(
           quien: null,
         });
 
-  return { tramos, sinOrigen };
+  const diferenciasDeDeposito = vivos
+    .filter((m) => m.categoryCode === 'FALTANTE_A_CARGO' && m.sourceType === 'TRANSFER' && m.sourceId && !efectivo.has(m.accountId))
+    .map((m) => ({
+      transferId: m.sourceId!,
+      movimientoId: m.id,
+      date: m.date,
+      amount: m.direction === 'IN' ? m.amount : -m.amount,
+      quien: m.counterpartyName ?? null,
+    }));
+
+  return { tramos, sinOrigen, diferenciasDeDeposito };
 }
 
 export interface ResumenDelSeguimiento {
@@ -242,6 +257,11 @@ export interface ResumenDelSeguimiento {
   readonly faltantes: number;
   /** Sigue en algún lugar de efectivo: lo que falta por llevar al banco o gastar. */
   readonly porUbicar: number;
+  /**
+   * Tanda 5: solo para un depósito, lo que el banco reportó distinto al conciliarlo (negativo = faltante). null para
+   * lo demás: un corte o una recolección pueden repartirse en varios depósitos.
+   */
+  readonly diferenciaAlConciliar: number | null;
 }
 
 const resumir = (tramos: readonly TramoDelEfectivo[]): ResumenDelSeguimiento => {
@@ -254,6 +274,7 @@ const resumir = (tramos: readonly TramoDelEfectivo[]): ResumenDelSeguimiento => 
     gastado: suma((t) => t.destino === 'PAGO_A_PROVEEDOR' || t.destino === 'RETIRO_DEL_DUENO' || t.destino === 'OTRA_SALIDA'),
     faltantes: suma((t) => t.destino === 'FALTANTE'),
     porUbicar: suma((t) => t.destino === 'EN_LUGAR'),
+    diferenciaAlConciliar: null,
   };
 };
 
@@ -264,7 +285,9 @@ export function seguimientoDeUnOrigen(s: SeguimientoDelEfectivo, origenId: strin
 
 /** Lo que pasó con el efectivo que viajó en un traspaso (una recolección o un depósito): de dónde vino y a dónde fue. */
 export function seguimientoDeUnTraspaso(s: SeguimientoDelEfectivo, transferId: string): ResumenDelSeguimiento {
-  return resumir(s.tramos.filter((t) => t.camino.some((x) => x.transferId === transferId)));
+  const resumen = resumir(s.tramos.filter((t) => t.camino.some((x) => x.transferId === transferId)));
+  const diferencias = (s.diferenciasDeDeposito ?? []).filter((d) => d.transferId === transferId);
+  return diferencias.length === 0 ? resumen : { ...resumen, diferenciaAlConciliar: p(diferencias.reduce((t, d) => t + c(d.amount), 0)) };
 }
 
 // ── Depósitos del banco sin origen ──────────────────────────────────────────
