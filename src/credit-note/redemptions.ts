@@ -35,3 +35,12 @@ export function saldoDeLaNota(importe: number, usos: readonly { readonly amount:
     const usado = usos.reduce((s, u) => s + u.amount, 0);
     return Math.max(0, Math.round((importe - usado) * 100) / 100);
 }
+
+/**
+ * (2.114.0) Lo que los usos de una nota pasan de su importe. Una misma nota usada en dos cajas a la vez, con una
+ * sin conexión, suma usos de más: los dos suben bien por el sync, y aquí se ve. 0 = no está sobregirada.
+ */
+export function sobregiroDeLaNota(importe: number, usos: readonly { readonly amount: number }[]): number {
+    const usado = usos.reduce((s, u) => s + u.amount, 0);
+    return Math.max(0, Math.round((usado - importe) * 100) / 100);
+}

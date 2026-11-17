@@ -33,6 +33,11 @@ export interface CreditNoteResponse {
     readonly amount: number;
     /** Saldo disponible (decrece al redimir; 0 = agotada). */
     readonly balance: number;
+    /**
+     * (2.114.0) Lo que sus usos pasan de su importe (`sobregiroDeLaNota`): la nota se usó de más en dos cajas a la vez.
+     * 0 o ausente = no está sobregirada. Solo lo calculan las consultas, no el sync.
+     */
+    readonly overdrawnAmount?: number;
     /** Moneda (ej. "MXN"). */
     readonly currency: string;
     /** Estado: ACTIVE | REDEEMED | EXPIRED | CANCELLED. */
