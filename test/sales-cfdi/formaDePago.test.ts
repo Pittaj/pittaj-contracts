@@ -33,3 +33,11 @@ describe('formaPagoDelEgreso', () => {
     it('sin datos: 15', () =>
         expect(formaPagoDelEgreso({ criterio: 'ORIGEN', formaDeLaVenta: null, formaDelReembolso: null })).toBe('15'));
 });
+
+describe('FORMAS_PARA_LA_NOTA_DE_CREDITO', () => {
+    it('la primera es la de omisión y todas son claves pagadas', async () => {
+        const { FORMAS_PARA_LA_NOTA_DE_CREDITO, esFormaDePagoPagada } = await import('../../src/sales-cfdi/formaDePago');
+        expect(FORMAS_PARA_LA_NOTA_DE_CREDITO[0]!.clave).toBe(formaPagoDeLaNota(null));
+        expect(FORMAS_PARA_LA_NOTA_DE_CREDITO.every((f) => esFormaDePagoPagada(f.clave))).toBe(true);
+    });
+});

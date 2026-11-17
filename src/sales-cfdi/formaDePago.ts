@@ -38,6 +38,17 @@ export const CRITERIOS_DEL_EGRESO = ['ORIGEN', 'REEMBOLSO'] as const;
 export type CriterioDelEgreso = (typeof CRITERIOS_DEL_EGRESO)[number];
 export const CRITERIO_DEL_EGRESO_POR_OMISION: CriterioDelEgreso = 'ORIGEN';
 
+/**
+ * (2.113.0) Las claves que tiene sentido elegir para la venta pagada con nota de crédito, con su nombre del
+ * catálogo c_FormaPago. Las dos pantallas enseñan esta lista (el catálogo de métodos de pago no trae 15, 17 ni 23).
+ */
+export const FORMAS_PARA_LA_NOTA_DE_CREDITO: ReadonlyArray<{ readonly clave: string; readonly texto: string }> = [
+    { clave: '17', texto: '17 · Compensación' },
+    { clave: '01', texto: '01 · Efectivo' },
+    { clave: '15', texto: '15 · Condonación' },
+    { clave: '23', texto: '23 · Novación' },
+];
+
 /** Las opciones del criterio, con el texto que enseñan las dos pantallas. */
 export const OPCIONES_DEL_CRITERIO_DEL_EGRESO: ReadonlyArray<{ readonly valor: CriterioDelEgreso; readonly texto: string }> = [
     { valor: 'ORIGEN', texto: 'Como la venta de origen (regla principal del SAT)' },
