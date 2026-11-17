@@ -15,6 +15,12 @@ export interface BankTransferResponse {
   /** Fecha ISO (YYYY-MM-DD). */
   readonly date: string;
   readonly notes: string | null;
+  /** E3 de plan-efectivo: traspaso, recolección o depósito de efectivo. */
+  readonly kind: 'TRANSFER' | 'COLLECTION' | 'DEPOSIT' | 'REPLENISHMENT';
+  /** Tanda 4: el número de la bolsa sellada y la evidencia del traslado. */
+  readonly bagNumber: string | null;
+  readonly evidenceFileId: string | null;
+  readonly evidenceFileName: string | null;
   /**
    * Las dos piernas del traspaso vía cuenta puente: OUT en la cuenta origen
    * e IN en la destino (nacen juntas, atómicamente).

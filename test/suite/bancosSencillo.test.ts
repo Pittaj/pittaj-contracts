@@ -16,14 +16,14 @@ describe('MODULOS_APAGADOS_EN_BANCOS_SENCILLO', () => {
         expect(visibilidadSchema.parse({ modulos }).modulos).toEqual(modulos);
     });
 
-    it('deja encendidos Cuentas, Movimientos, Saldos, Por categoría y Categorías', () => {
+    it('deja encendidos Cuentas, Movimientos, Efectivo, Saldos, Por categoría y Categorías (E3–E4: el efectivo también es del tendero)', () => {
         const v = visibilidadSchema.parse({
             modulos: Object.fromEntries(MODULOS_APAGADOS_EN_BANCOS_SENCILLO.map((c) => [c, false])),
         });
         const visibles = appDeLaSuite('bancos')!
             .modulos.filter((m) => moduloVisible(v, 'bancos', m.ruta))
             .map((m) => m.ruta);
-        expect(visibles).toEqual(['cuentas', 'movimientos', 'reportes/saldos', 'reportes/categorias', 'categorias']);
+        expect(visibles).toEqual(['cuentas', 'movimientos', 'efectivo', 'reportes/saldos', 'reportes/categorias', 'reportes/efectivo', 'categorias', 'configuracion/efectivo']);
     });
 
     it('Flujo de efectivo se apaga con Calendario: sin pagos programados no proyecta nada', () => {

@@ -48,6 +48,14 @@ export const bankAccountSyncSchema = z.object({
     businessLineId: z.string().uuid().nullish(),
     ledgerAccountCode: texto(20).nullish(),
     creditCard: tarjetaSchema.nullish(),
+    /**
+     * E1 de plan-efectivo (2.92.0). Opcionales: un escritorio viejo no los manda y la nube
+     * conserva los que tenía. La caja fuerte y «en manos de» no cambian de rol desde fuera.
+     */
+    cashRole: z.enum(BANKING_CONSTANTS.CASH_ROLES).nullish(),
+    responsibleUserId: z.string().uuid().nullish(),
+    fixedFund: importe.nullish(),
+    maxExpense: importe.nullish(),
     status: z.enum(BANKING_CONSTANTS.STATUSES),
     version: z.number().int().min(1),
 });
@@ -71,6 +79,12 @@ export const bankTransferSyncSchema = z.object({
     currency: z.string().length(3),
     date: fechaCivil,
     notes: texto(LIMITS.MAX_NOTES_LENGTH).nullish(),
+    /** E3 de plan-efectivo. Ausente = `TRANSFER` (lo que suba un escritorio viejo). */
+    kind: z.enum(['TRANSFER', 'COLLECTION', 'DEPOSIT', 'REPLENISHMENT']).nullish(),
+    /** Tanda 4: la bolsa y la evidencia del traslado. */
+    bagNumber: z.string().trim().max(40).nullish(),
+    evidenceFileId: z.string().uuid().nullish(),
+    evidenceFileName: z.string().trim().max(200).nullish(),
     version: z.number().int().min(1),
 });
 
@@ -115,6 +129,27 @@ export const bankTransactionSyncSchema = z.object({
     version: z.number().int().min(1),
 });
 
+/**
+ * Tanda 5 de plan-efectivo: el arqueo de un lugar de efectivo como documento (`cash-count`). Inmutable: lo contado y lo
+ * esperado en ese momento, con su desglose. La diferencia, si la hubo, es un `bank-transaction` aparte (su id viaja aquí).
+ */
+export const cashCountSyncSchema = z.object({
+    id: z.string().uuid(),
+    countNumber: z.string().trim().min(1).max(40),
+    accountId: z.string().uuid(),
+    date: fechaCivil,
+    expected: importe,
+    counted: importe.min(0),
+    difference: importe,
+    denominations: z.array(z.object({ value: z.number().positive(), quantity: z.number().int().min(0) })).max(40).nullish(),
+    explanation: texto(400).nullish(),
+    responsibleUserId: z.string().uuid().nullish(),
+    responsibleName: texto(150).nullish(),
+    transactionId: z.string().uuid().nullish(),
+    version: z.number().int().min(1),
+});
+
+export type CashCountSync = z.infer<typeof cashCountSyncSchema>;
 export type BankAccountSync = z.infer<typeof bankAccountSyncSchema>;
 export type TransactionCategorySync = z.infer<typeof transactionCategorySyncSchema>;
 export type BankTransferSync = z.infer<typeof bankTransferSyncSchema>;

@@ -45,6 +45,18 @@ export const BANKING_CONSTANTS = {
   /** Tipos de cuenta. TRANSIT = cuenta puente del sistema ("Fondos en tránsito"). */
   ACCOUNT_KINDS: ['BANK', 'CASH', 'CREDIT_CARD', 'PSP', 'TRANSIT'] as const,
 
+  /**
+   * Qué lugar de efectivo es una cuenta `CASH` (E1 de plan-efectivo).
+   *
+   * - `GENERAL`: efectivo sin más (lo que había antes del 2026-11-15).
+   * - `SAFE`: la caja fuerte de una sucursal. Una por sucursal; la crea el sistema.
+   * - `PETTY`: caja chica, con fondo fijo y responsable.
+   * - `CUSTODY`: el efectivo «en manos de» una persona. Una por persona; la crea el sistema.
+   *
+   * La caja registradora NO es una de estas: el cajón es del turno (`PosSession`).
+   */
+  CASH_ROLES: ['GENERAL', 'SAFE', 'PETTY', 'CUSTODY'] as const,
+
   /** Estados de cuenta y de categoría. */
   STATUSES: ['ACTIVE', 'INACTIVE'] as const,
 
@@ -81,6 +93,13 @@ export const BANKING_CONSTANTS = {
      * las tres y un reintento no las duplica.
      */
     'PSP_SETTLEMENT',
+    /**
+     * E2 de plan-efectivo · La otra pata de un movimiento del cajón: el retiro que entra a la caja
+     * fuerte, la entrega del corte, el cambio que sale de ella. El id de origen es el del movimiento
+     * de caja (o el del cierre, en la entrega). **No postea**: la póliza la hace el movimiento de
+     * caja o el corte, y postear las dos patas metería el mismo peso dos veces.
+     */
+    'CASH_SESSION',
   ] as const,
 
   /** Tipo de contraparte de un movimiento. */
@@ -111,6 +130,8 @@ export const BANKING_CONSTANTS = {
     'EXACT_REFERENCE',
     'AMOUNT_AND_DATE',
     'CASH_CLOSURE',
+    /** E3 de plan-efectivo: el depósito de efectivo que alguien llevó al banco (un traspaso DEPOSIT). */
+    'CASH_DEPOSIT',
     'TPV_SETTLEMENT',
     'RULE',
     'MANUAL',
@@ -345,6 +366,7 @@ export const BANKING_CONSTANTS = {
 } as const;
 
 export type BankAccountKindValue = (typeof BANKING_CONSTANTS.ACCOUNT_KINDS)[number];
+export type CashRoleValue = (typeof BANKING_CONSTANTS.CASH_ROLES)[number];
 export type BankingStatusValue = (typeof BANKING_CONSTANTS.STATUSES)[number];
 export type CategoryFlowValue = (typeof BANKING_CONSTANTS.CATEGORY_FLOWS)[number];
 export type TransactionDirectionValue = (typeof BANKING_CONSTANTS.DIRECTIONS)[number];
@@ -481,6 +503,13 @@ export const BANKING_SYSTEM_CATEGORIES: readonly SystemCategoryDef[] = [
   { code: 'PRESTAMO_A_SOCIO', name: 'Préstamo al socio', flow: 'OUT', ledgerAccountCode: '113-03' },
   { code: 'REPARTO_UTILIDADES', name: 'Reparto de utilidades', flow: 'OUT', ledgerAccountCode: '304-01' },
   { code: 'SUELDO_SOCIO', name: 'Sueldo del socio', flow: 'OUT', ledgerAccountCode: '601-01' },
+
+  /**
+   * E3 de plan-efectivo: la diferencia de un depósito de efectivo que paga quien lo llevó. Se crea
+   * al conciliar el depósito; 113-01 es lo que esa persona le debe al negocio (o, si el banco
+   * recibió de más, lo que el negocio le debe a ella). `BOTH` por eso.
+   */
+  { code: 'FALTANTE_A_CARGO', name: 'Faltante a cargo de quien depositó', flow: 'BOTH', ledgerAccountCode: '113-01' },
 
   /**
    * El cajón de «no sé qué es esto», y **se queda sin cuenta a propósito**. Darle una convertiría

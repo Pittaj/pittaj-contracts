@@ -3,3 +3,4 @@ export * from './responses/index.js';
 export * from './constants/index.js';
 export * from './primitives/index.js';
 export * from './verdict/index.js';
+export * from './lugares/index.js';
