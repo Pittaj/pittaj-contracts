@@ -92,3 +92,17 @@ describe('el último arqueo de cada lugar', () => {
     expect(dondeEstaElEfectivo(lugares, [M('a', 'norte', '2026-10-01', 'IN', 100)], '2026-11-30', 7).grupos[0]!.lugares[0]!.ultimoArqueo).toBeNull();
   });
 });
+
+describe('acotado por sucursal', () => {
+  it('se queda con la diferencia de sus depósitos', async () => {
+    const { acotarASucursal } = await import('../../src/banking/lugares/seguimientoDelEfectivo');
+    const movs = [
+      M('t1-out', 'norte', '2026-11-10', 'OUT', 100, { transferId: 't1', transferKind: 'DEPOSIT' }),
+      M('t1-in', 'bbva', '2026-11-10', 'IN', 100, { transferId: 't1', transferKind: 'DEPOSIT' }),
+      M('falta', 'bbva', '2026-11-11', 'OUT', 5, { categoryCode: 'FALTANTE_A_CARGO', sourceType: 'TRANSFER', sourceId: 't1' }),
+      M('otra', 'bbva', '2026-11-11', 'OUT', 7, { categoryCode: 'FALTANTE_A_CARGO', sourceType: 'TRANSFER', sourceId: 't9' }),
+    ];
+    const r = acotarASucursal({ lugares, movimientos: movs, cortes: [], delCajon: [], cortesSinDeposito: [] }, 'n');
+    expect(r.movimientos.map((m) => m.id)).toEqual(['t1-out', 't1-in', 'falta']);
+  });
+});

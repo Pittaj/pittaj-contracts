@@ -62,7 +62,11 @@ export function acotarASucursal(datos: DatosDeEfectivo, locationId: string | nul
   return {
     lugares,
     movimientos: datos.movimientos.filter(
-      (m) => ids.has(m.accountId) || (!efectivo.has(m.accountId) && m.transferId != null && traspasos.has(m.transferId)),
+      (m) =>
+        ids.has(m.accountId) ||
+        (!efectivo.has(m.accountId) && m.transferId != null && traspasos.has(m.transferId)) ||
+        // Tanda 5: la diferencia al conciliar uno de sus depósitos.
+        (!efectivo.has(m.accountId) && m.sourceType === 'TRANSFER' && m.sourceId != null && traspasos.has(m.sourceId)),
     ),
     cortes: datos.cortes.filter((x) => x.locationId === locationId),
     delCajon: datos.delCajon.filter((x) => x.locationId === locationId),
