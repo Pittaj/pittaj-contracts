@@ -12,6 +12,8 @@ import { RETURN_RESOLUTIONS } from '../primitives/salesReturnPrimitives.js';
 /** Query params de GET /api/sales-returns. */
 export const getSalesReturnsSchema = z.object({
     resolution: z.enum(RETURN_RESOLUTIONS).optional(),
+    /** C0 de plan-caja-sin-salir · Solo las de este turno (sesión de caja). */
+    sessionId: z.string().optional(),
     page: z.coerce.number().int().min(1).optional(),
     limit: z.coerce.number().int().min(1).max(200).optional(),
 });
