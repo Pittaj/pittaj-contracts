@@ -99,6 +99,15 @@ export const assignCustomerSchema = z.object({
   version: z.number().int().min(0),
 });
 
+/**
+ * C2 de plan-caja-sin-salir · PUT /api/pos-tickets/:id/notes — La nota del ticket («pasa por él a las
+ * 6»). Solo en un ticket abierto; vacía o null la borra.
+ */
+export const updateTicketNotesSchema = z.object({
+  notes: z.string().max(500).nullable(),
+  version: z.number().int().min(0),
+});
+
 /** POST /api/pos-tickets/:id/complete — Completar ticket. */
 export const completePosTicketSchema = z.object({
   version: z.number().int().min(0),
