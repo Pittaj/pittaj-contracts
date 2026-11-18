@@ -254,6 +254,12 @@ export const stampRepSchema = z.object({
     paymentDate: z.string().datetime().optional(),
     /** D7d · Tipo de cambio del día del pago (`TipoCambioP`), si la venta no está en MXN. */
     tipoCambio: z.number().positive().max(100_000).optional(),
+    /**
+     * (2.117.0) El cobro que origina el complemento (id del cobro, o `cobro:venta`). Hace idempotente el timbrado: un
+     * reintento con el mismo id devuelve el complemento ya timbrado en vez de timbrar otro. Lo manda la cola del
+     * escritorio, que reintenta tras cada sincronización, y la web desde el cobro de la estación.
+     */
+    sourcePaymentId: z.string().trim().min(1).max(80).optional(),
 });
 
 export type StampRepInput = z.infer<typeof stampRepSchema>;
