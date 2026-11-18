@@ -45,6 +45,8 @@ export interface LayawayPaymentResponse {
     readonly amount: number;
     readonly paymentMethodId: string | null;
     readonly paymentMethodName: string | null;
+    /** (2.115.0) Tipo del método (CASH, CARD…), del catálogo; null si el abono no trae método. */
+    readonly paymentMethodType?: string | null;
     readonly sessionId: string | null;
     readonly operatorId: string | null;
     /** ISO 8601. */

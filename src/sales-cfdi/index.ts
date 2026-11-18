@@ -6,3 +6,5 @@
 export * from './schemas/index.js';
 export * from './responses/index.js';
 export * from './monedaDelComprobante.js';
+export * from './facturarDesdeLaCaja.js';
+export * from './formaDePago.js';

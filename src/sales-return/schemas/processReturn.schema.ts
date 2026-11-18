@@ -65,6 +65,13 @@ export const processReturnSchema = z
         refundMethodId: z.string().optional(),
         refundMethodType: z.string().max(20).optional(),
         refundMethodName: z.string().max(100).optional(),
+        /**
+         * C0 de plan-caja-sin-salir · Cuenta de banco de la que sale el reembolso (solo TRANSFER).
+         * Con ella la devolución escribe su salida en Bancos (categoría «Transferencia», origen
+         * `SALES_RETURN`), y al conciliarla la puente 103-04 se cierra. Opcional para no romper a
+         * quien todavía no la manda: sin cuenta, la salida se captura a mano en Bancos como antes.
+         */
+        refundAccountId: z.string().optional(),
         /** Cliente para la nota de crédito (opcional). */
         customerId: z.string().optional(),
         /** Motivo de la devolución (texto libre). */
@@ -110,6 +117,12 @@ export const processReturnSchema = z
                         'El reembolso por transferencia necesita la cuenta o forma de pago con la que se envía',
                 });
             }
+        } else if (val.refundAccountId && val.refundAccountId.length > 0) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['refundAccountId'],
+                message: `Una devolución resuelta como ${val.resolution} no sale de una cuenta de banco`,
+            });
         } else if (val.refundMethodId && val.refundMethodId.length > 0) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,

@@ -78,7 +78,8 @@ export const removeLineSchema = z.object({
 export const addPaymentSchema = z.object({
   paymentMethodId: z.string().uuid(),
   paymentMethodName: z.string().min(1).max(100),
-  paymentMethodType: z.enum(['CASH', 'CARD', 'TRANSFER', 'CREDIT', 'OTHER']),
+  /** `CREDIT_NOTE` (C4): el pago con una nota de crédito; `paymentMethodId` es el id de la nota. La póliza del corte lo lleva a 206-02. */
+  paymentMethodType: z.enum(['CASH', 'CARD', 'TRANSFER', 'CREDIT', 'OTHER', 'CREDIT_NOTE']),
   amountPaid: z.number().min(0.01),
   currency: z.string().length(3).optional(),
   reference: z.string().max(200).nullable().optional(),
@@ -96,6 +97,15 @@ export const addPaymentSchema = z.object({
 /** POST /api/pos-tickets/:id/customer — Asignar/cambiar cliente del ticket (null = cliente de mostrador). */
 export const assignCustomerSchema = z.object({
   customerId: z.string().uuid().nullable(),
+  version: z.number().int().min(0),
+});
+
+/**
+ * C2 de plan-caja-sin-salir · PUT /api/pos-tickets/:id/notes — La nota del ticket («pasa por él a las
+ * 6»). Solo en un ticket abierto; vacía o null la borra.
+ */
+export const updateTicketNotesSchema = z.object({
+  notes: z.string().max(500).nullable(),
   version: z.number().int().min(0),
 });
 

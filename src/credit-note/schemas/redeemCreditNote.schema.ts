@@ -15,6 +15,13 @@ export const redeemCreditNoteSchema = z.object({
     amount: z.number().positive('El monto debe ser mayor que 0'),
     /** Versión esperada de la nota (OCC). */
     version: z.number().int().min(0),
+    /**
+     * C4 de plan-caja-sin-salir · Id del uso, generado por quien usa la nota: reintentar no lo cuenta
+     * dos veces. Sin él, la nube genera uno.
+     */
+    redemptionId: z.string().uuid().optional(),
+    /** C4 · Venta en la que se usó. */
+    ticketId: z.string().max(36).optional(),
 });
 
 export type RedeemCreditNoteBody = z.infer<typeof redeemCreditNoteSchema>;

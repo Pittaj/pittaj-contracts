@@ -74,6 +74,15 @@ export interface SalesReturnResponse {
     /** Nombre visible del método, para leer la devolución sin resolver el catálogo. */
     readonly refundMethodName: string | null;
 
+    /**
+     * C0 de plan-caja-sin-salir · Sesión de caja en la que se hizo. Con ella el turno sabe qué
+     * devoluciones son suyas (también las de nota de crédito y transferencia, que no mueven el
+     * cajón). Null en las anteriores al cambio.
+     */
+    readonly sessionId?: string | null;
+    /** C0 · Cuenta de banco de la que salió el reembolso (solo TRANSFER; null si no se dijo). */
+    readonly refundAccountId?: string | null;
+
     /** Renglones (tabla hija sales_return_lines). */
     readonly lines: SalesReturnLineResponse[];
 

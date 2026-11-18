@@ -55,6 +55,12 @@ export interface SaleCfdiStatusResponse {
     readonly reps: readonly RepResponse[];
     /** D7e · Notas de crédito por bonificación o descuento de la venta. */
     readonly bonifications?: readonly BonificationResponse[];
+    /**
+     * (2.117.0) Si la venta aún no se factura: por qué ya no se puede facturar aparte (`en-global-timbrada`,
+     * `de-otro-mes`), o null. La estación del escritorio lo pregunta antes de ofrecer «Facturar», porque las globales
+     * viven en la nube.
+     */
+    readonly motivoParaNoFacturar?: 'en-global-timbrada' | 'de-otro-mes' | null;
 }
 
 /** D7e · Una nota de crédito por bonificación o descuento (sin devolución). */

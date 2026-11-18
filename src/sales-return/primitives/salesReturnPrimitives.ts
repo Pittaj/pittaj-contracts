@@ -19,5 +19,17 @@
  */
 export const RETURN_RESOLUTIONS = ['CASH', 'CREDIT_NOTE', 'TRANSFER'] as const;
 
+/**
+ * C0 de plan-caja-sin-salir · Semilla del id del movimiento de banco de un reembolso por
+ * transferencia. La misma en la nube y en el escritorio (`IdDeterminista.DeSemilla`): la devolución
+ * hecha en un equipo y su salida en Bancos llegan a la nube por dos syncs distintos y no se duplican.
+ */
+export function semillaDelReembolsoPorBanco(returnId: string): string {
+    return `bank-transaction:sales-return:${returnId}`;
+}
+
+/** Folio de las devoluciones hechas en la web. Cada escritorio usa `DEV-<equipo>-`. */
+export const SALES_RETURN_WEB_PREFIX = 'DEV-W-';
+
 /** Resolución del importe: efectivo (cajón), nota de crédito (saldo a favor) o transferencia (banco). */
 export type ReturnResolutionPrimitive = (typeof RETURN_RESOLUTIONS)[number];
