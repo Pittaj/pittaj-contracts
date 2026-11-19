@@ -24,6 +24,8 @@ export const getPriceListsSchema = z.object({
         .transform((v) => v === 'true')
         .optional(),
     locationId: z.string().uuid().optional(),
+    /** Buscador de la lista (2026-11-19). */
+    search: z.string().trim().max(100).optional(),
     page: z.coerce.number().int().min(1).optional(),
     limit: z.coerce.number().int().min(1).max(200).optional(),
 });

@@ -105,6 +105,8 @@ export const listPendingRepsSchema = z.object({
     /** Incluye también los ya vencidos. Por omisión sí: esconderlos no los quita. */
     includeOverdue: z.coerce.boolean().default(true),
     sortOrder: z.enum(['asc', 'desc']).default('asc'),
+    /** Ticket, cliente, RFC o UUID de la factura (2026-11-19). */
+    search: z.string().trim().max(120).optional(),
 });
 
 export type ListPendingRepsInput = z.infer<typeof listPendingRepsSchema>;
