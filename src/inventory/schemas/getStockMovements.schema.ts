@@ -38,6 +38,8 @@ export const getStockMovementsSchema = z.object({
     sourceDocId: z.string().max(40).optional(),
     lotId: z.string().uuid().optional(),
     serialNumber: z.string().trim().max(80).optional(),
+    /** Buscador de la lista (2026-11-19): producto (nombre, código o código de barras), documento o lote. */
+    search: z.string().trim().max(100).optional(),
     /** Calcular `balanceAfter` (requiere `productId`; el saldo corrido es por producto). */
     withBalance: z.coerce.boolean().optional(),
     page: z.coerce.number().int().min(1).optional(),

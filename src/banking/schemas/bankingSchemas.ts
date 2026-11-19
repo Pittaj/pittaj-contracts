@@ -276,6 +276,8 @@ export const getBankTransactionsSchema = z.object({
   status: transactionStatusEnum.optional(),
   dateFrom: isoDateSchema.optional(),
   dateTo: isoDateSchema.optional(),
+  /** Buscador de la lista (2026-11-19). */
+  search: z.string().trim().max(100).optional(),
   page: z.coerce.number().int().min(1).optional(),
   limit: z.coerce.number().int().min(1).max(LIMITS.MAX_PAGE_SIZE).optional(),
 });
@@ -527,6 +529,8 @@ export const closeBankStatementSchema = z.object({
 export const getBankStatementsSchema = z.object({
   accountId: z.string().uuid().optional(),
   status: statementStatusEnum.optional(),
+  /** Buscador de la lista (2026-11-19). */
+  search: z.string().trim().max(100).optional(),
   page: z.coerce.number().int().min(1).optional(),
   limit: z.coerce.number().int().min(1).max(LIMITS.MAX_PAGE_SIZE).optional(),
 });
