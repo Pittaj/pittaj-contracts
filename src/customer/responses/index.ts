@@ -9,3 +9,4 @@ export * from './SearchCustomersForPosResponse.js';
 export * from './SyncPullCustomerResponse.js';
 export * from './SyncPushCustomerResponse.js';
 export * from './UpdateCustomerResponse.js';
+export * from './CustomerStatsResponse.js';
