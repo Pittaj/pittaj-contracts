@@ -7,3 +7,4 @@ export * from './PaginatedCategoriesResult.js';
 export * from './SyncPullResponse.js';
 export * from './SyncPushResponse.js';
 export * from './UpdateCategoryResponse.js';
+export * from './CategoryStatsResponse.js';
