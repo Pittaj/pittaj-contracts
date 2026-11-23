@@ -53,6 +53,12 @@ export const INVENTORY_REPORT_KINDS = [
      * excepciones, pólizas manuales a la cuenta).
      */
     'ACCOUNTING_RECONCILIATION',
+    /**
+     * U-T6 (2.127.0) · Rendimiento y merma: de lo que entró, cuánto se vendió y cuánto se mermó (lo
+     * reconocido con «Se acabó» / «Pesar lo que queda»), su costo, lo que el recorte recuperó y la
+     * merma neta. Marca lo que rinde por debajo del mínimo.
+     */
+    'YIELD',
 ] as const;
 export type InventoryReportKind = (typeof INVENTORY_REPORT_KINDS)[number];
 
@@ -69,6 +75,7 @@ export const INVENTORY_REPORT_LABELS: Readonly<Record<InventoryReportKind, strin
     REPLENISHMENT: 'Sugerido de reabasto',
     TRACEABILITY: 'Trazabilidad de lote o serie',
     ACCOUNTING_RECONCILIATION: 'Inventario contra contabilidad',
+    YIELD: 'Rendimiento y merma',
 };
 
 export const REPORT_FORMATS = ['json', 'xlsx', 'csv', 'pdf'] as const;
@@ -137,6 +144,14 @@ export const shrinkageReportSchema = z.object({
     groupBy: z.enum(['REASON', 'PRODUCT', 'CATEGORY', 'WAREHOUSE']).optional().default('REASON'),
 });
 
+/** U-T6 · YIELD. `minimo`: el rendimiento por debajo del cual se marca (0–1). */
+export const yieldReportSchema = z.object({
+    ...comunes,
+    ...periodo,
+    groupBy: z.enum(['PRODUCT', 'CATEGORY']).optional().default('CATEGORY'),
+    minimo: z.number().min(0).max(1).optional().default(0.85),
+});
+
 export const rotationAbcReportSchema = z.object({
     ...comunes,
     ...periodo,
@@ -187,6 +202,7 @@ export const INVENTORY_REPORT_SCHEMAS = {
     REPLENISHMENT: replenishmentReportSchema,
     TRACEABILITY: traceabilityReportSchema,
     ACCOUNTING_RECONCILIATION: accountingReconciliationReportSchema,
+    YIELD: yieldReportSchema,
 } as const satisfies Record<InventoryReportKind, z.ZodTypeAny>;
 
 export type StockAtDateReportRequest = z.infer<typeof stockAtDateReportSchema>;
@@ -196,6 +212,7 @@ export type MovementSummaryReportRequest = z.infer<typeof movementSummaryReportS
 export type NoMovementReportRequest = z.infer<typeof noMovementReportSchema>;
 export type ExpiryReportRequest = z.infer<typeof expiryReportSchema>;
 export type ShrinkageReportRequest = z.infer<typeof shrinkageReportSchema>;
+export type YieldReportRequest = z.infer<typeof yieldReportSchema>;
 export type RotationAbcReportRequest = z.infer<typeof rotationAbcReportSchema>;
 export type CountAccuracyReportRequest = z.infer<typeof countAccuracyReportSchema>;
 export type ReplenishmentReportRequest = z.infer<typeof replenishmentReportSchema>;

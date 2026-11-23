@@ -8,6 +8,10 @@
  * Espejo: `Rendimiento.cs` (escritorio), mismos casos.
  */
 
+import type { YieldRow, YieldTotals } from './responses/InventoryReportsResponse.js';
+import type { AlertaDerivada } from './schemas/inventoryAlert.schema.js';
+import { idDeAlerta } from './schemas/inventoryAlert.schema.js';
+
 /** Un movimiento del kárdex, como lo necesita el rendimiento. */
 export interface MovimientoParaRendimiento {
     readonly direction: 'IN' | 'OUT';
@@ -63,7 +67,7 @@ export function cierrePorPesaje(teorica: number, pesada: number): { readonly mer
     return teorica > p ? { merma: r4(teorica - p), sobrante: 0 } : { merma: 0, sobrante: r4(p - teorica) };
 }
 
-/** GET /api/stock-items/rendimiento?productId= — el rendimiento de los últimos 180 días y lo vendible. */
+/** GET /api/inventory/rendimiento/:id — el rendimiento de los últimos 180 días y lo vendible. */
 export interface RendimientoDelProductoResponse extends Rendimiento {
     readonly productId: string;
     /** Desde cuándo se mide (`YYYY-MM-DD`). */
@@ -72,4 +76,106 @@ export interface RendimientoDelProductoResponse extends Rendimiento {
     readonly existencia: number;
     /** Lo que de esa existencia se espera vender con el rendimiento aprendido. */
     readonly vendibleEstimada: number;
+}
+
+// ── U-T6 · Reporte, alerta y costo por unidad vendida ───────────────────────────────────────
+
+/** El rendimiento mínimo por omisión: debajo de esto se avisa. */
+export const RENDIMIENTO_MINIMO_POR_OMISION = 0.85;
+
+/**
+ * El costo de lo que de verdad se vende: si de cada kilo que entra se venden 0.85, cada kilo
+ * vendido cargó 1 ÷ 0.85 kilos comprados. Es el costo contra el que hay que poner precio.
+ */
+export function costoPorUnidadVendida(costo: number, rendimiento: number | null): number {
+    if (rendimiento == null || !(rendimiento > 0)) return costo;
+    return Math.round((costo / rendimiento) * 10000) / 10000;
+}
+
+/** Un movimiento del periodo con su producto y categoría, para el reporte YIELD. */
+export interface MovimientoDeRendimiento extends MovimientoParaRendimiento {
+    readonly productId: string;
+    readonly productName: string;
+    readonly categoryId: string | null;
+    readonly categoryName: string | null;
+    readonly unitCost: number;
+}
+
+/** Lo que vendió el recorte que recupera la merma de una categoría. */
+export interface RecuperacionDeMerma {
+    readonly categoryId: string;
+    readonly importe: number;
+}
+
+const r2 = (n: number) => Math.round(n * 100) / 100;
+
+/** YIELD: por producto o categoría, lo que entró, se vendió, se mermó, lo recuperado y la merma neta. */
+export function armarRendimiento(
+    movimientos: readonly MovimientoDeRendimiento[],
+    recuperaciones: readonly RecuperacionDeMerma[],
+    agrupar: 'PRODUCT' | 'CATEGORY',
+    minimo = RENDIMIENTO_MINIMO_POR_OMISION
+): { rows: YieldRow[]; totals: YieldTotals } {
+    const grupos = new Map<string, { label: string; movs: MovimientoDeRendimiento[]; entradas: number; costo: number }>();
+    for (const m of movimientos) {
+        const key = agrupar === 'CATEGORY' ? (m.categoryId ?? '') : m.productId;
+        const label = agrupar === 'CATEGORY' ? (m.categoryName ?? 'Sin categoría') : m.productName;
+        const g = grupos.get(key) ?? { label, movs: [], entradas: 0, costo: 0 };
+        g.movs.push(m);
+        if (m.sourceType === 'PURCHASE') g.entradas += m.direction === 'IN' ? m.quantity : -m.quantity;
+        if (m.sourceType === 'MERMA' && m.direction === 'OUT') g.costo += m.quantity * m.unitCost;
+        grupos.set(key, g);
+    }
+    const recuperadoDe = new Map<string, number>();
+    for (const r of recuperaciones) recuperadoDe.set(r.categoryId, (recuperadoDe.get(r.categoryId) ?? 0) + r.importe);
+    if (agrupar === 'CATEGORY') {
+        for (const [cat] of recuperadoDe) if (!grupos.has(cat)) grupos.set(cat, { label: 'Categoría', movs: [], entradas: 0, costo: 0 });
+    }
+    const rows: YieldRow[] = [...grupos.entries()].map(([key, g]) => {
+        const r = rendimientoAprendido(g.movs);
+        const recuperado = agrupar === 'CATEGORY' ? r2(recuperadoDe.get(key) ?? 0) : 0;
+        const costoMerma = r2(g.costo);
+        return {
+            groupKey: key,
+            groupLabel: g.label,
+            entradas: Math.round(g.entradas * 10000) / 10000,
+            vendido: r.vendido,
+            merma: r.merma,
+            rendimiento: r.rendimiento,
+            costoMerma,
+            recuperado,
+            mermaNeta: r2(costoMerma - recuperado),
+            bajo: r.rendimiento != null && r.rendimiento < minimo,
+        };
+    });
+    rows.sort((a, b) => b.mermaNeta - a.mermaNeta || a.groupLabel.localeCompare(b.groupLabel, 'es'));
+    const costoMerma = r2(rows.reduce((s, x) => s + x.costoMerma, 0));
+    const recuperado = r2(recuperaciones.reduce((s, x) => s + x.importe, 0));
+    return { rows, totals: { costoMerma, recuperado, mermaNeta: r2(costoMerma - recuperado) } };
+}
+
+/** LOW_YIELD: el producto rinde por debajo del mínimo (lo que se merma se lleva el margen). */
+export function alertaDeRendimiento(
+    p: { readonly productId: string; readonly productName: string; readonly productCode: string | null; readonly rendimiento: number | null; readonly costoMerma: number; readonly changedAt: string },
+    minimo = RENDIMIENTO_MINIMO_POR_OMISION
+): AlertaDerivada | null {
+    if (p.rendimiento == null || p.rendimiento >= minimo) return null;
+    return {
+        id: idDeAlerta('LOW_YIELD', p.productId),
+        kind: 'LOW_YIELD',
+        severity: p.rendimiento < minimo - 0.1 ? 'HIGH' : 'MEDIUM',
+        message: `${p.productName}: rinde ${Math.round(p.rendimiento * 1000) / 10} % (mínimo ${Math.round(minimo * 100)} %)`,
+        productId: p.productId,
+        productName: p.productName,
+        productCode: p.productCode,
+        warehouseId: null,
+        warehouseName: null,
+        docId: null,
+        docNumber: null,
+        onHand: null,
+        threshold: minimo,
+        daysWithoutMovement: null,
+        valueAtRisk: r2(p.costoMerma),
+        changedAt: p.changedAt,
+    };
 }

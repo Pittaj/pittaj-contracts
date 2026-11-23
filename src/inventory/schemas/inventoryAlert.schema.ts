@@ -29,6 +29,8 @@ export const INVENTORY_ALERT_KINDS = [
     'TRANSFER_STALE',
     /** Un conteo en borrador que lleva más de N días sin aplicarse. */
     'COUNT_STALE',
+    /** U-T6 · Rinde por debajo del mínimo: lo que se merma se lleva el margen. */
+    'LOW_YIELD',
 ] as const;
 export type InventoryAlertKind = (typeof INVENTORY_ALERT_KINDS)[number];
 
@@ -41,6 +43,7 @@ export const INVENTORY_ALERT_KIND_LABELS: Readonly<Record<InventoryAlertKind, st
     NO_MOVEMENT: 'Sin movimiento',
     TRANSFER_STALE: 'Traspaso sin recibir',
     COUNT_STALE: 'Conteo sin aplicar',
+    LOW_YIELD: 'Rinde poco',
 };
 
 export const INVENTORY_ALERT_SEVERITIES = ['HIGH', 'MEDIUM', 'LOW'] as const;
