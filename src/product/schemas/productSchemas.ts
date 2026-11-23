@@ -113,6 +113,8 @@ const productUnitSchema = z.object({
     sellable: z.boolean().optional(),
     /** U-T1: las compras la ofrecen (ausente = sí). */
     purchasable: z.boolean().optional(),
+    /** U-T3: equivalencia variable, se mide al recibir (ausente = fija). */
+    variable: z.boolean().optional(),
 });
 
 /**

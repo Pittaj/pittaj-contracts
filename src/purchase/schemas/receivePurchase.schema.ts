@@ -20,6 +20,12 @@ export const receivePurchaseLineSchema = z.object({
     /** Cantidad recibida HOY, unidad de compra. > 0 y ≤ pendiente abierto. */
     quantity: z.number().positive().max(1_000_000),
     /**
+     * U-T3 · Lo CONTADO en la unidad de inventario, cuando la unidad de compra es variable (540 kg
+     * facturados → 300 tapas). Manda sobre `quantity × unitFactor` y de él sale el costo exacto
+     * por unidad base. Ausente = el factor de la línea.
+     */
+    baseQuantity: z.number().positive().max(100_000_000).optional(),
+    /**
      * I8a · Si el producto se rastrea por lote: en qué lotes llegó, cuánto de cada uno (en la
      * MISMA unidad que `quantity`). Lo que no se reparta entra sin lote. Un número que ya existe
      * para el producto se reusa.

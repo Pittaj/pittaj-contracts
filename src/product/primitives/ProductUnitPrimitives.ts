@@ -12,4 +12,9 @@ export interface ProductUnitPrimitives {
   readonly barcode: string | null;
   readonly sellable?: boolean;
   readonly purchasable?: boolean;
+  /**
+   * U-T3 (2.123.0): la equivalencia cambia de una entrega a otra (kilos por tapa). `factor` es
+   * solo la estimación; la recepción pide lo contado en la base. Ausente = fija.
+   */
+  readonly variable?: boolean;
 }
