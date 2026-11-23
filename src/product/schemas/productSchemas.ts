@@ -109,6 +109,10 @@ const productUnitSchema = z.object({
     factor: z.number().positive(),
     price: z.number().min(0).nullable().optional(),
     barcode: z.string().max(LIMITS.MAX_BARCODE_LENGTH).nullable().optional(),
+    /** U-T1: la caja la ofrece (ausente = sí). */
+    sellable: z.boolean().optional(),
+    /** U-T1: las compras la ofrecen (ausente = sí). */
+    purchasable: z.boolean().optional(),
 });
 
 /**
@@ -233,6 +237,9 @@ export const createProductSchema = z.object({
         .optional(),
     canBeSold: z.boolean().optional(),
     canBePurchased: z.boolean().optional(),
+    /** U-T1: la unidad base (la de inventario) se vende / se compra (ausente = sí). */
+    baseUnitSellable: z.boolean().optional(),
+    baseUnitPurchasable: z.boolean().optional(),
     units: z.array(productUnitSchema).optional(),
     attributes: z.record(attributeValueSchema).optional(),
     inventoryConfig: productInventoryConfigSchema.optional(),
@@ -289,6 +296,9 @@ export const updateProductSchema = z.object({
         .optional(),
     canBeSold: z.boolean().optional(),
     canBePurchased: z.boolean().optional(),
+    /** U-T1: la unidad base (la de inventario) se vende / se compra (ausente = sí). */
+    baseUnitSellable: z.boolean().optional(),
+    baseUnitPurchasable: z.boolean().optional(),
     units: z.array(productUnitSchema).optional(),
     attributes: z.record(attributeValueSchema).optional(),
     inventoryConfig: productInventoryConfigSchema.optional(),

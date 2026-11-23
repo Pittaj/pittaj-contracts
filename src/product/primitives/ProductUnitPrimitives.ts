@@ -1,6 +1,8 @@
 /**
- * Unidad de venta alterna del producto (del desktop; la nube la almacena como
- * passthrough en el jsonb `units`, no la razona).
+ * Unidad alterna del producto (del desktop; la nube la guarda en `product_units`).
+ *
+ * U-T1 (2.121.0): `sellable` / `purchasable` dicen si la caja y las compras la ofrecen. Ausentes =
+ * `true` (lo de antes de 2.121.0 se vendía y se compraba en todas sus unidades).
  */
 export interface ProductUnitPrimitives {
   readonly id: string;
@@ -8,4 +10,6 @@ export interface ProductUnitPrimitives {
   readonly factor: number;
   readonly price: number | null;
   readonly barcode: string | null;
+  readonly sellable?: boolean;
+  readonly purchasable?: boolean;
 }

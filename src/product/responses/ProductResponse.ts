@@ -51,7 +51,10 @@ export interface ProductResponse {
     readonly canBeSold: boolean;
     /** Aparece en búsquedas de compra; false = no se compra (del desktop). */
     readonly canBePurchased: boolean;
-    /** Unidades de venta alternas (del desktop). */
+    /** U-T1: la unidad base (la de inventario) se vende / se compra. Ausente = sí. */
+    readonly baseUnitSellable?: boolean;
+    readonly baseUnitPurchasable?: boolean;
+    /** Unidades alternas (del desktop), cada una con si se vende y si se compra. */
     readonly units: ProductUnitPrimitives[];
     readonly tags: string[];
     readonly weight: number | null;
