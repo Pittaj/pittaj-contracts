@@ -242,6 +242,8 @@ export const createProductSchema = z.object({
     /** U-T1: la unidad base (la de inventario) se vende / se compra (ausente = sí). */
     baseUnitSellable: z.boolean().optional(),
     baseUnitPurchasable: z.boolean().optional(),
+    /** U-T4: regla «costo + %» (recargo sobre el costo real). Nulo = sin regla. */
+    markupPercent: z.number().min(0).max(1000).nullable().optional(),
     units: z.array(productUnitSchema).optional(),
     attributes: z.record(attributeValueSchema).optional(),
     inventoryConfig: productInventoryConfigSchema.optional(),
@@ -301,6 +303,8 @@ export const updateProductSchema = z.object({
     /** U-T1: la unidad base (la de inventario) se vende / se compra (ausente = sí). */
     baseUnitSellable: z.boolean().optional(),
     baseUnitPurchasable: z.boolean().optional(),
+    /** U-T4: regla «costo + %» (recargo sobre el costo real). Nulo = sin regla. */
+    markupPercent: z.number().min(0).max(1000).nullable().optional(),
     units: z.array(productUnitSchema).optional(),
     attributes: z.record(attributeValueSchema).optional(),
     inventoryConfig: productInventoryConfigSchema.optional(),

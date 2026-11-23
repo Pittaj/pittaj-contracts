@@ -19,3 +19,4 @@ export * from './purchaseRequest.schema.js';
 export * from './quoteRequest.schema.js';
 export * from './supplierPayment.schema.js';
 export * from './expenses.schema.js';
+export * from './pesoReal.schema.js';

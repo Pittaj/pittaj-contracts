@@ -54,6 +54,8 @@ export interface ProductResponse {
     /** U-T1: la unidad base (la de inventario) se vende / se compra. Ausente = sí. */
     readonly baseUnitSellable?: boolean;
     readonly baseUnitPurchasable?: boolean;
+    /** U-T4: regla «costo + %» (recargo sobre el costo real). Nulo = sin regla. */
+    readonly markupPercent?: number | null;
     /** Unidades alternas (del desktop), cada una con si se vende y si se compra. */
     readonly units: ProductUnitPrimitives[];
     readonly tags: string[];
