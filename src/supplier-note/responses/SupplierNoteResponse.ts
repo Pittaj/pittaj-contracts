@@ -145,6 +145,12 @@ export interface SupplierProductLinkResponse {
     readonly productId: string;
     /** Última descripción vista (diagnóstico/UI). */
     readonly description: string;
+    /**
+     * U-T2 · En qué unidad del producto factura este proveedor ese concepto. Solo cuenta si
+     * `unitRemembered`: entonces nulo = la base. Ausentes = nada recordado (antes de 2.122.0).
+     */
+    readonly unitName?: string | null;
+    readonly unitRemembered?: boolean;
 
     readonly version: number;
     readonly createdAt?: string;

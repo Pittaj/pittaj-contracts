@@ -125,6 +125,11 @@ export const cfdiResolvedConceptoSchema = cfdiConceptoSchema
         origin: z.enum(PURCHASE_LINE_ORIGINS).nullish(),
         originDetail: z.string().trim().max(200).nullish(),
         originUser: z.string().trim().max(120).nullish(),
+        /**
+         * U-T2 · En qué unidad del producto entra. Ausente = la decide el servidor
+         * (`unidadDelConcepto`); `null` = la base; texto = esa alterna. Se recuerda para el proveedor.
+         */
+        unitName: z.string().trim().max(50).nullable().optional(),
     })
     .strict();
 
