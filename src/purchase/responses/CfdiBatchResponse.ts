@@ -89,6 +89,8 @@ export interface CfdiBatchResolvedConcepto {
     readonly unitFactor?: number;
     /** RECORDADA · BASE · NOMBRE · SIN_DATO: los dos últimos conviene que alguien los mire. */
     readonly unitMatchedBy?: import('../unidadDelConcepto.js').UnidadDelConceptoPor | null;
+    /** Las alternas del producto que se compran (la base siempre se puede): de aquí se elige. */
+    readonly unitOptions?: readonly { readonly name: string; readonly factor: number }[];
 }
 
 /** Un comprobante del lote, ya evaluado. */
