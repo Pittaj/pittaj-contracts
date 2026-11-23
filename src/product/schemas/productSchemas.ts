@@ -244,6 +244,8 @@ export const createProductSchema = z.object({
     baseUnitPurchasable: z.boolean().optional(),
     /** U-T4: regla «costo + %» (recargo sobre el costo real). Nulo = sin regla. */
     markupPercent: z.number().min(0).max(1000).nullable().optional(),
+    /** U-T5: este producto (sin existencia, p. ej. el recorte a $30/kg) recupera la merma de esa categoría. */
+    mermaRecoveryCategoryId: z.string().uuid().nullable().optional(),
     units: z.array(productUnitSchema).optional(),
     attributes: z.record(attributeValueSchema).optional(),
     inventoryConfig: productInventoryConfigSchema.optional(),
@@ -305,6 +307,8 @@ export const updateProductSchema = z.object({
     baseUnitPurchasable: z.boolean().optional(),
     /** U-T4: regla «costo + %» (recargo sobre el costo real). Nulo = sin regla. */
     markupPercent: z.number().min(0).max(1000).nullable().optional(),
+    /** U-T5: este producto (sin existencia, p. ej. el recorte a $30/kg) recupera la merma de esa categoría. */
+    mermaRecoveryCategoryId: z.string().uuid().nullable().optional(),
     units: z.array(productUnitSchema).optional(),
     attributes: z.record(attributeValueSchema).optional(),
     inventoryConfig: productInventoryConfigSchema.optional(),

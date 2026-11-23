@@ -56,6 +56,8 @@ export interface ProductResponse {
     readonly baseUnitPurchasable?: boolean;
     /** U-T4: regla «costo + %» (recargo sobre el costo real). Nulo = sin regla. */
     readonly markupPercent?: number | null;
+    /** U-T5: este producto recupera la merma de esa categoría (el recorte que se vende sin existencia). */
+    readonly mermaRecoveryCategoryId?: string | null;
     /** Unidades alternas (del desktop), cada una con si se vende y si se compra. */
     readonly units: ProductUnitPrimitives[];
     readonly tags: string[];
