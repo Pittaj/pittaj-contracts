@@ -50,10 +50,12 @@ export const SEED_PAYMENT_METHODS = [
     { name: 'Credito', type: 'CREDIT', isCashCount: false, requiresCustomer: true, requiresReference: false, commission: 0, displayOrder: 3, satFormaPago: '99' },
 ] as const;
 
-/** Series de folios base (reinicio anual, alcance GLOBAL). */
+/**
+ * Series de folios base (reinicio anual, alcance GLOBAL). Solo documentos internos: la serie de las
+ * facturas es la de Fiscal › Configuración de emisión (`TIPOS_DE_SERIE_FISCALES`).
+ */
 export const SEED_DOCUMENT_SERIES = [
     { documentType: 'TICKET', series: 'A', scope: 'GLOBAL', format: 'TKT-{serie}-{folio:00000}' },
-    { documentType: 'INVOICE', series: 'F', scope: 'GLOBAL', format: 'F-{folio:0000}' },
     { documentType: 'CREDIT_NOTE', series: 'NC', scope: 'GLOBAL', format: 'NC-{folio:0000}' },
 ] as const;
 
