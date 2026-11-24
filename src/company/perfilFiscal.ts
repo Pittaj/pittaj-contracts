@@ -12,6 +12,16 @@
  */
 import { z } from 'zod';
 
+/**
+ * D4 · RFC con la forma del SAT: 12 caracteres persona moral, 13 persona física, en mayúsculas.
+ * Sin él, «Mis obligaciones», el libro del RESICO y el pago provisional no saben qué persona es.
+ */
+export const rfcDelSatSchema = z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/, 'El RFC no tiene la forma del SAT (12 caracteres una empresa, 13 una persona)');
+
 /** Clave del catálogo `c_RegimenFiscal` del SAT (601, 612, 626…). */
 export const regimenFiscalSchema = z
     .string()

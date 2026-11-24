@@ -4,5 +4,6 @@
  */
 
 export * from './catalogo.js';
+export * from './perfiles.js';
 export * from './schemas/index.js';
 export * from './responses/index.js';
