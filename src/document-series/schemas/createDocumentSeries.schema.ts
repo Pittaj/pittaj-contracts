@@ -26,6 +26,26 @@ export const DOCUMENT_TYPES = [
 ] as const;
 export type DocumentType = (typeof DOCUMENT_TYPES)[number];
 
+/**
+ * Los comprobantes que timbra el PAC (factura y complemento de pago). Su serie y su folio NO salen
+ * de Series y folios: salen de Fiscal › Configuración de emisión (`cfdi.series` / `cfdi.folio`),
+ * el único lugar donde se configura lo del SAT. Una serie de estos tipos aquí no la usaría nadie,
+ * así que ya no se crean.
+ *
+ * `CREDIT_NOTE` NO está: es la nota de crédito INTERNA de una devolución (saldo a favor), y su
+ * folio `NC-…` sí sale de aquí (`CreditNoteIssuer`).
+ */
+export const TIPOS_DE_SERIE_FISCALES = ['INVOICE', 'PAYMENT'] as const satisfies readonly DocumentType[];
+
+/** Los documentos internos cuya numeración sí se configura en Series y folios. */
+export const TIPOS_DE_SERIE_INTERNOS = DOCUMENT_TYPES.filter(
+    (t) => !(TIPOS_DE_SERIE_FISCALES as readonly string[]).includes(t)
+) as readonly DocumentType[];
+
+export function esSerieFiscal(t: string): boolean {
+    return (TIPOS_DE_SERIE_FISCALES as readonly string[]).includes(t);
+}
+
 /** Alcances de la serie (enum SeriesScope). BY_REGISTER = una serie por caja (offline sin colisión). */
 export const SERIES_SCOPES = ['GLOBAL', 'BY_REGISTER', 'BY_BRANCH'] as const;
 export type SeriesScope = (typeof SERIES_SCOPES)[number];
@@ -33,6 +53,7 @@ export type SeriesScope = (typeof SERIES_SCOPES)[number];
 const ERROR_MESSAGES = {
     ID_INVALID_UUID: 'El ID debe ser un UUID válido',
     DOC_TYPE_INVALID: 'Tipo de documento inválido',
+    DOC_TYPE_FISCAL: 'La serie de facturas y complementos de pago se configura en Fiscal › Configuración de emisión',
     SERIE_REQUIRED: 'La serie es requerida',
     SERIE_TOO_LONG: 'La serie no puede exceder 10 caracteres',
     SCOPE_INVALID: 'Alcance inválido. Use: GLOBAL, BY_REGISTER o BY_BRANCH',
@@ -74,7 +95,9 @@ export const createDocumentSeriesSchema = z
     .object({
         id: z.string().uuid({ message: ERROR_MESSAGES.ID_INVALID_UUID }),
         /** Tipo de documento (inmutable tras crear). */
-        docType: z.enum(DOCUMENT_TYPES, { errorMap: () => ({ message: ERROR_MESSAGES.DOC_TYPE_INVALID }) }),
+        docType: z
+            .enum(DOCUMENT_TYPES, { errorMap: () => ({ message: ERROR_MESSAGES.DOC_TYPE_INVALID }) })
+            .refine((t) => !esSerieFiscal(t), { message: ERROR_MESSAGES.DOC_TYPE_FISCAL }),
         ...baseSeriesFields,
         /** Folio inicial (inmutable tras crear). */
         startFolio: z.number().int().min(0, { message: ERROR_MESSAGES.START_FOLIO_MIN }).optional().default(0),
