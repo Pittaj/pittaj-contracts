@@ -38,6 +38,13 @@ export interface CfdiMatchedConceptoResponse {
     readonly matchScore?: number | null;
     readonly matchedAlias?: string | null;
     readonly matchedAliasSupplierRfc?: string | null;
+    /**
+     * U-T2 · En qué unidad del producto entra (nulo = la base) y por qué (`unidadDelConcepto`).
+     * Solo si hay producto emparejado.
+     */
+    readonly unitName?: string | null;
+    readonly unitFactor?: number;
+    readonly unitMatchedBy?: import('../unidadDelConcepto.js').UnidadDelConceptoPor | null;
 }
 
 /** POST /api/purchases/cfdi-match. */
@@ -65,6 +72,9 @@ export interface SupplierProductLinkResponse {
     readonly conceptoKey: string;
     readonly productId: string;
     readonly description: string;
+    /** U-T2 · La unidad recordada (ver `SupplierProductLinkResponse` del sync). */
+    readonly unitName?: string | null;
+    readonly unitRemembered?: boolean;
     /** El proveedor, cuando se consulta por producto («Cómo te lo facturan»). */
     readonly supplierRfc?: string;
     readonly supplierName?: string | null;

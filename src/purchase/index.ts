@@ -22,3 +22,6 @@ export * from './gastosRecurrentes.js';
 export * from './diot.js';
 export * from './activoDesdeCompra.js';
 export * from './sugerencias.js';
+export * from './unidadDelConcepto.js';
+export * from './equivalenciaMedida.js';
+export * from './pesoRealPorProveedor.js';

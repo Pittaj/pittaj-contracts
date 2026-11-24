@@ -51,7 +51,14 @@ export interface ProductResponse {
     readonly canBeSold: boolean;
     /** Aparece en búsquedas de compra; false = no se compra (del desktop). */
     readonly canBePurchased: boolean;
-    /** Unidades de venta alternas (del desktop). */
+    /** U-T1: la unidad base (la de inventario) se vende / se compra. Ausente = sí. */
+    readonly baseUnitSellable?: boolean;
+    readonly baseUnitPurchasable?: boolean;
+    /** U-T4: regla «costo + %» (recargo sobre el costo real). Nulo = sin regla. */
+    readonly markupPercent?: number | null;
+    /** U-T5: este producto recupera la merma de esa categoría (el recorte que se vende sin existencia). */
+    readonly mermaRecoveryCategoryId?: string | null;
+    /** Unidades alternas (del desktop), cada una con si se vende y si se compra. */
     readonly units: ProductUnitPrimitives[];
     readonly tags: string[];
     readonly weight: number | null;

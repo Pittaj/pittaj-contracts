@@ -150,6 +150,8 @@ export interface PurchaseReceptionLineResponse {
     readonly quantity: number;
     /** Costo con el que entró (neto por unidad de compra, sin impuestos). */
     readonly unitCost: number;
+    /** U-T3 · Lo contado en la unidad de inventario (unidad variable). Nulo = `quantity × unitFactor`. */
+    readonly baseQuantity?: number | null;
 }
 
 /** DTO de respuesta para consultas/sync de compras. */

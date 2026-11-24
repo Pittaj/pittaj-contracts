@@ -82,6 +82,15 @@ export interface CfdiBatchResolvedConcepto {
     readonly matchedAliasSupplierName?: string | null;
     /** BARCODE · NAME · ALIAS · LEARNED · SUGGESTED · NONE: para decir de dónde salió. */
     readonly matchedBy?: import('../cfdiMatching.js').CfdiMatchSource;
+
+    // ── U-T2 · En qué unidad del producto entra (solo si hay producto) ──
+    /** La alterna propuesta; nulo = la base. Se manda de vuelta como `unitName` para confirmarla. */
+    readonly unitName?: string | null;
+    readonly unitFactor?: number;
+    /** RECORDADA · BASE · NOMBRE · SIN_DATO: los dos últimos conviene que alguien los mire. */
+    readonly unitMatchedBy?: import('../unidadDelConcepto.js').UnidadDelConceptoPor | null;
+    /** Las alternas del producto que se compran (la base siempre se puede): de aquí se elige. */
+    readonly unitOptions?: readonly { readonly name: string; readonly factor: number }[];
 }
 
 /** Un comprobante del lote, ya evaluado. */

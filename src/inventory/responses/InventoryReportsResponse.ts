@@ -116,6 +116,34 @@ export interface ShrinkageRow {
     readonly documents: number;
 }
 
+/** U-T6 · YIELD: rendimiento y merma por producto o categoría. */
+export interface YieldRow {
+    readonly groupKey: string;
+    readonly groupLabel: string;
+    /** Entradas por compra, en la base. */
+    readonly entradas: number;
+    /** Vendido neto (ventas − devoluciones). */
+    readonly vendido: number;
+    /** Merma reconocida (salidas MERMA). */
+    readonly merma: number;
+    /** vendido ÷ (vendido + merma); nulo sin merma reconocida en el periodo. */
+    readonly rendimiento: number | null;
+    /** La merma al costo con que salió. */
+    readonly costoMerma: number;
+    /** Lo que vendió el recorte de esa categoría (solo agrupando por categoría). */
+    readonly recuperado: number;
+    /** costoMerma − recuperado. */
+    readonly mermaNeta: number;
+    /** Rinde por debajo del mínimo pedido. */
+    readonly bajo: boolean;
+}
+
+export interface YieldTotals {
+    readonly costoMerma: number;
+    readonly recuperado: number;
+    readonly mermaNeta: number;
+}
+
 export interface RotationAbcRow {
     readonly productId: string;
     readonly productCode: string | null;
