@@ -21,4 +21,10 @@ export interface StartupGuideResponse {
     /** Más de un usuario: el dueño ya cuenta, el equipo empieza en el segundo. */
     readonly tieneEquipo: boolean;
     readonly tieneDatosFiscales: boolean;
+    /** D4 · Hay una e.firma (FIEL) cargada para descargar del SAT. */
+    readonly tieneEfirma?: boolean;
+    /** D4 · Ya corrió alguna descarga de CFDI del SAT. */
+    readonly tieneDescargasSat?: boolean;
+    /** D4 · Se importó algún estado de cuenta en Bancos. */
+    readonly tieneEstadosDeCuenta?: boolean;
 }

@@ -5,6 +5,7 @@
 
 import type { Visibilidad } from '../schemas/visibilidad.schema.js';
 import { APPS_SIEMPRE_VISIBLES } from '../catalogo.js';
+import type { PerfilDeUso } from '../perfiles.js';
 
 /**
  * GET /api/suite/visibilidad — lo que ve ESTE negocio, ya resuelto (predeterminado u override).
@@ -13,6 +14,12 @@ import { APPS_SIEMPRE_VISIBLES } from '../catalogo.js';
 export interface VisibilidadEfectivaResponse extends Visibilidad {
     /** De dónde salió: útil para mostrar «sigue el predeterminado» en el backoffice. */
     readonly origen: 'predeterminado' | 'personalizado';
+    /**
+     * D4 · El perfil de uso del negocio (null = no eligió, los anteriores a D4). Con `origen`
+     * `predeterminado`, la lista ya trae lo que el perfil apaga; con `personalizado` el perfil no
+     * cuenta: manda la lista del backoffice.
+     */
+    readonly perfil?: PerfilDeUso | null;
 }
 
 /** GET /api/admin/tenants/:id/suite/visibilidad — el override tal como está guardado. */
