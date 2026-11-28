@@ -1,5 +1,5 @@
 /**
- * @fileoverview Una entrada de la Bitácora del negocio (`GET /api/bitacora`).
+ * @fileoverview Una entrada de la Bitácora del negocio (`GET /api/audit-logs/negocio`).
  * @module Contracts/Audit/Responses
  */
 

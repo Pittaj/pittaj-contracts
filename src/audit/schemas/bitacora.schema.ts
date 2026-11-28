@@ -1,5 +1,5 @@
 /**
- * @fileoverview Filtros de la Bitácora del negocio (`GET /api/bitacora`).
+ * @fileoverview Filtros de la Bitácora del negocio (`GET /api/audit-logs/negocio`).
  * @module Contracts/Audit/Schemas
  */
 
