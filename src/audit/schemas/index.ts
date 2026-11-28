@@ -5,3 +5,4 @@
 
 export * from './audit.schema.js';
 export * from './syncDeviceAudit.schema.js';
+export * from './bitacora.schema.js';

@@ -11,3 +11,4 @@ export type {
     AccessLogsPageResponse,
 } from './AuditResponses.js';
 export * from './DeviceAuditLogResponse.js';
+export * from './BitacoraResponse.js';
