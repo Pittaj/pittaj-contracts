@@ -265,9 +265,9 @@ export const APPS_DE_LA_SUITE: readonly AppDeLaSuite[] = [
             { ruta: 'configuracion/series', nombre: 'Series y Folios' },
             { ruta: 'configuracion/metodos-pago', nombre: 'Métodos de Pago' },
             { ruta: 'configuracion/general', nombre: 'General' },
-            { ruta: 'auditoria/bitacora', nombre: 'Bitácora de Actividad' },
+            // Una sola Bitácora (la web y las instalaciones) desde el 2026-11-28.
+            { ruta: 'auditoria/bitacora', nombre: 'Bitácora' },
             { ruta: 'auditoria/accesos', nombre: 'Registro de Accesos' },
-            { ruta: 'auditoria/instalaciones', nombre: 'Bitácora de Instalaciones' },
             { ruta: 'mi-suscripcion', nombre: 'Mi Suscripción' },
             { ruta: 'operaciones', nombre: 'Operaciones del mes' },
             { ruta: 'planes', nombre: 'Planes' },
